@@ -5,10 +5,10 @@
  * @link http://localhost:8888/jog/hashcode/hashcode_test.html
  */
 
-var TestCase = require('/jog/testing').TestCase;
-var asserts = require('/jog/asserts').asserts;
+var TestCase = require('jog/testing').TestCase;
+var asserts = require('jog/asserts').asserts;
 
-var HashCode = require('/jog/hashcode').HashCode;
+var HashCode = require('jog/hashcode').HashCode;
 
 
 (new TestCase('HashCode Test'))

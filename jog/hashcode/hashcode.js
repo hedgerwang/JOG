@@ -3,7 +3,7 @@
  * @author Hedger Wang
  */
 
-var ID = require('/jog/id').ID;
+var ID = require('jog/id').ID;
 
 /**
  * @const {Object}

@@ -24,8 +24,8 @@ js_template = '''
  * @url http://localhost:8888/%s
  */
 
-var TestCase = require('/jog/testing').TestCase;
-var asserts = require('/jog/asserts').asserts;
+var TestCase = require('jog/testing').TestCase;
+var asserts = require('jog/asserts').asserts;
 
 (new TestCase('%s Test'))
   .test('test 1',

@@ -3,7 +3,7 @@
  * @author Hedger Wang
  */
 
-var Class = require('/jog/class').Class;
+var Class = require('jog/class').Class;
 var objectPrototypeToString = Object.prototype.toString;
 
 var DOM = Class.create({

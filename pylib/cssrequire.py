@@ -1,4 +1,6 @@
 import re
+import jsrequire
+import os
 from os import curdir, sep
 
 MODULE_WRAP = """
@@ -11,55 +13,29 @@ MODULE_WRAP = """
 
 """ + '/' + ('*' * 78) + '/'
 
-def get(path, required=None, include_requires=False) :
-  if required is None :
-    required = {}
+def get(path, _required=None) :
+  if _required is None :
+    _required = {}
 
-  abs_path = curdir + sep + path
+  path = _normalize_file_path(path)
+  deps = []
 
-  if required.get(abs_path) :
-    # Already required.
-    return ''
-  else :
-    # Mark as required.
-    required[abs_path] = True
-
-  content = _get_module(abs_path)
-  all_before_content = []
-
-  prefix = "@import url('"
-  suffix = "');"
-
-  while True :
-    start = content.find(prefix)
-    if start < 0 :
-      break
-    else :
-      content_before = content[0 :start]
-      content_after = content[start :]
-      end = content_after.find(suffix)
-      if suffix < 0 :
-        raise 'Inlaid @import url syntax'
+  js_path = path.replace('.css', '.js')
+  if os.path.isfile(js_path) :
+    more_js_deps = jsrequire.get_deps(js_path)
+    for more_js_file in more_js_deps :
+      more_css_path = more_js_file.replace('.js', '.css')
+      if os.path.isfile(more_css_path) :
+        deps.append(more_css_path)
       else :
-        end = end + len(suffix)
-        content_after = content_after[end :].strip()
-        import_url = content[start :end].strip()
-        import_url = import_url[len(prefix) :import_url.find(suffix)]
-        if import_url :
-          all_before_content.append(get(import_url, required))
-        content = content_before + content_after
+        print more_css_path
 
-  core_content = ''
-  if include_requires :
-    pass
-    # core_content = _get_module(curdir + sep + 'jog/ui/baseui/baseui.css')
-
-  out = (MODULE_WRAP % (core_content,
-                        ''.join(all_before_content),
-                        path,
-                        content))
-  out = out.strip() # .replace(RE_REQUIRE, '')
-  return out
+  deps.append(path)
+  css = []
+  for css_path in deps :
+    css.append('/* %s */' % css_path)
+    css.append(_get_file(css_path))
+  return '\n\n'.join(css)
 
 
 def _get_module(abs_path) :
@@ -67,6 +43,30 @@ def _get_module(abs_path) :
     module_name = abs_path[abs_path.rfind('/') :]
     abs_path = abs_path + module_name + '.css'
   return _get_file(abs_path)
+
+
+def _normalize_file_path(path) :
+  path = (curdir + sep + path).strip()
+  path = path.replace('//', '/')
+
+  if path.startswith('./') :
+    path = path.replace('./', '')
+
+  if path.endswith('/') :
+    path = path[0 :len(path) - 2]
+
+  if path.find('.css') < 0 :
+    idx = path.rfind('/')
+    if idx > -1 :
+      module_name = path[idx + 1 :]
+      temp_path = path + '/' + module_name + '.css'
+      if os.path.isfile(temp_path) :
+        path = temp_path
+      else :
+        raise 'Module %s not found' % temp_path
+    else :
+      raise 'Unable to normalize path %s' % path
+  return path
 
 
 def _get_file(abs_path) :

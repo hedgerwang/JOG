@@ -3,9 +3,9 @@
  * @author Hedger Wang
  */
 
-var TestCase = require('/jog/testing').TestCase;
-var asserts = require('/jog/asserts').asserts;
-var dom = require('/jog/dom').dom;
+var TestCase = require('jog/testing').TestCase;
+var asserts = require('jog/asserts').asserts;
+var dom = require('jog/dom').dom;
 
 
 (new TestCase('dom'))

@@ -3,9 +3,9 @@
  * @author Hedger Wang
  */
 
-var Class = require('/jog/class').Class;
-var Disposable = require('/jog/disposable').Disposable;
-var dom = require('/jog/dom').dom;
+var Class = require('jog/class').Class;
+var Disposable = require('jog/disposable').Disposable;
+var dom = require('jog/dom').dom;
 
 var BaseUI = Class.create({
   extend: Disposable,

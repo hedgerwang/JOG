@@ -9,6 +9,7 @@ import cssrequire
 import jsrequire
 import urlparse
 import urllib2
+import os
 
 
 httpHandler = urllib2.HTTPHandler(debuglevel=1)
@@ -44,21 +45,22 @@ class WebHandler(BaseHTTPRequestHandler) :
         # Will server local file
         if path.endswith('/') or type is None :
           # Default path.
-          path = path + 'index.html'
+          path = self._normalize_html_file_path(path)
           type = 'html'
 
         if type == 'html' :
           mine = 'text/html'
+          content = 'xxx'
           content = self._get_file(path)
         elif type == 'ico' :
           mine = 'image/vnd.microsoft.icon'
           content = ''
         elif type == 'js' :
           mine = 'text/javascript'
-          content = jsrequire.get(path, None, True)
+          content = jsrequire.get(path)
         elif  type == 'css' :
           mine = 'text/css'
-          content = cssrequire.get(path, None, True)
+          content = cssrequire.get(path)
         else :
           mine = 'text/plain'
           content = 'Not supported "%s, %s"' % (type, path)
@@ -104,6 +106,21 @@ class WebHandler(BaseHTTPRequestHandler) :
     #
     #    except :
     #      pass
+
+  def _normalize_html_file_path(self, path) :
+    path = (curdir + sep + path).strip()
+    path = path.replace('//', '/')
+
+    if path.startswith('./') :
+      path = path.replace('./', '')
+
+    if path.endswith('/') :
+      path = path[0 :len(path) - 2]
+
+    if not path.endswith('.html') :
+      path = path + '/index.html'
+
+    return path
 
   def _get_path_type(self, path) :
     pos = path.rfind('.')

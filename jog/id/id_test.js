@@ -5,10 +5,10 @@
  * @url http://localhost:8888/jog/id/id_test.html
  */
 
-var TestCase = require('/jog/testing').TestCase;
-var asserts = require('/jog/asserts').asserts;
+var TestCase = require('jog/testing').TestCase;
+var asserts = require('jog/asserts').asserts;
 
-var ID = require('/jog/id').ID;
+var ID = require('jog/id').ID;
 
 (new TestCase('ID Test'))
   .test('next',
