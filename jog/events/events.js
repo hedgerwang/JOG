@@ -110,6 +110,7 @@ Events.prototype.unlistenByKey = function(key) {
     // TODO(hedger): This won't work in IE since IE does not support interface
     // handleEvent & addEventListener.
     handler.target.removeEventListener(handler.type, handler, handler.capture);
+    delete this._eventsHandlers[key];
   }
 };
 
