@@ -30,6 +30,33 @@ var dom = require('jog/dom').dom;
     target.click();
     asserts.equal(called, 1);
   })
+  .test('listen with many arguments', function() {
+    var events = new Events();
+    var called = 0;
+    var target = new EventTarget();
+    var context = {};
+    var fn = function(event, x, y) {
+      called++;
+      asserts.equal(this, context);
+      asserts.equal(event.target, target);
+      asserts.equal('x', x);
+      asserts.equal('y', y);
+    };
+    var key = events.listen(target, 'foo', fn, context, true, 'x', 'y');
+    target.dispatchEvent('foo');
+    asserts.equal(called, 1);
+
+    // This should not remove the listener since the "more" arguments passed
+    // here is different from the "more" arguments passed earlier.
+    events.unlisten(target, 'foo', fn, context, true, 'x', 'y');
+    target.dispatchEvent('foo');
+    asserts.equal(called, 2);
+
+    // Then we will remove the listener here.
+    events.unlistenByKey(key);
+    target.dispatchEvent('foo');
+    asserts.equal(called, 2);
+  })
   .test('listen EventTarget', function() {
     var events = new Events();
     var called = 0;
