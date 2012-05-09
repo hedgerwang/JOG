@@ -4,86 +4,98 @@
  */
 
 
-/**
- * @const {Object}
- */
-var HashCode = {};
-
 var base = 0;
 var prefix = 0;
 
 /**
- * @param {*} obj
- * @return {string}
+ * @const {Object}
  */
-HashCode.getHashCode = function(obj) {
-  if (!obj) {
-    switch (obj) {
-      case '':
-        return ':empty';
+var HashCode = {
 
-      case undefined:
-        return ':undefined';
-
-      case 0:
-        return ':zero';
-
-      case null:
-        return ':null';
-
-      case false:
-        return ':false';
-
-      default:
-        throw new Error('unknown HashCode source');
+  /**
+   * Returns a hash code value for the object. If two variables are equal
+   * (e.g. varFoo === varBar), their hashCode must be the same. Note that
+   * variables of different types are not equal (e.g. "123" !== 123).
+   * Also, if the variable is NaN (isNaN(obj) === true), returns the same
+   * hashCode for NaN.
+   *
+   * @param {*} obj The object to get the hashCode from.
+   * @return {string} the hashCode found.
+   */
+  getHashCode : function(obj) {
+    if (obj === undefined) {
+      return 'hash_undefined';
     }
-  }
 
-  switch (typeof obj) {
-    case 'object':
-      var key = '__auto_hash_code__';
-      if (!obj.hasOwnProperty(key)) {
-        var value = HashCode.nextHashCode();
+    if (obj === null) {
+      return 'hash_null';
+    }
+
+    if (obj === '') {
+      return 'hash_empty_string';
+    }
+
+    switch (typeof obj) {
+      case 'function':
+        // fall-through.
+      case 'object':
+        // DOM Node, Array, Date, Object....etc.
+        var key = '__auto__hash__';
+        if (obj.hasOwnProperty(key)) {
+          return obj[key];
+        }
+
+        var hashCode = HashCode.nextHashCode();
         if (Object.defineProperty) {
+          // Make the property "__auto__hash__" not enumerable
+          // and writable. So it won't be cloned or show up in
+          // for(x in in) loop.
           Object.defineProperty(
             obj,
             key,
             {
-              value : value ,
+              value : hashCode,
               writable : false,
               enumerable : false,
               configurable : false
-            }
-          );
+            });
         } else {
-          obj[key] = value;
+          // Add an expando to the object.
+          // Note that the hashCode may not be universally unique if the
+          // a object is cloned from the object which already have a hashCode
+          // In mobile, browsers (Safari and Chrome)do support
+          // Object.defineProperty so we're less worried about the
+          // case that two objects have the same hashCode.
+          obj[key] = hashCode;
         }
-        return value;
-      } else {
-        return obj[key];
-      }
+        return hashCode;
 
-    case 'string':
-      return ':str-' + obj;
+      case 'boolean':
+        return obj ? 'hash_boolean_true' : 'hash_boolean_false';
 
-    case 'number':
-      return isNaN(obj) ? ':nan' : ':number-' + obj;
+      case 'string':
+        return 'hash_string_' + obj;
 
-    case 'boolean':
-      return ':true';
+      case 'number':
+        return isNaN(obj) ? 'hash_nan' : 'hash_number_' + obj;
+
+      default:
+        // should never be here.
+        throw new Error('Unknown Hash object:' + (typeof obj));
+    }
+  },
+
+  /**
+   * @return {string}
+   */
+  nextHashCode : function() {
+    base++;
+    if (base > Number.MAX_VALUE) {
+      base = 0;
+      prefix++;
+    }
+    return '_' + prefix + '_' + (base++).toString(16);
   }
-};
-
-/**
- * @return {string}
- */
-HashCode.nextHashCode = function() {
-  base++;
-  if (base > Number.MAX_VALUE) {
-    base = 0;
-    prefix++;
-  }
-  return '_' + prefix + '_' + (base++).toString(16);
 };
 
 exports.HashCode = HashCode;

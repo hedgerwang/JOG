@@ -3,54 +3,64 @@
  * @author Hedger Wang
  */
 
+var Class = require('/jog/class').Class;
+var Disposable = require('/jog/disposable').Disposable;
 var dom = require('/jog/dom').dom;
 
-/**
- * @constructor
- */
-function BaseUI() {
+var BaseUI = Class.create({
+  extend: Disposable,
+
   /**
-   * @type {Node}
-   * @private
+   * @constructor
    */
-  this._node = null;
-}
+  construct: function() {
+    /**
+     * @type {Node}
+     * @private
+     */
+    this._node = null;
+  },
 
-/**
- * Dispose itself.
- */
-BaseUI.prototype.dispose = function() {
-  // No op for now.
-};
+  members : {
+    /**
+     * @override
+     */
+    disposeInternal : function() {
+      this.unlistenAll();
+      delete this._eventsHandlers;
+    },
 
-/**
- * @param {Element} element
- * @param {Node=} opt_nextSibling
- */
-BaseUI.prototype.render = function(element, opt_nextSibling) {
-  var node = this.getNode();
-  if (opt_nextSibling) {
-    opt_nextSibling.parentNode.insertBefore(node, opt_nextSibling);
-  } else {
-    element.appendChild(this.getNode());
+    /**
+     * @param {Element} element
+     * @param {Node=} opt_nextSibling
+     */
+    render : function(element, opt_nextSibling) {
+      var node = this.getNode();
+      if (opt_nextSibling) {
+        opt_nextSibling.parentNode.insertBefore(node, opt_nextSibling);
+      } else {
+        element.appendChild(this.getNode());
+      }
+    },
+
+    /**
+     * @return {Node}
+     */
+    getNode : function() {
+      if (!this._node) {
+        this._node = this.createNode();
+      }
+      return this._node;
+    },
+
+    /**
+     * @return {Node}
+     */
+    createNode : function() {
+      return /** @type {Node} */ (dom.createElement('div'));
+    }
   }
-};
+});
 
-/**
- * @return {Node}
- */
-BaseUI.prototype.getNode = function() {
-  if (!this._node) {
-    this._node = this.createNode();
-  }
-  return this._node;
-};
-
-/**
- * @return {Node}
- */
-BaseUI.prototype.createNode = function() {
-  return /** @type {Node} */ (dom.createElement('div'));
-};
 
 exports.BaseUI = BaseUI;

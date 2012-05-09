@@ -1,4 +1,4 @@
-var DEBUG = true;
+var __DEV__ = true;
 var require;
 var define;
 var debugLog;
@@ -24,13 +24,13 @@ var debugError;
   };
 
   debugLog = function() {
-    if (DEBUG) {
+    if (__DEV__) {
       console.log.apply(console, arguments);
     }
   };
 
   debugError = function() {
-    if (DEBUG) {
+    if (__DEV__) {
       console.error.apply(console, arguments);
     }
   };
