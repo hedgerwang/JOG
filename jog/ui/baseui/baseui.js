@@ -1,10 +1,9 @@
 /**
- * @fileOverview Base Class for UI components.
+ * @fileOverview Base Class for UI component.
  * @author Hedger Wang
  */
 
-var HashCode = require('jog/hashcode').HashCode;
-var dom = require('jog/dom').dom;
+var dom = require('/jog/dom').dom;
 
 /**
  * @constructor

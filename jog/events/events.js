@@ -3,9 +3,9 @@
  * @author Hedger Wang
  */
 
-var Class = require('jog/class').Class;
-var Disposable = require('jog/disposable').Disposable;
-var HashCode = require('jog/hashcode').HashCode;
+var Class = require('/jog/class').Class;
+var Disposable = require('/jog/disposable').Disposable;
+var HashCode = require('/jog/hashcode').HashCode;
 var hashCodeGetHashCode = HashCode.getHashCode;
 
 /**

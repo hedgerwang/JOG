@@ -1,16 +1,13 @@
 import re
 from os import curdir, sep
 
-RE_REQUIRE = re.compile(
-  r'\s*@import\surl\(\'(?P<path>[a-zA-Z0-9\/\.]+)\'\)[;\s\.]?')
-
 MODULE_WRAP = """
 %s
 %s
 
 /* import %s */
 
-%s;
+%s
 
 """ + '/' + ('*' * 78) + '/'
 
@@ -29,13 +26,33 @@ def get(path, required=None, include_requires=False) :
 
   content = _get_module(abs_path)
   all_before_content = []
-  for match in RE_REQUIRE.finditer(content) :
-    all_before_content.append(get(match.group('path'), required))
-    content = content.replace(match.string, '/* %s */' % match.string)
+
+  prefix = "@import url('"
+  suffix = "');"
+
+  while True :
+    start = content.find(prefix)
+    if start < 0 :
+      break
+    else :
+      content_before = content[0 :start]
+      content_after = content[start :]
+      end = content_after.find(suffix)
+      if suffix < 0 :
+        raise 'Inlaid @import url syntax'
+      else :
+        end = end + len(suffix)
+        content_after = content_after[end :].strip()
+        import_url = content[start :end].strip()
+        import_url = import_url[len(prefix) :import_url.find(suffix)]
+        if import_url :
+          all_before_content.append(get(import_url, required))
+        content = content_before + content_after
 
   core_content = ''
   if include_requires :
-    core_content = _get_module(curdir + sep + 'jog/ui/baseui/baseui.css')
+    pass
+    # core_content = _get_module(curdir + sep + 'jog/ui/baseui/baseui.css')
 
   out = (MODULE_WRAP % (core_content,
                         ''.join(all_before_content),
@@ -43,6 +60,7 @@ def get(path, required=None, include_requires=False) :
                         content))
   out = out.strip() # .replace(RE_REQUIRE, '')
   return out
+
 
 def _get_module(abs_path) :
   if not abs_path.endswith('.css') :

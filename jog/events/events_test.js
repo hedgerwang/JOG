@@ -3,11 +3,11 @@
  * @author Hedger Wang
  */
 
-var Events = require('jog/events').Events;
-var EventTarget = require('jog/events/eventtarget').EventTarget;
-var TestCase = require('jog/testing').TestCase;
-var asserts = require('jog/asserts').asserts;
-var dom = require('jog/dom').dom;
+var Events = require('/jog/events').Events;
+var EventTarget = require('/jog/events/eventtarget').EventTarget;
+var TestCase = require('/jog/testing').TestCase;
+var asserts = require('/jog/asserts').asserts;
+var dom = require('/jog/dom').dom;
 
 (new TestCase('Events'))
   .test('listen Node',

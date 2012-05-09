@@ -3,9 +3,9 @@
  * @author Hedger Wang
  */
 
-var EventTarget = require('jog/events/eventtarget').EventTarget;
-var TestCase = require('jog/testing').TestCase;
-var asserts = require('jog/asserts').asserts;
+var EventTarget = require('/jog/events/eventtarget').EventTarget;
+var TestCase = require('/jog/testing').TestCase;
+var asserts = require('/jog/asserts').asserts;
 
 (new TestCase('EventTarget'))
   .test('addEventListener with normal function',

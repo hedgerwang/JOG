@@ -34,6 +34,12 @@ DOM.prototype.prependChild = function(node, parentNode) {
  */
 DOM.prototype.createElement = function(tagName, properties, more) {
   var node = this._document.createElement(tagName);
+  if (typeof properties === 'string') {
+    // TODO(hedger): Perf hit!. Should re-use the same object.
+    properties = {
+      className: properties
+    }
+  }
   for (var key in properties) {
     var value = properties[key];
     switch (key) {

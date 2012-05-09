@@ -3,7 +3,7 @@
  * @author Hedger Wang
  */
 
-var HashCode = require('jog/hashcode').HashCode;
+var HashCode = require('/jog/hashcode').HashCode;
 var hashCodeGetHashCode = HashCode.getHashCode;
 
 

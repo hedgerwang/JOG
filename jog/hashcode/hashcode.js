@@ -20,7 +20,7 @@ HashCode.getHashCode = function(obj) {
   if (!obj) {
     switch (obj) {
       case '':
-        return ':empty_str';
+        return ':empty';
 
       case undefined:
         return ':undefined';
@@ -41,18 +41,36 @@ HashCode.getHashCode = function(obj) {
 
   switch (typeof obj) {
     case 'object':
-      var key = '__JS_HASH_CODE__';
-      if (!obj[key]) {
-        obj[key] = HashCode.nextHashCode();
+      var key = '__auto_hash_code__';
+      if (!obj.hasOwnProperty(key)) {
+        var value = HashCode.nextHashCode();
+        if (Object.defineProperty) {
+          Object.defineProperty(
+            obj,
+            key,
+            {
+              value : value ,
+              writable : false,
+              enumerable : false,
+              configurable : false
+            }
+          );
+        } else {
+          obj[key] = value;
+        }
+        return value;
+      } else {
+        return obj[key];
       }
-      return obj[key];
 
     case 'string':
-      return obj;
+      return ':str-' + obj;
 
     case 'number':
+      return isNaN(obj) ? ':nan' : ':number-' + obj;
+
     case 'boolean':
-      return '' + obj;
+      return ':true';
   }
 };
 
@@ -69,4 +87,3 @@ HashCode.nextHashCode = function() {
 };
 
 exports.HashCode = HashCode;
-
