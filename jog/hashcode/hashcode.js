@@ -3,9 +3,7 @@
  * @author Hedger Wang
  */
 
-
-var base = 0;
-var prefix = 0;
+var ID = require('/jog/id').ID;
 
 /**
  * @const {Object}
@@ -37,7 +35,7 @@ var HashCode = {
 
     switch (typeof obj) {
       case 'function':
-        // fall-through.
+      // fall-through.
       case 'object':
         // DOM Node, Array, Date, Object....etc.
         var key = '__auto__hash__';
@@ -45,7 +43,7 @@ var HashCode = {
           return obj[key];
         }
 
-        var hashCode = HashCode.nextHashCode();
+        var hashCode = ID.next();
         if (Object.defineProperty) {
           // Make the property "__auto__hash__" not enumerable
           // and writable. So it won't be cloned or show up in
@@ -83,18 +81,6 @@ var HashCode = {
         // should never be here.
         throw new Error('Unknown Hash object:' + (typeof obj));
     }
-  },
-
-  /**
-   * @return {string}
-   */
-  nextHashCode : function() {
-    base++;
-    if (base > Number.MAX_VALUE) {
-      base = 0;
-      prefix++;
-    }
-    return '_' + prefix + '_' + (base++).toString(16);
   }
 };
 
