@@ -22,8 +22,6 @@ function TestCase(description) {
   this._logsEl.style.cssText = 'font:12px/140%  Monaco, monospace;';
 }
 
-TestCase.prototype._logBuffer = null;
-
 /**
  *
  * @param {string} description
