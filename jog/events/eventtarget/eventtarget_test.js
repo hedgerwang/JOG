@@ -1,6 +1,8 @@
 /**
  * @fileOverview Tests for Events.
  * @author Hedger Wang
+ *
+ * @url http://localhost:8888/jog/events/eventtarget/eventtarget_test.html
  */
 
 var EventTarget = require('/jog/events/eventtarget').EventTarget;

@@ -1,6 +1,8 @@
 /**
  * @fileOverview Tests for Events
  * @author Hedger Wang
+ *
+ * @url http://localhost:8888/jog/events/events_test.html
  */
 
 var Events = require('/jog/events').Events;

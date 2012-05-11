@@ -23,19 +23,20 @@ var EventTarget = Class.create({
      */
     _eventTargetHandlers: null,
 
-    /**
-     * @return {EventTarget}
-     */
-    getParentEventTarget : function() {
-      return null;
-    },
-
-    /**
-     * @parm {EventTarget} target
-     */
-    setParentEventTarget : function(target) {
-      this._parentEventTarget = target;
-    },
+// TODO(hedger): Bubbling?
+//    /**
+//     * @return {EventTarget}
+//     */
+//    getParentEventTarget : function() {
+//      return null;
+//    },
+//
+//    /**
+//     * @parm {EventTarget} target
+//     */
+//    setParentEventTarget : function(target) {
+//      this._parentEventTarget = target;
+//    },
 
 
     /**

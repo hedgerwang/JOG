@@ -12,7 +12,7 @@ var asserts = {
    * @param {*} val
    * @param {string=} opt_description
    */
-  assertTrue : function(val, opt_description) {
+  isTrue : function(val, opt_description) {
     opt_description = opt_description || '';
     if (val !== true) {
       throw new Error(opt_description + ': ' + 'Expect true but get ' + val);
@@ -23,7 +23,7 @@ var asserts = {
    * @param {*} val
    * @param {string=} opt_description
    */
-  assertFalse : function(val, opt_description) {
+  isFalse : function(val, opt_description) {
     opt_description = opt_description || '';
     if (val !== false) {
       throw new Error(opt_description + ': ' + 'Expect false but get ' + val);
