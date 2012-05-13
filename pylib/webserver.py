@@ -7,39 +7,65 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 #import pri
 import cssrequire
 import jsrequire
+import urlparse
+import urllib2
 
+
+httpHandler = urllib2.HTTPHandler(debuglevel=1)
+httpsHandler = urllib2.HTTPSHandler(debuglevel=1)
+opener = urllib2.build_opener(httpHandler, httpsHandler)
+urllib2.install_opener(opener)
 
 class WebHandler(BaseHTTPRequestHandler) :
   def do_GET(self) :
     try :
-      path = self.path
-      type = self._get_path_type(path)
+      parsed_url = urlparse.urlparse(self.path)
+      path = parsed_url.path
+      scheme = parsed_url.scheme.lower()
+      mine = None
+      type = self._get_path_type(parsed_url.path)
 
-      if path.endswith('/') :
-        path = path + 'index.html'
-        type = 'html'
-      elif type is None :
-        path = path + '/index.html'
-        type = 'html'
-
-      if type == 'html' :
-        mine = 'text/html'
-        content = self._get_file(path)
-      elif type == 'ico' :
-        mine = 'image/vnd.microsoft.icon'
-        content = ''
-      elif type == 'js' :
-        mine = 'text/javascript'
-        content = jsrequire.get(path, None, True)
-      elif  type == 'css':
-        mine = 'text/css'
-        content = cssrequire.get(path, None, True)
+      if ((scheme == 'http' or scheme == 'https') and
+          (parsed_url.netloc != 'gqlapp.appspot.com') and
+          (parsed_url.netloc != 'localhost')) :
+        raise Exception('Invalid request')
+        # Use Proxy.
+        # If the requested URL isn't from the domain that I can control,
+        # this web server should have been used as a proxy server (e.g.
+        # for iPhone browser testing).
+        # url = parsed_url.geturl()
+        # print '>> proxy %s' % url
+        # req = urllib2.Request(url)
+        # response = urllib2.urlopen(req)
+        # content = response.read()
+        # content = content.replace('https://', 'http://')
+        # content = content.replace('<html', '----<xmp><html')
       else :
-        mine = 'text/plain'
-        content = 'Not supported "%s, %s"' % (type, path)
+        # Will server local file
+        if path.endswith('/') or type is None :
+          # Default path.
+          path = path + 'index.html'
+          type = 'html'
+
+        if type == 'html' :
+          mine = 'text/html'
+          content = self._get_file(path)
+        elif type == 'ico' :
+          mine = 'image/vnd.microsoft.icon'
+          content = ''
+        elif type == 'js' :
+          mine = 'text/javascript'
+          content = jsrequire.get(path, None, True)
+        elif  type == 'css' :
+          mine = 'text/css'
+          content = cssrequire.get(path, None, True)
+        else :
+          mine = 'text/plain'
+          content = 'Not supported "%s, %s"' % (type, path)
 
       self.send_response(200)
-      self.send_header('Content-type', mine)
+      if mine is not None :
+        self.send_header('Content-type', mine)
       self.end_headers()
       self.wfile.write(content)
       return
@@ -48,21 +74,36 @@ class WebHandler(BaseHTTPRequestHandler) :
       self.send_error(404, 'File Not Found: "%s"' % inst)
 
   def do_POST(self) :
-    global rootnode
-    try :
-      ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-      if ctype == 'multipart/form-data' :
-        query = cgi.parse_multipart(self.rfile, pdict)
-      self.send_response(301)
-
-      self.end_headers()
-      upfilecontent = query.get('upfile')
-      print "filecontent", upfilecontent[0]
-      self.wfile.write("<HTML>POST OK.<BR><BR>")
-      self.wfile.write(upfilecontent[0])
-
-    except :
-      pass
+    raise Exception('NO POST FOR NOW')
+    #    global rootnode
+    #
+    #    parsed_url = urlparse.urlparse(self.path)
+    #    scheme = parsed_url.scheme.lower()
+    #
+    #    if ((scheme == 'http' or scheme == 'https') and
+    #        (parsed_url.netloc != 'gqlapp.appspot.com') and
+    #        (parsed_url.netloc != 'localhost')) :
+    #      url = parsed_url.geturl()
+    #      print '>> POST proxy %s' % url
+    #      req = urllib2.Request(url)
+    #      response = urllib2.urlopen(req)
+    #      content = response.read()
+    #      content = content.replace('https://', 'http://')
+    #
+    #    try :
+    #      ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+    #      if ctype == 'multipart/form-data' :
+    #        query = cgi.parse_multipart(self.rfile, pdict)
+    #      self.send_response(301)
+    #
+    #      self.end_headers()
+    #      upfilecontent = query.get('upfile')
+    #      print "filecontent", upfilecontent[0]
+    #      self.wfile.write("<HTML>POST OK.<BR><BR>")
+    #      self.wfile.write(upfilecontent[0])
+    #
+    #    except :
+    #      pass
 
   def _get_path_type(self, path) :
     pos = path.rfind('.')
