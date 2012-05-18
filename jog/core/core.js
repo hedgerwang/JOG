@@ -4,6 +4,7 @@ var define;
 var debugLog;
 var debugError;
 
+
 (function() {
   var defines = {};
 
@@ -19,7 +20,7 @@ var debugError;
   define = function (path, fn) {
     if (!defines[path]) {
       defines[path] = fn();
-      debugLog('define module:', path);
+      // debugLog('define module:', path);
     }
   };
 

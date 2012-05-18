@@ -8,6 +8,7 @@ var EventTarget = require('jog/events/eventtarget').EventTarget;
 var Events = require('jog/events').Events;
 var Functions = require('jog/functions').Functions;
 var dom = require('jog/dom').dom;
+var lang = require('jog/lang').lang;
 
 var BaseUI = Class.create({
   extend: EventTarget,
@@ -63,7 +64,7 @@ var BaseUI = Class.create({
         this._inDocument = true;
         this.onDocumentReady();
       } else {
-        this._onDOMNodeInserted = Class.bind(this, this._onDOMNodeInserted);
+        this._onDOMNodeInserted = lang.bind(this, this._onDOMNodeInserted);
         this.getEvents().listen(
           element, 'DOMNodeInserted', this._onDOMNodeInserted
         );

@@ -44,6 +44,13 @@ var DOM = Class.create({
     },
 
     /**
+     * @param {Node} node
+     */
+    remove: function(node) {
+      node && node.parentNode && node.parentNode.removeChild(node);
+    },
+
+    /**
      *
      * @param {Node} node
      * @param {Node} parentNode

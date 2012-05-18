@@ -76,6 +76,7 @@ var EventTarget = Class.create({
       staticReadOnlyEvent.type = type;
       staticReadOnlyEvent.target = this;
       staticReadOnlyEvent.data = opt_data ? opt_data : null;
+      staticReadOnlyEvent.capture = opt_capture;
 
       for (var key in this._eventTargetHandlers) {
         var handler = this._eventTargetHandlers[key];

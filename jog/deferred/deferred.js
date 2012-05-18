@@ -5,6 +5,7 @@
 
 var Class = require('jog/class').Class;
 var Disposable = require('jog/disposable').Disposable;
+var lang = require('jog/lang').lang;
 
 var Deferred = Class.create({
   /**
@@ -18,7 +19,8 @@ var Deferred = Class.create({
 
   members: {
     /**
-     * @type {Array.<Function>}
+     * @type {Array.<Function>}    PC@nc6000
+     *
      */
     _callbacks : null,
 
@@ -41,20 +43,38 @@ var Deferred = Class.create({
     },
 
     /**
+     * @param {Object} context
+     * @param {Function} onSuccess
+     * @param {Function=} opt_onError
+     * @return {Deferred}
+     */
+    bindCallback: function(context, onSuccess, opt_onError) {
+      if (context) {
+        onSuccess = lang.bind(context, onSuccess);
+
+        opt_onError = opt_onError ?
+          lang.bind(context, opt_onError) :
+          opt_onError;
+      }
+    },
+
+    /**
      * @param {*} result
      * @return {Deferred}
      */
     succeed: function(result) {
-      setTimeout(Class.bind(this, function() {
-        for (var i = 0, j = this._callbacks.length; i < j; i += 2) {
-          var callback = this._callbacks[i];
-          callback && callback(result);
-        }
-        this._callbacks.length = 0;
-        this._result = result;
-        result = null;
-        this.dispose();
-      }), 0);
+      if (this._callbacks) {
+        setTimeout(lang.bind(this, function() {
+          for (var i = 0, j = this._callbacks.length; i < j; i += 2) {
+            var callback = this._callbacks[i];
+            callback && callback(result);
+          }
+          this._callbacks.length = 0;
+          this._result = result;
+          result = null;
+          this.dispose();
+        }), 0);
+      }
       return this;
     },
 
@@ -63,15 +83,17 @@ var Deferred = Class.create({
      * @return {Deferred}
      */
     fail: function(opt_error) {
-      setTimeout(Class.bind(this, function() {
-        for (var i = 1, j = this._callbacks.length; i < j; i += 2) {
-          var callback = this._callbacks[i];
-          callback && callback(opt_error);
-        }
-        this._callbacks.length = 0;
-        opt_error = null;
-        this.dispose();
-      }), 0);
+      if (this._callbacks) {
+        setTimeout(lang.bind(this, function() {
+          for (var i = 1, j = this._callbacks.length; i < j; i += 2) {
+            var callback = this._callbacks[i];
+            callback && callback(opt_error);
+          }
+          this._callbacks.length = 0;
+          opt_error = null;
+          this.dispose();
+        }), 0);
+      }
       return this;
     },
 
@@ -86,7 +108,7 @@ var Deferred = Class.create({
 
       var df = new Deferred();
 
-      var onWaitForValue = Class.bind(df, function() {
+      var onWaitForValue = lang.bind(df, function() {
         if (object[key]) {
           clearTimeout(timeout);
           clearInterval(interval);
@@ -94,7 +116,7 @@ var Deferred = Class.create({
         }
       });
 
-      var onWaitForValueTimeout = Class.bind(df, function() {
+      var onWaitForValueTimeout = lang.bind(df, function() {
         clearTimeout(timeout);
         clearInterval(interval);
         df.fail('wait timeout');

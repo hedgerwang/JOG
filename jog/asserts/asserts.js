@@ -67,6 +67,26 @@ var asserts = {
   },
 
   /**
+   * @param {Function} fn
+   * @param {Object} opt_context
+   * @param {*...} var_args
+   */
+  throws: function(fn, opt_context, var_args) {
+    try {
+      if (arguments.length > 2) {
+        fn.apply(opt_context, Array.prototype.slice.call(arguments, 2));
+      } else if (arguments.length > 1) {
+        fn.call(opt_context);
+      } else {
+        fn();
+      }
+    } catch(ex) {
+      return;
+    }
+    throw new Error('expected error');
+  },
+
+  /**
    * @param {*} val1
    * @param {*} val2
    * @param {string=} opt_description
