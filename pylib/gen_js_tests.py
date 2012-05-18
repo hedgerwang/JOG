@@ -8,10 +8,12 @@ html_template = '''
 <html>
 <head>
 <title>Test %s</title>
+<!-- http://localhost:8888/%s -->
 <meta name="auto-generated" content="true" />
+%s
 </head>
 <body>
-<script src="/%s"></script>
+<script src="/%s?mode=debug"></script>
 </body>
 </html>
 '''
@@ -67,25 +69,39 @@ def gen_js_test(dir_path) :
 
       js_file_name = path[path.rfind('/') + 1 :]
 
-
       if (js_file_name == 'requires.js' or
           js_file_name == 'asserts.js' or
           js_file_name == 'testing.js') :
         print '>>> skip >>> %s' % path
         continue
 
+      css_file_path = path[0 :path.rfind('.js')] + '.css'
+      stylesheet_html = ''
+      if os.path.isfile(css_file_path) :
+        stylesheet_html = (
+          '<link type="text/css" rel="stylesheet" href="/%s?mode=debug"/>' %
+          css_file_path
+          )
+
       js_test_file_path = path[0 :path.rfind('.js')] + '_test.js'
       html_test_file_path = path[0 :path.rfind('.js')] + '_test.html'
+
       module_name = get_js_module_name(path)
 
-      if not os.path.exists(html_test_file_path):
-        html = html_template % (module_name, js_test_file_path)
+      if True or not os.path.exists(html_test_file_path) :
+        html = html_template % (
+          module_name,
+          html_test_file_path,
+          stylesheet_html,
+          js_test_file_path
+          )
+        # print html
         html_file = open(html_test_file_path, 'w')
         html_file.write(html.strip())
         html_file.close()
         print html_test_file_path
 
-      if not os.path.exists(js_test_file_path):
+      if not os.path.exists(js_test_file_path) :
         js = js_template % (module_name, html_test_file_path, module_name)
         js_file = open(js_test_file_path, 'w')
         js_file.write(js.strip())

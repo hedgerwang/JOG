@@ -10,23 +10,18 @@ var Class = {
    * @param {Function} parentClass
    */
   extend : function(childClass, parentClass) {
-    childClass.superClass = parentClass;
+    /**
+     * @private
+     */
+    childClass._superClass = parentClass;
 
     // IE-Compatible Implementation.
-    //  var midClass = function() {
-    //  };
-    //  midClass.prototype = parentClass.prototype;
-    //  childClass.prototype = new midClass();
-    //  childClass.prototype.superPrototype = parentClass.prototype;
-
-    // Modern Style Implementation.
-    var superPrototype = parentClass.prototype;
-    childClass.prototype = {
-      __proto__ : superPrototype,
-      superClass: parentClass,
-      superPrototype : superPrototype,
-      constructor: childClass
+    var midClass = function() {
     };
+    midClass.prototype = parentClass.prototype;
+    childClass.prototype = new midClass();
+    childClass.prototype.constructor = childClass;
+    childClass.prototype.superPrototype = parentClass.prototype;
   },
 
   /**
@@ -49,6 +44,11 @@ var Class = {
       var classPrototype = childClass.prototype;
       for (key in members) {
         // TODO(hedgder): Check whether private property is overriden.
+        if (__DEV__) {
+          if (key in classPrototype && key.charAt(0) == '_') {
+            throw new Error('private member should not be overriden');
+          }
+        }
         classPrototype[key] = members[key];
       }
     }

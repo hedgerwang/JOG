@@ -4,30 +4,40 @@
  */
 
 var Class = require('jog/class').Class;
-var Disposable = require('jog/disposable').Disposable;
+var EventTarget = require('jog/events/eventtarget').EventTarget;
+var Events = require('jog/events').Events;
 var dom = require('jog/dom').dom;
 
 var BaseUI = Class.create({
-  extend: Disposable,
+  extend: EventTarget,
 
   /**
    * @constructor
    */
   construct: function() {
-    /**
-     * @type {Node}
-     * @private
-     */
-    this._node = null;
+    EventTarget.call(this);
   },
 
   members : {
     /**
-     * @override
+     * @type {Node}
+     * @private
      */
+    _node: null,
+
+    /**
+     * @type {Events}
+     * @private
+     */
+    _events: null,
+
+
+    /** @override */
     disposeInternal : function() {
-      this.unlistenAll();
-      delete this._eventsHandlers;
+      if (this._events) {
+        this._events.dispose();
+      }
+      this.superPrototype.disposeInternal.call(this);
     },
 
     /**
@@ -58,6 +68,13 @@ var BaseUI = Class.create({
      */
     createNode : function() {
       return /** @type {Node} */ (dom.createElement('div'));
+    },
+
+    /**
+     * @return {Events}
+     */
+    getEvents: function() {
+      return this._events || (this._events = new Events(this));
     },
 
     /**

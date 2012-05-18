@@ -40,6 +40,7 @@ var DOM = Class.create({
      * @param {string} tagName
      * @param {Object} properties
      * @param {...*} more
+     * @return {Element}
      */
     createElement: function(tagName, properties, more) {
       var node = this._document.createElement(tagName);

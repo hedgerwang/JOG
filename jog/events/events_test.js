@@ -89,6 +89,20 @@ var dom = require('jog/dom').dom;
     target.dispatchEvent('foo');
     asserts.equal(called, 0);
   })
+  .test('listen with context',
+  function() {
+    var obj = {};
+    var events = new Events(obj);
+    var target = new EventTarget();
+    var calledContext;
+    var fn = function(e) {
+      calledContext = this;
+    };
+    events.listen(target, 'foo', fn);
+    target.dispatchEvent('foo');
+    console.warn(calledContext);
+    asserts.equal(calledContext, obj);
+  })
   .test('dispose',
   function() {
     var events = new Events();

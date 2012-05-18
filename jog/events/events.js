@@ -15,10 +15,14 @@ var Events = Class.create({
 
   /**
    * @constructor
+   * @param {Object=} opt_context
    * @extends {Disposable}
    */
-  construct: function() {
-    this.superClass.call(this);
+  construct: function(opt_context) {
+    Disposable.call(this);
+
+    this._context = opt_context || null;
+
     /**
      * @type {Object}
      * @private
@@ -43,6 +47,11 @@ var Events = Class.create({
 
   members: {
     /**
+     * @type {Object}
+     */
+    _context: null,
+
+    /**
      * @override
      */
     disposeInternal : function() {
@@ -61,7 +70,11 @@ var Events = Class.create({
      */
     listen : function(target, type, listener, opt_context, opt_capture,
                       opt_more) {
-      var context = opt_context || null;
+      var context = opt_context || this._context;
+
+      console.info(context);
+
+
       var capture = !!opt_capture;
       var args = typeof opt_more === 'undefined' ?
         null :
@@ -76,7 +89,7 @@ var Events = Class.create({
         target: target,
         type: type,
         listener: listener,
-        context: opt_context,
+        context: context,
         args: args,
         capture: capture,
         handleEvent: Events._handleEvent

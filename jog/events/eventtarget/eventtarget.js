@@ -4,40 +4,33 @@
  */
 
 var Class = require('jog/class').Class;
+var Disposable = require('jog/disposable').Disposable;
+var Event = require('jog/events/event').Event;
 var HashCode = require('jog/hashcode').HashCode;
 var hashCodeGetHashCode = HashCode.getHashCode;
 
+// For perf reason, we should re-use the event singleton.
+var staticReadOnlyEvent = new Event();
+
 
 var EventTarget = Class.create({
+
+  extend: Disposable,
+
+  /**
+   * @constructor
+   */
+  construct: function() {
+    Disposable.call(this);
+  },
+
+
   members: {
-
-    /**
-     * @type {EventTarget}
-     * @private
-     */
-    _parentEventTarget : null,
-
     /**
      * @type {Object}
      * @private
      */
     _eventTargetHandlers: null,
-
-// TODO(hedger): Bubbling?
-//    /**
-//     * @return {EventTarget}
-//     */
-//    getParentEventTarget : function() {
-//      return null;
-//    },
-//
-//    /**
-//     * @parm {EventTarget} target
-//     */
-//    setParentEventTarget : function(target) {
-//      this._parentEventTarget = target;
-//    },
-
 
     /**
      * @param {string} type
@@ -80,24 +73,22 @@ var EventTarget = Class.create({
      * @param {boolean=} opt_capture
      */
     dispatchEvent : function(type, opt_data, opt_capture) {
-      var event = {
-        type: type,
-        target: this,
-        data: opt_data ? opt_data : null,
-        capture: !!opt_capture
-      };
+      staticReadOnlyEvent.type = type;
+      staticReadOnlyEvent.target = this;
+      staticReadOnlyEvent.data = opt_data ? opt_data : null;
+
       for (var key in this._eventTargetHandlers) {
         var handler = this._eventTargetHandlers[key];
         if (handler.type === type) {
           var listener = handler.listener;
           if (typeof listener === 'function') {
-            listener.call(this, event);
+            listener.call(this, staticReadOnlyEvent);
           } else {
-            listener.handleEvent.call(listener, event);
+            listener.handleEvent.call(listener, staticReadOnlyEvent);
           }
         }
       }
-      // TODO(hedger): Implement event bubbling.
+      staticReadOnlyEvent.clear();
     },
 
     /**

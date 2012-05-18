@@ -21,7 +21,7 @@ def get(path, mode=None) :
   contents = []
   path = _normalize_file_path(path)
 
-  print mode
+  module_name = None
 
   if mode == 'debug' :
     deps = get_deps(path)
@@ -48,6 +48,10 @@ def get(path, mode=None) :
       module_text = MODULE_WRAP % (module_name, _get_file(js_path))
       contents.append('/* %s */' % js_path)
       contents.append(module_text)
+
+  if module_name is not None and module_name.endswith('_test'):
+    # This will run the test.
+    contents.append('require(\'%s\');' % module_name)
 
   return '\n\n'.join(contents)
 
@@ -85,6 +89,8 @@ def _normalize_module_name(path) :
   path = (curdir + sep + path).strip()
   path = path.replace('//', '/')
 
+  is_test = path.endswith('_test.js')
+
   if path.startswith('./') :
     path = path.replace('./', '')
 
@@ -92,7 +98,10 @@ def _normalize_module_name(path) :
     idx = path.rfind('/')
     path = path[0 :idx]
 
-  return path
+  if is_test :
+    return path + '_test'
+  else :
+    return path
 
 
 def _normalize_file_path(path) :
@@ -113,9 +122,9 @@ def _normalize_file_path(path) :
       if os.path.isfile(temp_path) :
         path = temp_path
       else :
-        raise 'Module %s not found' % temp_path
+        raise Exception('Module %s not found' % temp_path)
     else :
-      raise 'Unable to normalize path %s' % path
+      raise Exception('Unable to normalize path %s' % path)
   return path
 
 

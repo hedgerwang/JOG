@@ -8,6 +8,12 @@ var Functions = require('jog/functions').Functions;
 
 var Disposable = Class.create({
   members: {
+    /**
+     * @type {boolean}
+     * @private
+     */
+    _disposed: false,
+
     dispose: function() {
       if (!this._disposed) {
         this.disposeInternal();
@@ -19,10 +25,11 @@ var Disposable = Class.create({
     disposeInternal: Functions.EMPTY,
 
     /**
-     * @type {boolean}
-     * @private
+     * @return {boolean}
      */
-    _disposed: false,
+    isDisposed: function() {
+      return this._disposed;
+    },
 
     _disposeAll: function() {
       for (var key in this) {
