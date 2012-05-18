@@ -6,6 +6,7 @@
 var Class = require('jog/class').Class;
 var EventTarget = require('jog/events/eventtarget').EventTarget;
 var Events = require('jog/events').Events;
+var Functions = require('jog/functions').Functions;
 var dom = require('jog/dom').dom;
 
 var BaseUI = Class.create({
@@ -14,23 +15,20 @@ var BaseUI = Class.create({
   /**
    * @constructor
    */
-  construct: function() {
+  main:  function() {
     EventTarget.call(this);
   },
 
   members : {
     /**
      * @type {Node}
-     * @private
      */
     _node: null,
 
     /**
      * @type {Events}
-     * @private
      */
     _events: null,
-
 
     /** @override */
     disposeInternal : function() {
@@ -46,10 +44,29 @@ var BaseUI = Class.create({
      */
     render : function(element, opt_nextSibling) {
       var node = this.getNode();
+
+      if (node.parentNode) {
+        throw new Error('UI was rendered');
+      }
+
       if (opt_nextSibling) {
         opt_nextSibling.parentNode.insertBefore(node, opt_nextSibling);
       } else {
-        element.appendChild(this.getNode());
+        element.appendChild(node);
+      }
+
+      if (this._inDocument) {
+        this.onExitDocument();
+      }
+
+      if (dom.isInDocument(node)) {
+        this._inDocument = true;
+        this.onDocumentReady();
+      } else {
+        this._onDOMNodeInserted = Class.bind(this, this._onDOMNodeInserted);
+        this.getEvents().listen(
+          element, 'DOMNodeInserted', this._onDOMNodeInserted
+        );
       }
     },
 
@@ -82,6 +99,24 @@ var BaseUI = Class.create({
      */
     appendChild: function(ui) {
 
+    },
+
+    /**
+     * Safe to bind events and lookup dom elements.
+     */
+    onDocumentReady: Functions.EMPTY,
+
+    /**
+     * Handler for node that enters or exits the document.
+     * @param {Event}
+      */
+    _onDOMNodeInserted: function(event) {
+      if (!this.isDisposed() && dom.isInDocument(this._node)) {
+        this.getEvents().listen(
+          event.currentTarget, 'DOMNodeInserted', this._onDOMNodeInserted
+        );
+        this.onDocumentReady();
+      }
     }
   }
 });

@@ -18,7 +18,7 @@ var Events = Class.create({
    * @param {Object=} opt_context
    * @extends {Disposable}
    */
-  construct: function(opt_context) {
+  main:  function(opt_context) {
     Disposable.call(this);
 
     this._context = opt_context || null;
@@ -71,9 +71,6 @@ var Events = Class.create({
     listen : function(target, type, listener, opt_context, opt_capture,
                       opt_more) {
       var context = opt_context || this._context;
-
-      console.info(context);
-
 
       var capture = !!opt_capture;
       var args = typeof opt_more === 'undefined' ?

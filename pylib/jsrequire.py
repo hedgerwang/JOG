@@ -15,7 +15,7 @@ return exports;
 
 """ + '/' + ('*' * 78) + '/'
 
-CORE_JS_PATH = 'jog/requires/requires.js'
+CORE_JS_PATH = 'jog/core/core.js'
 
 def get(path, mode=None) :
   contents = []
@@ -122,7 +122,7 @@ def _normalize_file_path(path) :
       if os.path.isfile(temp_path) :
         path = temp_path
       else :
-        raise Exception('Module %s not found' % temp_path)
+        raise Exception('%s :: Module %s not found' % (path, temp_path))
     else :
       raise Exception('Unable to normalize path %s' % path)
   return path

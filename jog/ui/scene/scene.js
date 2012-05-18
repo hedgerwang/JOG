@@ -1,5 +1,5 @@
 /**
- * @fileOverview Chrome that sticks to the page.
+ * @fileOverview Scene
  * @author Hedger Wang
  */
 
@@ -8,7 +8,7 @@ var Class = require('jog/class').Class;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
-var Chrome = Class.create({
+var Scene = Class.create({
   extend: BaseUI,
 
   main:  function() {
@@ -19,7 +19,7 @@ var Chrome = Class.create({
     /** @override */
     createNode: function() {
       var node = dom.createElement('div', {
-        className: cssx('jog-ui-chrome')
+        className: cssx('jog-ui-scene')
       });
       return node;
     }
@@ -27,4 +27,4 @@ var Chrome = Class.create({
 });
 
 
-exports.Chrome = Chrome;
+exports.Scene = Scene;

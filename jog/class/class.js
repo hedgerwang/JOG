@@ -6,6 +6,21 @@
 
 var Class = {
   /**
+   * @param {Object} context
+   * @param {Function} fn
+   */
+  bind: function(context, fn) {
+    if (fn._bound_by_class) {
+      return fn;
+    }
+    var fn2 = function() {
+      return fn.apply(context, arguments)
+    };
+    fn2._bound_by_class = true;
+    return fn2;
+  },
+
+  /**
    * @param {Function} childClass
    * @param {Function} parentClass
    */
@@ -29,7 +44,7 @@ var Class = {
    * @param {Object} object
    */
   create : function(object) {
-    var childClass = object.construct || function() {
+    var childClass = object.main || function() {
     };
 
     var parentClass = object.extend;
@@ -43,13 +58,20 @@ var Class = {
     if (members) {
       var classPrototype = childClass.prototype;
       for (key in members) {
-        // TODO(hedgder): Check whether private property is overriden.
         if (__DEV__) {
           if (key in classPrototype && key.charAt(0) == '_') {
             throw new Error('private member should not be overriden');
           }
         }
-        classPrototype[key] = members[key];
+
+        var thing = members[key];
+
+        if (__DEV__) {
+          if (thing && typeof thing === 'object') {
+            throw new Error('member "' + key + '" can\'t be object. ' + thing);
+          }
+        }
+        classPrototype[key] = thing;
       }
     }
 
@@ -59,7 +81,6 @@ var Class = {
         childClass[key] = statics[key];
       }
     }
-
     return childClass;
   }
 };

@@ -11,8 +11,9 @@ var DOM = Class.create({
    * @constructor
    * @param {Document} doc
    */
-  construct: function(doc) {
+  main:  function(doc) {
     this._document = doc;
+    this._rootNode = doc.documentElement;
   },
 
   members: {
@@ -21,6 +22,26 @@ var DOM = Class.create({
      * @private
      */
     _document : null,
+
+    /**
+     * @type {Node}
+     */
+    _rootNode: null,
+
+    /**
+     * @return {Document}
+     */
+    getDocument: function() {
+      return this._document;
+    },
+
+    /**
+     * @param {Node} node
+     * @return {boolean}
+     */
+    isInDocument: function(node) {
+      return node ? this._rootNode.contains(node) : false;
+    },
 
     /**
      *
@@ -33,6 +54,14 @@ var DOM = Class.create({
       } else {
         parentNode.appendChild(node);
       }
+    },
+
+    /**
+     * @param {Element} element
+     * @param {string} className
+     */
+    addClassName: function(element, className) {
+      element.className += ' ' + className;
     },
 
     /**
@@ -61,7 +90,7 @@ var DOM = Class.create({
             node.style.cssText = value;
             break;
           default:
-            node.setAttribute(value);
+            node.setAttribute(key, value);
         }
       }
       if (arguments.length > 2) {

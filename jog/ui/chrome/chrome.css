@@ -1,7 +1,13 @@
-.jog-ui-chrome {
+body {
   background: #133783;
+}
+
+.jog-ui-chrome {
+  background: #fff;
   bottom: 0;
   left: 0;
+  max-height: 580px;
+  max-width: 380px;
   position: absolute;
   right: 0;
   top: 0;

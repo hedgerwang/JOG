@@ -20,7 +20,7 @@ var EventTarget = Class.create({
   /**
    * @constructor
    */
-  construct: function() {
+  main:  function() {
     Disposable.call(this);
   },
 

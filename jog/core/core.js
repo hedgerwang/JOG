@@ -10,7 +10,7 @@ var debugError;
   require = function(path) {
     var fn = defines[path];
     if (typeof fn != 'object') {
-      debugLog(path, fn);
+      // debugLog(path, fn);
       throw new Error('require error ' + path);
     }
     return fn;

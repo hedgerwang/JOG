@@ -5,6 +5,9 @@
 
 var Functions = {
   EMPTY: function() {
+    if (__DEV__) {
+      debugLog('empty function called', arguments);
+    }
   }
 };
 
