@@ -21,6 +21,7 @@ class WebHandler(BaseHTTPRequestHandler) :
   def do_GET(self) :
     try :
       parsed_url = urlparse.urlparse(self.path)
+      query_params = urlparse.parse_qs(parsed_url.query)
       path = parsed_url.path
       scheme = parsed_url.scheme.lower()
       mine = None
@@ -50,17 +51,16 @@ class WebHandler(BaseHTTPRequestHandler) :
 
         if type == 'html' :
           mine = 'text/html'
-          content = 'xxx'
           content = self._get_file(path)
         elif type == 'ico' :
           mine = 'image/vnd.microsoft.icon'
           content = ''
         elif type == 'js' :
           mine = 'text/javascript'
-          content = jsrequire.get(path)
+          content = jsrequire.get(path, query_params.get('mode', [None])[0])
         elif  type == 'css' :
           mine = 'text/css'
-          content = cssrequire.get(path)
+          content = cssrequire.get(path, query_params.get('mode', [None])[0])
         else :
           mine = 'text/plain'
           content = 'Not supported "%s, %s"' % (type, path)

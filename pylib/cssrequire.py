@@ -13,29 +13,43 @@ MODULE_WRAP = """
 
 """ + '/' + ('*' * 78) + '/'
 
-def get(path, _required=None) :
-  if _required is None :
-    _required = {}
+def get(path, mode=None) :
+  path = _normalize_file_path(path)
+  deps = get_deps(path)
+  css = []
 
+  if mode == 'all' :
+    for css_path in deps :
+      css.append('/* %s */' % css_path)
+      css.append(_get_file(css_path))
+  elif mode == 'debug' :
+    template = '@import url(/%s);'
+    for css_path in deps :
+      css.append(template % css_path)
+  else :
+    css.append(_get_file(path))
+
+  return '\n\n'.join(css)
+
+
+def get_deps(path) :
   path = _normalize_file_path(path)
   deps = []
-
   js_path = path.replace('.css', '.js')
+  required = {}
+
   if os.path.isfile(js_path) :
     more_js_deps = jsrequire.get_deps(js_path)
     for more_js_file in more_js_deps :
       more_css_path = more_js_file.replace('.js', '.css')
       if os.path.isfile(more_css_path) :
-        deps.append(more_css_path)
-      else :
-        print more_css_path
+        if not required.get(more_css_path) :
+          required[more_css_path] = True
+          deps.append(more_css_path)
 
-  deps.append(path)
-  css = []
-  for css_path in deps :
-    css.append('/* %s */' % css_path)
-    css.append(_get_file(css_path))
-  return '\n\n'.join(css)
+  if not required.get(path) :
+    deps.append(path)
+  return deps
 
 
 def _get_module(abs_path) :

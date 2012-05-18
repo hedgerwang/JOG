@@ -17,10 +17,30 @@ return exports;
 
 CORE_JS_PATH = 'jog/requires/requires.js'
 
-def get(path) :
-  deps = get_deps(path)
+def get(path, mode=None) :
   contents = []
-  for js_path in deps :
+  path = _normalize_file_path(path)
+
+  print mode
+
+  if mode == 'debug' :
+    deps = get_deps(path)
+    template = """document.write('<script src="/%s"><\/script>');"""
+    for js_path in deps :
+      contents.append(template % js_path)
+
+  elif mode == 'all' :
+    deps = get_deps(path)
+    for js_path in deps :
+      if js_path == CORE_JS_PATH :
+        contents.append(_get_file(js_path))
+      else :
+        module_name = _normalize_module_name(js_path)
+        module_text = MODULE_WRAP % (module_name, _get_file(js_path))
+        contents.append('/* %s */' % js_path)
+        contents.append(module_text)
+  else :
+    js_path = path
     if js_path == CORE_JS_PATH :
       contents.append(_get_file(js_path))
     else :
@@ -28,10 +48,11 @@ def get(path) :
       module_text = MODULE_WRAP % (module_name, _get_file(js_path))
       contents.append('/* %s */' % js_path)
       contents.append(module_text)
+
   return '\n\n'.join(contents)
 
 
-def get_deps(path, _required=None, _include_core=True) :
+def get_deps(path, _required=None) :
   if _required is None :
     _required = {}
 
@@ -48,11 +69,12 @@ def get_deps(path, _required=None, _include_core=True) :
   deps = []
 
   for match in RE_REQUIRE.finditer(content) :
-    more_deps = get_deps(match.group('path'), _required, False)
+    more_deps = get_deps(match.group('path'), _required)
     for more_dep in more_deps :
       deps.append(more_dep)
 
-  if _include_core :
+  if not _required.get(CORE_JS_PATH) :
+    _required[CORE_JS_PATH] = True
     deps.insert(0, CORE_JS_PATH)
 
   deps.append(path)

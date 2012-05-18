@@ -58,9 +58,15 @@ var BaseUI = Class.create({
      */
     createNode : function() {
       return /** @type {Node} */ (dom.createElement('div'));
+    },
+
+    /**
+     * @param {BaseUI} ui
+     */
+    appendChild: function(ui) {
+
     }
   }
 });
-
 
 exports.BaseUI = BaseUI;
