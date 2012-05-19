@@ -61,6 +61,9 @@ class WebHandler(BaseHTTPRequestHandler) :
         elif  type == 'css' :
           mine = 'text/css'
           content = cssrequire.get(path, query_params.get('mode', [None])[0])
+        elif type == 'png' :
+          mine = 'image/png'
+          content = self._get_file(path)
         else :
           mine = 'text/plain'
           content = 'Not supported "%s, %s"' % (type, path)

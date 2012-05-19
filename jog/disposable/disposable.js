@@ -6,35 +6,34 @@
 var Class = require('jog/class').Class;
 var Functions = require('jog/functions').Functions;
 
-var Disposable = Class.create({
-  members: {
-    /**
-     * @type {boolean}
-     * @private
-     */
-    _disposed: false,
+var Disposable = Class.create(null, {
 
-    dispose: function() {
-      if (!this._disposed) {
-        this.disposeInternal();
-        this._disposeAll();
-        this._disposed = true;
-      }
-    },
+  /**
+   * @type {boolean}
+   * @private
+   */
+  _disposed: false,
 
-    disposeInternal: Functions.EMPTY,
+  dispose: function() {
+    if (!this._disposed) {
+      this.disposeInternal();
+      this._disposeAll();
+      this._disposed = true;
+    }
+  },
 
-    /**
-     * @return {boolean}
-     */
-    isDisposed: function() {
-      return this._disposed;
-    },
+  disposeInternal: Functions.EMPTY,
 
-    _disposeAll: function() {
-      for (var key in this) {
-        delete this[key];
-      }
+  /**
+   * @return {boolean}
+   */
+  isDisposed: function() {
+    return this._disposed;
+  },
+
+  _disposeAll: function() {
+    for (var key in this) {
+      delete this[key];
     }
   }
 });

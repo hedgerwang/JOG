@@ -10,114 +10,105 @@ var Functions = require('jog/functions').Functions;
 var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;
 
-var BaseUI = Class.create({
-  extend: EventTarget,
+var BaseUI = Class.create(EventTarget, {
 
   /**
-   * @constructor
+   * @type {Node}
    */
-  main:  function() {
-    EventTarget.call(this);
+  _node: null,
+
+  /**
+   * @type {Events}
+   */
+  _events: null,
+
+  /** @override */
+  disposeInternal : function() {
+    if (this._events) {
+      this._events.dispose();
+    }
+    dom.remove(this._node);
+    EventTarget.prototype.disposeInternal.call(this);
   },
 
-  members : {
-    /**
-     * @type {Node}
-     */
-    _node: null,
+  /**
+   * @param {Element} element
+   * @param {Node=} opt_nextSibling
+   */
+  render : function(element, opt_nextSibling) {
+    var node = this.getNode();
 
-    /**
-     * @type {Events}
-     */
-    _events: null,
+    if (node.parentNode) {
+      throw new Error('UI was rendered');
+    }
 
-    /** @override */
-    disposeInternal : function() {
-      if (this._events) {
-        this._events.dispose();
-      }
-      this.superPrototype.disposeInternal.call(this);
-    },
+    if (opt_nextSibling) {
+      opt_nextSibling.parentNode.insertBefore(node, opt_nextSibling);
+    } else {
+      element.appendChild(node);
+    }
 
-    /**
-     * @param {Element} element
-     * @param {Node=} opt_nextSibling
-     */
-    render : function(element, opt_nextSibling) {
-      var node = this.getNode();
+    if (this._inDocument) {
+      this.onExitDocument();
+    }
 
-      if (node.parentNode) {
-        throw new Error('UI was rendered');
-      }
+    if (dom.isInDocument(node)) {
+      this._inDocument = true;
+      this.onDocumentReady();
+    } else {
+      this._onDOMNodeInserted = lang.bind(this, this._onDOMNodeInserted);
+      this.getEvents().listen(
+        element, 'DOMNodeInserted', this._onDOMNodeInserted
+      );
+    }
+  },
 
-      if (opt_nextSibling) {
-        opt_nextSibling.parentNode.insertBefore(node, opt_nextSibling);
-      } else {
-        element.appendChild(node);
-      }
+  /**
+   * @return {Node}
+   */
+  getNode : function() {
+    if (!this._node) {
+      this._node = this.createNode();
+    }
+    return this._node;
+  },
 
-      if (this._inDocument) {
-        this.onExitDocument();
-      }
+  /**
+   * @return {Node}
+   */
+  createNode : function() {
+    return /** @type {Node} */ (dom.createElement('div'));
+  },
 
-      if (dom.isInDocument(node)) {
-        this._inDocument = true;
-        this.onDocumentReady();
-      } else {
-        this._onDOMNodeInserted = lang.bind(this, this._onDOMNodeInserted);
-        this.getEvents().listen(
-          element, 'DOMNodeInserted', this._onDOMNodeInserted
-        );
-      }
-    },
+  /**
+   * @return {Events}
+   */
+  getEvents: function() {
+    return this._events || (this._events = new Events(this));
+  },
 
-    /**
-     * @return {Node}
-     */
-    getNode : function() {
-      if (!this._node) {
-        this._node = this.createNode();
-      }
-      return this._node;
-    },
+  /**
+   * @param {BaseUI} ui
+   */
+  appendChild: function(ui) {
 
-    /**
-     * @return {Node}
-     */
-    createNode : function() {
-      return /** @type {Node} */ (dom.createElement('div'));
-    },
+  },
 
-    /**
-     * @return {Events}
-     */
-    getEvents: function() {
-      return this._events || (this._events = new Events(this));
-    },
+  /**
+   * Safe to bind events and lookup dom elements.
+   */
+  onDocumentReady: Functions.EMPTY,
 
-    /**
-     * @param {BaseUI} ui
-     */
-    appendChild: function(ui) {
-
-    },
-
-    /**
-     * Safe to bind events and lookup dom elements.
-     */
-    onDocumentReady: Functions.EMPTY,
-
-    /**
-     * Handler for node that enters or exits the document.
-     * @param {Event}
-      */
-    _onDOMNodeInserted: function(event) {
-      if (!this.isDisposed() && dom.isInDocument(this._node)) {
-        this.getEvents().listen(
-          event.currentTarget, 'DOMNodeInserted', this._onDOMNodeInserted
-        );
-        this.onDocumentReady();
-      }
+  /**
+   * Handler for node that enters or exits the document.
+   * @param {Event}
+    */
+  _onDOMNodeInserted: function(event) {
+    if (!this.isDisposed() && dom.isInDocument(this._node)) {
+      this.getEvents().listen(
+        event.currentTarget, 'DOMNodeInserted', this._onDOMNodeInserted
+      );
+      this.onDocumentReady();
     }
   }
 });

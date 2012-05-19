@@ -3,85 +3,87 @@
  * @author Hedger Wang
  */
 
+/**
+ * @type {number}
+ */
+var classID = 0;
 
 var Class = {
   /**
-   * @param {Object} context
-   * @param {Function} fn
+   * @param {Function=} superClass
+   * @param {Object=} config
    */
-  bind: function(context, fn) {
-    if (fn._bound_by_class) {
-      return fn;
-    }
-    var fn2 = function() {
-      return fn.apply(context, arguments)
+  create: function(superClass, config) {
+    var newClass = function() {
+      if (superClass) {
+        superClass.apply(this, arguments);
+      }
+
+      var main = this['_main_' + newClass._classID];
+      if (main) {
+        main.apply(this, arguments);
+      }
     };
-    fn2._bound_by_class = true;
-    return fn2;
+
+    if (superClass) {
+      Class._extend(newClass, superClass);
+    } else {
+      newClass.prototype.constructor = newClass;
+    }
+
+    newClass._classID = classID++;
+
+    if (config) {
+      var newClassPrototype = newClass.prototype;
+      for (var key in config) {
+        var thing = config[key];
+        if (key === 'main') {
+          delete config[key];
+          // TODO(hedger): Better way to make ClassID more readable.
+          key = '_main_' + newClass._classID;
+        }
+
+        if (__DEV__) {
+          if (superClass &&
+            key.charAt(0) === '_' &&
+            key in superClass.prototype) {
+            throw new Error('override private member');
+          }
+
+          if (thing && typeof thing === 'object') {
+            throw new Error('prototype member should not be an object');
+          }
+        }
+
+        newClassPrototype[key] = thing;
+      }
+    }
+
+    return newClass;
   },
 
   /**
    * @param {Function} childClass
-   * @param {Function} parentClass
+   * @param {Function} superClass
    */
-  extend : function(childClass, parentClass) {
-    /**
-     * @private
-     */
-    childClass._superClass = parentClass;
+  _extend : function(childClass, superClass) {
+    if (__DEV__) {
+      if (childClass._debugSuperClass) {
+        throw new Error('no multiple inheritence');
+      }
+      /**
+       * @type {Function}
+       */
+      childClass._debugSuperClass = superClass;
+    }
 
     // IE-Compatible Implementation.
     var midClass = function() {
     };
-    midClass.prototype = parentClass.prototype;
+
+    midClass.prototype = superClass.prototype;
     childClass.prototype = new midClass();
     childClass.prototype.constructor = childClass;
-    childClass.prototype.superPrototype = parentClass.prototype;
-  },
-
-  /**
-   * @return {Function}
-   * @param {Object} object
-   */
-  create : function(object) {
-    var childClass = object.main || function() {
-    };
-
-    var parentClass = object.extend;
-
-    if (parentClass) {
-      Class.extend(childClass, parentClass);
-    }
-
-    var key;
-    var members = object.members;
-    if (members) {
-      var classPrototype = childClass.prototype;
-      for (key in members) {
-        if (__DEV__) {
-          if (key in classPrototype && key.charAt(0) == '_') {
-            throw new Error('private member should not be overriden');
-          }
-        }
-
-        var thing = members[key];
-
-        if (__DEV__) {
-          if (thing && typeof thing === 'object') {
-            throw new Error('member "' + key + '" can\'t be object. ' + thing);
-          }
-        }
-        classPrototype[key] = thing;
-      }
-    }
-
-    var statics = object.statics;
-    if (statics) {
-      for (key in statics) {
-        childClass[key] = statics[key];
-      }
-    }
-    return childClass;
   }
 };
 

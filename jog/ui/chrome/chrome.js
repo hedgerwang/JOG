@@ -8,21 +8,14 @@ var Class = require('jog/class').Class;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
-var Chrome = Class.create({
-  extend: BaseUI,
+var Chrome = Class.create(BaseUI, {
 
-  main:  function() {
-    BaseUI.call(this);
-  },
-
-  members: {
-    /** @override */
-    createNode: function() {
-      var node = dom.createElement('div', {
-        className: cssx('jog-ui-chrome')
-      });
-      return node;
-    }
+  /** @override */
+  createNode: function() {
+    var node = dom.createElement('div', {
+      className: cssx('jog-ui-chrome')
+    });
+    return node;
   }
 });
 

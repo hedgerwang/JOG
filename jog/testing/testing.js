@@ -27,6 +27,27 @@ function TestCase(description) {
  * @param {string} description
  * @param {Function} fn
  */
+TestCase.prototype.demo = function(description, fn) {
+  if (document.body) {
+    if (!this._logsEl.parentNode) {
+      document.body.appendChild(this._logsEl);
+    }
+    fn(document.body);
+  } else {
+    var that = this;
+    setTimeout(function() {
+      that.demo(fn);
+    }, 500);
+  }
+  return this;
+};
+
+
+/**
+ *
+ * @param {string} description
+ * @param {Function} fn
+ */
 TestCase.prototype.test = function(description, fn) {
   if (document.body) {
     if (!this._logsEl.parentNode) {

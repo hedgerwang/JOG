@@ -2,32 +2,28 @@ var Class = require('jog/class').Class;
 var Disposable = require('jog/disposable').Disposable;
 var Functions = require('jog/functions').Functions;
 
-var Event = Class.create({
+var Event = Class.create(Disposable, {
 
-  extend: Disposable,
+  _readonly: true,
 
-  members: {
-    _readonly: true,
+  _prevented: false,
 
-    _prevented: false,
+  type: null,
 
-    type: null,
+  target: null,
 
-    target: null,
+  data: null,
 
-    data: null,
-
-    clear : function() {
-      for (var key in this) {
-        delete this[key];
-      }
-    },
-
-    stopPropagation: Functions.EMPTY,
-
-    preventDefault: function() {
-      this._prevented = true;
+  clear : function() {
+    for (var key in this) {
+      delete this[key];
     }
+  },
+
+  stopPropagation: Functions.EMPTY,
+
+  preventDefault: function() {
+    this._prevented = true;
   }
 });
 
