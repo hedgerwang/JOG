@@ -1,0 +1,49 @@
+/**
+ * @provides m-scroll-area-css
+ */
+
+.scrollArea {
+  overflow: hidden;
+}
+
+.scrollArea.degraded {
+  overflow: visible;
+}
+
+.scrollArea.degraded .scrollAreaBody {
+  -webkit-transform: none;
+  -webkit-transition: none;
+  width: 110%;
+}
+
+.scrollArea .scrollAreaBody {
+  position: relative;
+  z-index: 5; /* must be less than 10 to prevent overlaying the notifications */
+}
+
+.scrollArea .scrollAreaPaginator {
+  line-height: 0;
+  margin-bottom: 6px;
+  margin-top: 8px;
+  text-align: center;
+  width: 100%;
+}
+
+.scrollArea .scrollAreaPaginatorBubble {
+  background-image: url(/images/mobile/ui/scroll/dot.png);
+  background-position: right;
+  background-size: 10px;
+  display: inline-block;
+  height: 5px;
+  margin: 0 3px;
+  width: 5px;
+}
+
+.hires .scrollArea .scrollAreaPaginatorBubble,
+.xhdpi .scrollArea .scrollAreaPaginatorBubble {
+  background-image: url(/images/mobile/ui/scroll/dot-2x.png);
+}
+
+.scrollArea .scrollAreaPaginatorBubble.scrollAreaPaginatorBubbleActive {
+  background-position: left;
+}

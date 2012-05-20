@@ -90,7 +90,11 @@ var BaseUI = Class.create(EventTarget, {
    * @param {BaseUI} ui
    */
   appendChild: function(ui) {
-
+    if (__DEV__) {
+      if (!ui || !(ui instanceof BaseUI)) {
+        throw new Error('child must be an instance of BaseUI');
+      }
+    }
   },
 
   /**

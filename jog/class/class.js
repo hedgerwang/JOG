@@ -18,6 +18,12 @@ var defaultClassConfig = {
 
 var Class = {
   /**
+   * Create a Class that implements these methods:
+   * {
+   *   main: function(){},
+   *   dispose: function(){},
+   *   bind: function(){}
+   * }
    * @param {Function=} superClass
    * @param {Object=} config
    */
