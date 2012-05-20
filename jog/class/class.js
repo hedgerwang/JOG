@@ -6,7 +6,15 @@
 /**
  * @type {number}
  */
-var classID = 0;
+var classID = 1;
+
+/**
+ * @type {Object}
+ */
+var defaultClassConfig = {
+  dispose: classDispose,
+  bind: classBind
+};
 
 var Class = {
   /**
@@ -14,52 +22,76 @@ var Class = {
    * @param {Object=} config
    */
   create: function(superClass, config) {
-    var newClass = function() {
-      if (superClass) {
-        superClass.apply(this, arguments);
+    if (__DEV__) {
+      if (superClass && typeof superClass !== 'function') {
+        throw new Error('superclass should be function');
       }
 
-      var main = this['_main_' + newClass._classID];
-      if (main) {
-        main.apply(this, arguments);
+      if (config && typeof config !== 'object') {
+        throw new Error('class config should be an object');
       }
+    }
+
+    var newClass = function() {
+      classMain.apply(this, arguments);
     };
 
     if (superClass) {
       Class._extend(newClass, superClass);
-    } else {
-      newClass.prototype.constructor = newClass;
     }
 
+    newClass.prototype.constructor = newClass;
+    newClass._superClass = superClass;
     newClass._classID = classID++;
 
     if (config) {
-      var newClassPrototype = newClass.prototype;
-      for (var key in config) {
-        var thing = config[key];
-        if (key === 'main') {
-          delete config[key];
-          // TODO(hedger): Better way to make ClassID more readable.
-          key = '_main_' + newClass._classID;
-        }
+      if (config.main) {
+        config['main_' + newClass._classID] = config.main;
+        delete config.main;
+      }
 
-        if (__DEV__) {
-          if (superClass &&
-            key.charAt(0) === '_' &&
-            key in superClass.prototype) {
-            throw new Error('override private member');
-          }
+      if (config.dispose) {
+        config['dispose_' + newClass._classID] = config.dispose;
+      }
 
-          if (thing && typeof thing === 'object') {
-            throw new Error('prototype member should not be an object');
-          }
-        }
+      config.dispose = classDispose;
+      config.bind = classBind;
+    } else {
+      config = defaultClassConfig;
+    }
 
-        newClassPrototype[key] = thing;
+    Class.mixin(newClass, config);
+
+    if (__DEV__) {
+      var els = document.scripts;
+      if (els && els.length) {
+        newClass._debugSourceURL = els[els.length - 1].src;
       }
     }
 
     return newClass;
+  },
+
+  /**
+   * @param {Function} klass
+   * @param {Object} config
+   */
+  mixin: function(klass, config) {
+    var proto = klass.prototype;
+    for (var key in config) {
+      var thing = config[key];
+
+      if (__DEV__) {
+        if (key in proto && key.charAt(0) === '_') {
+          throw new Error('override private member');
+        }
+        if (thing && typeof thing === 'object') {
+          throw new Error('prototype member should not be an object');
+        }
+      }
+
+      proto[key] = thing;
+    }
   },
 
   /**
@@ -86,5 +118,69 @@ var Class = {
     childClass.prototype.constructor = childClass;
   }
 };
+
+/**
+ * The main() function that calls its internal main_* recursively.
+ */
+function classMain() {
+  var constructor = this.constructor;
+  var klass = constructor;
+  var klassList = klass._classList;
+  var i = 0;
+
+  if (!klassList) {
+    klassList = [];
+
+    while (klass) {
+      var main = this['main_' + klass._classID];
+      if (main) {
+        klassList[i] = main;
+        i++;
+      }
+      klass = klass._superClass;
+    }
+    constructor._classList = klassList;
+  }
+
+  var args = arguments;
+  if (klassList.length) {
+    for (i = klassList.length - 1; i > -1; i--) {
+      main = klassList[i];
+      main.apply(this, args);
+    }
+  }
+}
+
+/**
+ * The dispose() function that calls its internal dispose_* recursively.
+ */
+function classDispose() {
+  if (!this.disposed) {
+    var klass = this.constructor;
+    while (klass) {
+      var dispose = this['dispose_' + klass._classID];
+      dispose && dispose.call(this);
+      klass = klass._superClass;
+    }
+
+    for (var key in this) {
+      delete this[key];
+    }
+  }
+  this.disposed = true;
+}
+
+/**
+ * @param {Function} fn
+ * @return {Function}
+ */
+function classBind(fn) {
+  var that = this;
+  return function() {
+    if (!that.disposed) {
+      return fn.apply(that, arguments);
+    }
+  };
+}
 
 exports.Class = Class;

@@ -4,21 +4,15 @@
  */
 
 var Class = require('jog/class').Class;
-var Disposable = require('jog/disposable').Disposable;
 var lang = require('jog/lang').lang;
 
-var Deferred = Class.create(Disposable, {
+var Deferred = Class.create(null, {
 
   /**
    * @type {Array.<Function>}    PC@nc6000
    *
    */
   _callbacks : null,
-
-  /**
-   * @type {*}
-   */
-  _result: undefined,
 
   /**
    * @param {Function} onSuccess
@@ -41,12 +35,16 @@ var Deferred = Class.create(Disposable, {
    */
   bindCallback: function(context, onSuccess, opt_onError) {
     if (context) {
-      onSuccess = lang.bind(context, onSuccess);
+      onSuccess = onSuccess ?
+        lang.bind(context, onSuccess) :
+        onSuccess;
 
       opt_onError = opt_onError ?
         lang.bind(context, opt_onError) :
         opt_onError;
     }
+
+    return this.addCallback(onSuccess, opt_onError);
   },
 
   /**
@@ -54,18 +52,18 @@ var Deferred = Class.create(Disposable, {
    * @return {Deferred}
    */
   succeed: function(result) {
-    if (this._callbacks) {
-      setTimeout(lang.bind(this, function() {
+    setTimeout(lang.bind(this, function() {
+      if (this._callbacks) {
         for (var i = 0, j = this._callbacks.length; i < j; i += 2) {
           var callback = this._callbacks[i];
           callback && callback(result);
         }
         this._callbacks.length = 0;
-        this._result = result;
         result = null;
-        this.dispose();
-      }), 0);
-    }
+      }
+      this.dispose();
+    }), 10);
+
     return this;
   },
 
@@ -74,17 +72,18 @@ var Deferred = Class.create(Disposable, {
    * @return {Deferred}
    */
   fail: function(opt_error) {
-    if (this._callbacks) {
-      setTimeout(lang.bind(this, function() {
+    setTimeout(lang.bind(this, function() {
+      if (this._callbacks) {
         for (var i = 1, j = this._callbacks.length; i < j; i += 2) {
           var callback = this._callbacks[i];
           callback && callback(opt_error);
         }
         this._callbacks.length = 0;
-        opt_error = null;
-        this.dispose();
-      }), 0);
-    }
+      }
+      opt_error = null;
+      this.dispose();
+    }), 0);
+
     return this;
   },
 

@@ -4,7 +4,7 @@
  */
 
 var Class = require('jog/class').Class;
-var Disposable = require('jog/disposable').Disposable;
+
 var Event = require('jog/events/event').Event;
 var HashCode = require('jog/hashcode').HashCode;
 var hashCodeGetHashCode = HashCode.getHashCode;
@@ -12,8 +12,7 @@ var hashCodeGetHashCode = HashCode.getHashCode;
 // For perf reason, we should re-use the event singleton.
 var staticReadOnlyEvent = new Event();
 
-
-var EventTarget = Class.create(Disposable, {
+var EventTarget = Class.create(null, {
   /**
    * @type {Object}
    * @private
@@ -61,7 +60,7 @@ var EventTarget = Class.create(Disposable, {
    * @param {boolean=} opt_capture
    */
   dispatchEvent : function(type, opt_data, opt_capture) {
-    if (this.isDisposed()) {
+    if (this.disposed) {
       return;
     }
     staticReadOnlyEvent.type = type;

@@ -1,8 +1,8 @@
 var Class = require('jog/class').Class;
-var Disposable = require('jog/disposable').Disposable;
+
 var Functions = require('jog/functions').Functions;
 
-var Event = Class.create(Disposable, {
+var Event = Class.create(null, {
 
   _readonly: true,
 

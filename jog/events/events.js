@@ -4,7 +4,6 @@
  */
 
 var Class = require('jog/class').Class;
-var Disposable = require('jog/disposable').Disposable;
 var HashCode = require('jog/hashcode').HashCode;
 var hashCodeGetHashCode = HashCode.getHashCode;
 
@@ -22,17 +21,14 @@ var handleEvent = function(event) {
 };
 
 
-var Events = Class.create(Disposable, {
+var Events = Class.create(null, {
 
   /**
    * @constructor
    * @param {Object=} opt_context
-   * @extends {Disposable}
    */
   main:  function(opt_context) {
     this._context = opt_context || null;
-
-
     this._eventsHandlers = {};
   },
 
@@ -51,9 +47,8 @@ var Events = Class.create(Disposable, {
   /**
    * @override
    */
-  disposeInternal : function() {
+  dispose : function() {
     this.unlistenAll();
-    delete this._eventsHandlers;
   },
 
   /**

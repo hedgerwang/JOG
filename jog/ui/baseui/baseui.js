@@ -23,12 +23,11 @@ var BaseUI = Class.create(EventTarget, {
   _events: null,
 
   /** @override */
-  disposeInternal : function() {
+  dispose : function() {
     if (this._events) {
       this._events.dispose();
     }
     dom.remove(this._node);
-    EventTarget.prototype.disposeInternal.call(this);
   },
 
   /**
@@ -104,7 +103,7 @@ var BaseUI = Class.create(EventTarget, {
    * @param {Event}
     */
   _onDOMNodeInserted: function(event) {
-    if (!this.isDisposed() && dom.isInDocument(this._node)) {
+    if (!this.disposed && dom.isInDocument(this._node)) {
       this.getEvents().listen(
         event.currentTarget, 'DOMNodeInserted', this._onDOMNodeInserted
       );
