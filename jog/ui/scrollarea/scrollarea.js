@@ -3,8 +3,11 @@
  * @author Hedger Wang
  */
 
+var Animator = require('jog/animator').Animator;
 var BaseUI = require('jog/ui/baseui').BaseUI;
 var Class = require('jog/class').Class;
+var Scroller = require('jog/scroller').Scroller;
+var TouchHelper = require('jog/touchhelper').TouchHelper;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
@@ -14,57 +17,43 @@ var ScrollArea = Class.create(BaseUI, {
    * @param {Object} opt_options
    */
   main: function(opt_options) {
-    var options = opt_options || {};
-    var element = this.createNode();
-
     // Ensure that these functions are always called as instance's methods.
     this.reflow = this.bind(this.reflow);
-    this._onTouchMove = this.bind(this._onTouchMove);
-    this._onTouchEnd = this.bind(this._onTouchEnd);
     this._renderScroll = this.bind(this._renderScroll);
-
-    this._element = element;
-    this._content = element.children[0];
-    this._scroller = null; // new JX.MScrollAreaScroller(this, options);
-
-//    if (options.showpaginator && options.direction === 'horizontal') {
-//      this._paginatorEl = this._element.lastChild;
-//      if (__DEV__) {
-//        if (!(/\bscrollAreaPaginator\b/).test(this._paginatorEl.className)) {
-//          throw new Error('Invalid paginator element');
-//        }
-//      }
-//    }
-
-    this.reflow();
-    this._renderScroll();
+    this._options = opt_options || {};
+    this._scroller = new Scroller(this, this._options);
   },
 
   /** @override */
   dispose: function() {
-    JX.MAnimator.cancelAnimationFrame(this._renderID);
-
-    if (this._paginatorEl) {
-      JX.DOM.setContent(this._paginatorEl, '');
-    }
-
-    this._clearListeners();
+    Animator.cancelAnimationFrame(this._renderID);
     this._scroller.dispose();
-    for (var property in this) {
-      delete this[property];
-    }
-    this._disposed = true;
   },
 
   /** @override */
   createNode: function() {
-    var node = dom.createElement('div');
+    var content = dom.createElement('div', cssx('jog-ui-scrollarea_content'));
+
+    var node = dom.createElement('div', cssx('jog-ui-scrollarea'), content);
+
+    if (this._options.showpaginator &&
+      this._options.direction === 'horizontal') {
+      var pager = dom.createElement('i', cssx('jog-ui-scrollarea_paginator'));
+      node.appendChild(pager);
+    }
+
+    this._paginatorEl = pager;
+    this._element = node;
+    this._content = content;
+
     return node;
   },
 
   /** @override */
   onDocumentReady:function() {
-
+    this.reflow();
+    this._renderScroll();
+    this._bindListeners(true);
   },
 
   scrollTo: function(left, top) {
@@ -111,113 +100,101 @@ var ScrollArea = Class.create(BaseUI, {
   },
 
   /**
-   * Public interface for Javelin behavior to pass TOUCHSTART event in.
-   * @param {JX.Event} jxEvent
-   */
-  onTouchStart: function(jxEvent) {
-    this.reflow();
-    this._scroller.doTouchStart(jxEvent);
-    this._clearListeners();
-    this._bindListeners();
-  },
-
-  /**
-   * Public interface for Javelin behavior to pass touch CLICK in.
-   * @param {JX.Event} jxEvent
-   */
-  onClick: function(jxEvent) {
-    if (this._scroller.scrolling) {
-      jxEvent.prevent();
-    }
-  },
-
-  /**
-   * Implementation of interface for MScrollAreaScroller's handler.
+   * Implementation of interface for Scroller's handler.
    * @param {number} left
    * @param {number} top
    */
   onScrollStart: function(left, top) {
-    JX.Stratcom.invoke('MScrollArea:scrollstart', null, this._eventData);
+    this.dispatchEvent('scrollstart');
     if (this._renderSlowly) {
       // Render the scrolling asynchronously with acceptable frame rate.
-      JX.MAnimator.cancelAnimationFrame(this._renderID);
-      this._renderID = JX.MAnimator.requestAnimationFrame(this._renderScroll);
+      Animator.cancelAnimationFrame(this._renderID);
+      this._renderID = Animator.requestAnimationFrame(this._renderScroll);
     }
   },
 
   /**
-   * Implementation of interface for MScrollAreaScroller's handler.
+   * Implementation of interface for Scroller's handler.
    * @param {number} left
    * @param {number} top
    */
   onScroll: function(left, top) {
-    JX.Stratcom.invoke('MScrollArea:scroll', null, this._eventData);
+    this.dispatchEvent('scroll');
     if (!this._renderSlowly) {
       this._renderScroll();
     }
   },
 
   /**
-   * Implementation of interface for MScrollAreaScroller's handler.
+   * Implementation of interface for Scroller's handler.
    * @param {number} left
    * @param {number} top
    */
   onScrollEnd: function(left, top) {
     this._syncPaginator();
-
-    this._eventData.scrollEndCount++;
-    JX.Stratcom.invoke('MScrollArea:scrollend', null, this._eventData);
-
     if (this._renderSlowly) {
       // Cancel the asynchronous scroll-rendering that was set up at
       // TOUCHSTART.
-      JX.MAnimator.cancelAnimationFrame(this._renderID);
+      Animator.cancelAnimationFrame(this._renderID);
       delete this._renderID;
       this._renderScroll();
     }
+    this.dispatchEvent('scroll');
   },
 
-  _bindListeners: function() {
+  /**
+   * @param {boolean} forTouchStart
+   */
+  _bindListeners: function(forTouchStart) {
     var root = this._element;
-    this._listeners.push(
-      JX.DOM.listen(
-        root,
-        JX.MTouchHelper.EVT_TOUCHMOVE,
-        null,
-        this._onTouchMove
-      ),
-      JX.DOM.listen(
-        root,
-        JX.MTouchHelper.EVT_TOUCHEND,
-        null,
-        this._onTouchEnd
-      ),
-      JX.DOM.listen(
-        root,
-        JX.MTouchHelper.EVT_TOUCHCANCEL,
-        null,
-        this._onTouchEnd
-      )
-    );
+    var events = this.getEvents();
+    if (forTouchStart) {
+      events.listen(root, TouchHelper.EVT_TOUCHSTART, this._onTouchStart);
+    } else {
+      events.listen(root, TouchHelper.EVT_TOUCHMOVE, this._onTouchMove);
+      events.listen(root, TouchHelper.EVT_TOUCHEND, this._onTouchEnd);
+      events.listen(root, TouchHelper.EVT_TOUCHCANCEL, this._onTouchEnd);
+    }
+    events.listen(root, 'click', this._onClick);
   },
 
   _clearListeners: function() {
-    for (var i = 0, listener; listener = this._listeners[i]; i++) {
-      listener.remove();
-    }
-    this._listeners.length = 0;
+    this.getEvents().unlistenAll();
   },
 
-  _onTouchMove: function(jxEvent) {
-    if (!jxEvent.getPrevented()) {
-      this._scroller.doTouchMove(jxEvent);
-    }
-  },
-
-  _onTouchEnd: function(jxEvent) {
-    this._scroller.doTouchEnd(jxEvent);
+  /**
+   * Public interface to pass in TOUCHSTART event in.
+   * @param {Event} event
+   */
+  _onTouchStart: function(event) {
+    this.reflow();
+    this._scroller.doTouchStart(event);
     this._clearListeners();
+    this._bindListeners(false);
   },
+
+  _onTouchMove: function(event) {
+    if (!event.defaultPrevented) {
+      this._scroller.doTouchMove(event);
+    }
+  },
+
+  _onTouchEnd: function(event) {
+    this._scroller.doTouchEnd(event);
+    this._clearListeners();
+    this._bindListeners(true);
+  },
+
+  /**
+   * Public interface to pass touch CLICK in.
+   * @param {Event} event
+   */
+  _onClick: function(event) {
+    if (this._scroller.scrolling) {
+      event.preventDefault();
+    }
+  },
+
 
   _renderScroll: function() {
     delete this._renderID;
@@ -238,25 +215,57 @@ var ScrollArea = Class.create(BaseUI, {
     }
 
     if (this._renderSlowly && this._scroller.scrolling) {
-      this._renderID = JX.MAnimator.requestAnimationFrame(this._renderScroll);
+      this._renderID = Animator.requestAnimationFrame(this._renderScroll);
     }
   },
 
   _syncPaginator: function() {
     if (this._paginatorEl) {
-      var bubbleBase = JX.$N('i', {className:'scrollAreaPaginatorBubble'});
-      var fragment = document.createDocumentFragment();
+      var bubbleBase = dom.createElement('i', cssx('jog-ui-scrollarea_dot'));
+      var fragment = dom.createDocumentFragment();
       var index = this._scroller.pageIndex;
+
       for (var i = 0; i < this._scroller.pagesCount; i++) {
         var bubble = bubbleBase.cloneNode(false);
         if (i === index) {
-          JX.DOM.alterClass(bubble, 'scrollAreaPaginatorBubbleActive', true);
+          dom.alterClassName(bubble, cssx('jog-ui-scrollarea_dot_on'), true);
         }
         fragment.appendChild(bubble);
       }
-      JX.DOM.setContent(this._paginatorEl, fragment);
+      this._paginatorEl.textContent = '';
+      this._paginatorEl.appendChild(fragment);
     }
-  }
+  },
+
+  /**
+   * @type {string}
+   */
+  _renderID: null,
+
+  /**
+   * @type {boolean}
+   */
+  _renderSlowly: (/android/gi).test(navigator.appVersion),
+
+  /**
+   * @type {Element}
+   */
+  _paginatorEl: null,
+
+  /**
+   * @type {Element}
+   */
+  _element : null,
+
+  /**
+   * @type {Element}
+   */
+  _content: null,
+
+  /**
+   * @type {boolean}
+   */
+  _useCSSTranslate : 'webkitTransform' in document.documentElement.style
 });
 
 exports.ScrollArea = ScrollArea;

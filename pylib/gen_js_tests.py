@@ -79,34 +79,44 @@ def gen_js_test(dir_path) :
       stylesheet_html = ''
       if os.path.isfile(css_file_path) :
         stylesheet_html = (
-          '<link type="text/css" rel="stylesheet" href="/%s?mode=debug"/>' %
+          """
+          <link type="text/css" rel="stylesheet"
+                href="/%s?mode=debug"/>""" %
           css_file_path
-          )
+          ).strip()
+
+      css_demo_file_path = path[0 :path.rfind('.js')] + '_demo.css'
+      if os.path.isfile(css_demo_file_path) :
+        stylesheet_html = (
+          """
+          %s \n<link type="text/css" rel="stylesheet"
+                href="/%s"/>""" %
+          (stylesheet_html, css_demo_file_path)
+          ).strip()
 
       js_test_file_path = path[0 :path.rfind('.js')] + '_test.js'
       html_test_file_path = path[0 :path.rfind('.js')] + '_test.html'
 
       module_name = get_js_module_name(path)
 
-      if True or not os.path.exists(html_test_file_path) :
+      if not os.path.exists(html_test_file_path) :
         html = html_template % (
           module_name,
           html_test_file_path,
           stylesheet_html,
           js_test_file_path
           )
-        # print html
         html_file = open(html_test_file_path, 'w')
         html_file.write(html.strip())
         html_file.close()
-        print html_test_file_path
+        print 'gen >> ' + html_test_file_path
 
       if not os.path.exists(js_test_file_path) :
         js = js_template % (module_name, html_test_file_path, module_name)
         js_file = open(js_test_file_path, 'w')
         js_file.write(js.strip())
         js_file.close()
-        print js_test_file_path
+        print 'gen >> ' + js_test_file_path
 
 if __name__ == '__main__' :
   dir_names = [

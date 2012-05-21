@@ -3,7 +3,6 @@
  * @author Hedger Wang
  */
 
-var BaseUI = require('jog/ui/baseui').BaseUI;
 var Class = require('jog/class').Class;
 
 var animInterval = 16;

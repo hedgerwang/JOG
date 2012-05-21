@@ -36,6 +36,13 @@ var DOM = Class.create(null, {
   },
 
   /**
+   * @return {DocumentFragment}
+   */
+  createDocumentFragment: function() {
+    return this._document.createDocumentFragment();
+  },
+
+  /**
    * @param {Node} node
    * @return {boolean}
    */
@@ -69,6 +76,27 @@ var DOM = Class.create(null, {
    */
   addClassName: function(element, className) {
     element.className += ' ' + className;
+  },
+
+  /**
+   * @param {Element} element
+   * @param {string} className
+   */
+  removeClassName:function(element, className) {
+    var element = element;
+    element.className = element.className.replace(
+      new RegExp('(\\s|^)' + className + '(\\s|$)'), ' ').
+      replace(/^\s+|\s+$/g, '');
+  },
+
+  /**
+   * @param {Element} element
+   * @param {string} className
+   * @param {boolean} enabled
+   */
+  alterClassName: function(element, className, enabled) {
+    enabled ? this.addClassName(element, className) :
+      this.removeClassName(element, className);
   },
 
   /**
