@@ -28,6 +28,7 @@ footer, header, hgroup, menu, nav, section {
 body {
   border: none;
   line-height: 1;
+  -webkit-user-select: none;
 }
 
 ol, ul {

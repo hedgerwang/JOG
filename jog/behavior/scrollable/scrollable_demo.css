@@ -1,0 +1,16 @@
+.jog-bebavior-scrollable {
+  border: solid 1px red;
+  height: 400px;
+  margin: 100px auto;
+  width: 200px;
+}
+
+.jog-bebavior-scrollable_content {
+  border: 10px dotted #000;
+  height: 3000px;
+}
+
+.jog-bebavior-scrollable_content > .item {
+  border: solid 1px #eee;
+  padding: 10px;
+}

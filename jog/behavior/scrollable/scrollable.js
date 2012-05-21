@@ -4,56 +4,51 @@
  */
 
 var Animator = require('jog/animator').Animator;
-var BaseUI = require('jog/ui/baseui').BaseUI;
 var Class = require('jog/class').Class;
-var Scroller = require('jog/scroller').Scroller;
+var Events = require('jog/events').Events;
+var EventTarget = require('jog/events/eventtarget').EventTarget;
+var Scroller = require('jog/behavior/scrollable/scroller').Scroller;
 var TouchHelper = require('jog/touchhelper').TouchHelper;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
-var ScrollArea = Class.create(BaseUI, {
+var Scrollable = Class.create(EventTarget, {
   /**
    * @override
+   * @param {{Element} element
    * @param {Object} opt_options
    */
-  main: function(opt_options) {
+  main: function(element, opt_options) {
     // Ensure that these functions are always called as instance's methods.
     this.reflow = this.bind(this.reflow);
     this._renderScroll = this.bind(this._renderScroll);
+    this._element = element;
+    this._content = element.children[0];
     this._options = opt_options || {};
-    this._scroller = new Scroller(this, this._options);
+    this._scroller = new Scroller(this, opt_options);
+    this._events = new Events(this);
+
+    if (opt_options &&
+      opt_options.showpaginator &&
+      opt_options.direction === 'horizontal') {
+      this._paginator = dom.createElement(
+        'div', cssx('jog-bebavior-scrollable_paginator'));
+      element.appendChild(paginator);
+    }
+
+    dom.addClassName(this._element, cssx('jog-bebavior-scrollable'));
+    dom.addClassName(this._content, cssx('jog-bebavior-scrollable_content'));
+    this._scroller = new Scroller(this, opt_options);
+    this.reflow();
+    this._renderScroll();
+    this._bindListeners(true);
   },
 
   /** @override */
   dispose: function() {
     Animator.cancelAnimationFrame(this._renderID);
     this._scroller.dispose();
-  },
-
-  /** @override */
-  createNode: function() {
-    var content = dom.createElement('div', cssx('jog-ui-scrollarea_content'));
-
-    var node = dom.createElement('div', cssx('jog-ui-scrollarea'), content);
-
-    if (this._options.showpaginator &&
-      this._options.direction === 'horizontal') {
-      var pager = dom.createElement('i', cssx('jog-ui-scrollarea_paginator'));
-      node.appendChild(pager);
-    }
-
-    this._paginatorEl = pager;
-    this._element = node;
-    this._content = content;
-
-    return node;
-  },
-
-  /** @override */
-  onDocumentReady:function() {
-    this.reflow();
-    this._renderScroll();
-    this._bindListeners(true);
+    this._events.dispose();
   },
 
   scrollTo: function(left, top) {
@@ -147,7 +142,7 @@ var ScrollArea = Class.create(BaseUI, {
    */
   _bindListeners: function(forTouchStart) {
     var root = this._element;
-    var events = this.getEvents();
+    var events = this._events;
     if (forTouchStart) {
       events.listen(root, TouchHelper.EVT_TOUCHSTART, this._onTouchStart);
     } else {
@@ -159,7 +154,7 @@ var ScrollArea = Class.create(BaseUI, {
   },
 
   _clearListeners: function() {
-    this.getEvents().unlistenAll();
+    this._events.unlistenAll();
   },
 
   /**
@@ -220,20 +215,20 @@ var ScrollArea = Class.create(BaseUI, {
   },
 
   _syncPaginator: function() {
-    if (this._paginatorEl) {
-      var bubbleBase = dom.createElement('i', cssx('jog-ui-scrollarea_dot'));
+    if (this._paginator) {
+      var dot = dom.createElement('i', cssx('jog-bebavior-scrollable_dot'));
       var fragment = dom.createDocumentFragment();
       var index = this._scroller.pageIndex;
 
       for (var i = 0; i < this._scroller.pagesCount; i++) {
-        var bubble = bubbleBase.cloneNode(false);
+        var newDot = dot.cloneNode(false);
         if (i === index) {
-          dom.alterClassName(bubble, cssx('jog-ui-scrollarea_dot_on'), true);
+          dom.addClassName(newDot, cssx('jog-bebavior-scrollable_dot_on'));
         }
-        fragment.appendChild(bubble);
+        fragment.appendChild(newDot);
       }
-      this._paginatorEl.textContent = '';
-      this._paginatorEl.appendChild(fragment);
+      this._paginator.textContent = '';
+      this._paginator.appendChild(fragment);
     }
   },
 
@@ -255,7 +250,7 @@ var ScrollArea = Class.create(BaseUI, {
   /**
    * @type {Element}
    */
-  _element : null,
+  _paginator : null,
 
   /**
    * @type {Element}
@@ -268,4 +263,4 @@ var ScrollArea = Class.create(BaseUI, {
   _useCSSTranslate : 'webkitTransform' in document.documentElement.style
 });
 
-exports.ScrollArea = ScrollArea;
+exports.Scrollable = Scrollable;

@@ -7,7 +7,6 @@ var Animator = require('jog/animator').Animator;
 var BaseUI = require('jog/ui/baseui').BaseUI;
 var Class = require('jog/class').Class;
 var TouchHelper = require('jog/touchhelper').TouchHelper;
-var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
 var Scroller = Class.create(null, {
