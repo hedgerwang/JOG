@@ -39,7 +39,13 @@ var Class = {
     }
 
     var newClass = function() {
-      classMain.apply(this, arguments);
+      var klass = arguments.callee;
+      var superKlass = klass._superClass;
+      if (superKlass) {
+        superKlass.apply(this, arguments);
+      }
+      var main = this['main_' + klass._classID];
+      main && main.apply(this, arguments);
     };
 
     if (superClass) {
@@ -66,7 +72,7 @@ var Class = {
       config = defaultClassConfig;
     }
 
-    Class.mixin(newClass, config);
+    Class.mixin(newClass.prototype, config);
 
     if (__DEV__) {
       var els = document.scripts;
@@ -79,24 +85,23 @@ var Class = {
   },
 
   /**
-   * @param {Function} klass
-   * @param {Object} config
+   * @param {Object} target
+   * @param {Object} source
    */
-  mixin: function(klass, config) {
-    var proto = klass.prototype;
-    for (var key in config) {
-      var thing = config[key];
+  mixin: function(target, source) {
+    for (var key in source) {
+      var thing = source[key];
 
       if (__DEV__) {
-        if (key in proto && key.charAt(0) === '_') {
-          throw new Error('override private member');
+        if (key in target && key.charAt(0) === '_') {
+          throw new Error('override private member = ' + key);
         }
         if (thing && typeof thing === 'object') {
           throw new Error('prototype member should not be an object');
         }
       }
 
-      proto[key] = thing;
+      target[key] = thing;
     }
   },
 
@@ -125,37 +130,6 @@ var Class = {
   }
 };
 
-/**
- * The main() function that calls its internal main_* recursively.
- */
-function classMain() {
-  var constructor = this.constructor;
-  var klass = constructor;
-  var klassList = klass._classList;
-  var i = 0;
-
-  if (!klassList) {
-    klassList = [];
-
-    while (klass) {
-      var main = this['main_' + klass._classID];
-      if (main) {
-        klassList[i] = main;
-        i++;
-      }
-      klass = klass._superClass;
-    }
-    constructor._classList = klassList;
-  }
-
-  var args = arguments;
-  if (klassList.length) {
-    for (i = klassList.length - 1; i > -1; i--) {
-      main = klassList[i];
-      main.apply(this, args);
-    }
-  }
-}
 
 /**
  * The dispose() function that calls its internal dispose_* recursively.
@@ -185,6 +159,8 @@ function classBind(fn) {
   return function() {
     if (!that.disposed) {
       return fn.apply(that, arguments);
+    } else {
+      that = null;
     }
   };
 }
