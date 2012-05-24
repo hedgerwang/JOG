@@ -113,3 +113,49 @@ TestCase.prototype._logToPage = function(success, objs) {
 };
 
 exports.TestCase = TestCase;
+
+
+////////////////////////////////////////////////////////////////////////////////
+var useTouch = 'ontouchstart' in document;
+var ua = window.navigator.userAgent;
+var isAndroid = /Android/g.test(ua);
+var isIOS = /iPhone/g.test(ua);
+
+var classNames = [
+  isAndroid ? 'android' : undefined,
+  isIOS ? 'ios' : undefined,
+  useTouch ? 'touch' : undefined,
+  (isIOS || isAndroid) ? 'mobile' : 'desktop'
+];
+document.documentElement.className += ' ' + classNames.join(' ');
+
+if (useTouch && (isIOS || isAndroid)) {
+  document.addEventListener('touchmove', function(evt) {
+    evt.preventDefault();
+  });
+
+  document.addEventListener('touchend', function(evt) {
+    scrollTo(0, 1);
+  });
+
+  var pageNode = document.createElement('div');
+  pageNode.style.cssText = 'position:absolute;left:0;top:0;width:1px;background:red;';
+  var onresize = function() {
+    if (!document.body) {
+      setTimeout(onresize, 16);
+      return;
+    }
+
+    if (!pageNode.parentNode) {
+      document.body.appendChild(pageNode);
+    }
+
+    var h = Math.max(window.outerHeight, window.innerHeight);
+    pageNode.style.height = h + 50 + 'px';
+    setTimeout(function() {
+      scrollTo(0, 1);
+    });
+  };
+  window.addEventListener('resize', onresize);
+  onresize();
+}

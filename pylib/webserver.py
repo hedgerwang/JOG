@@ -10,12 +10,32 @@ import jsrequire
 import urlparse
 import urllib2
 import os
-
+import glob
+import fnmatch
 
 httpHandler = urllib2.HTTPHandler(debuglevel=1)
 httpsHandler = urllib2.HTTPSHandler(debuglevel=1)
 opener = urllib2.build_opener(httpHandler, httpsHandler)
 urllib2.install_opener(opener)
+
+def recursive_glob(rootdir='.') :
+  files = []
+  for rootdir, dirnames, filenames in os.walk(rootdir) :
+    for filename in filenames :
+      if filename.endswith('_test.html') :
+        if rootdir.find('google_app_engine_host') < 0 :
+          path = os.path.join(rootdir, filename)
+          files.append(path)
+  sorted(files)
+  return files
+
+
+def get_tests(rootdir='.') :
+  return '\n'.join([
+  '<li style="margin: 20px;"><a href="/%s">%s</a></li>' % (path, path)
+  for path in recursive_glob(rootdir)
+  ])
+
 
 class WebHandler(BaseHTTPRequestHandler) :
   def do_GET(self) :
@@ -49,7 +69,13 @@ class WebHandler(BaseHTTPRequestHandler) :
           path = self._normalize_html_file_path(path)
           type = 'html'
 
-        if type == 'html' :
+        if path.endswith('tests') :
+          mine = 'text/html'
+          content = get_tests(rootdir='jog') + get_tests(rootdir='app')
+
+
+        elif type == 'html' :
+          path = self._normalize_html_file_path(path)
           mine = 'text/html'
           content = self._get_file(path)
         elif type == 'ico' :
@@ -63,6 +89,9 @@ class WebHandler(BaseHTTPRequestHandler) :
           content = cssrequire.get(path, query_params.get('mode', [None])[0])
         elif type == 'png' :
           mine = 'image/png'
+          content = self._get_file(path)
+        elif type == 'jpg' :
+          mine = 'image/jpg'
           content = self._get_file(path)
         else :
           mine = 'text/plain'
@@ -116,6 +145,12 @@ class WebHandler(BaseHTTPRequestHandler) :
 
     if path.startswith('./') :
       path = path.replace('./', '')
+
+    if path.startswith('/') :
+      path = path[1 :]
+
+    if path.endswith('/tests') or path == 'tests' :
+      return path
 
     if path.endswith('/') :
       path = path[0 :len(path) - 2]

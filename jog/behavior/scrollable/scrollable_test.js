@@ -19,7 +19,7 @@ var dom = require('jog/dom').dom;
     var content = element.lastChild;
     var n = 0;
     while (n < 80) {
-      content.appendChild(dom.createElement('div', 'item', 'item ' + n));
+      content.appendChild(dom.createElement('div', 'chunk', 'chunk ' + n));
       n++;
     }
     body.appendChild(element);

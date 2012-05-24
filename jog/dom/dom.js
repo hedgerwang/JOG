@@ -29,6 +29,13 @@ var DOM = Class.create(null, {
   _rootNode: null,
 
   /**
+   * @return {Node}
+   */
+  getRootNode: function() {
+    return this._rootNode;
+  },
+
+  /**
    * @return {Document}
    */
   getDocument: function() {

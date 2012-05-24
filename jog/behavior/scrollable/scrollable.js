@@ -21,10 +21,12 @@ var Scrollable = Class.create(EventTarget, {
   main: function(element, opt_options) {
     // Ensure that these functions are always called as instance's methods.
     this.reflow = this.bind(this.reflow);
+
     this._renderScroll = this.bind(this._renderScroll);
     this._element = element;
     this._content = element.children[0];
     this._options = opt_options || {};
+
     this._scroller = new Scroller(this, opt_options);
     this._events = new Events(this);
 
@@ -33,12 +35,17 @@ var Scrollable = Class.create(EventTarget, {
       opt_options.direction === 'horizontal') {
       this._paginator = dom.createElement(
         'div', cssx('jog-bebavior-scrollable_paginator'));
-      element.appendChild(paginator);
+      element.appendChild(this._paginator);
+    }
+
+    if (opt_options && opt_options.dimentions) {
+      this._dimentions = opt_options.dimentions;
     }
 
     dom.addClassName(this._element, cssx('jog-bebavior-scrollable'));
     dom.addClassName(this._content, cssx('jog-bebavior-scrollable_content'));
     this._scroller = new Scroller(this, opt_options);
+
     this.reflow();
     this._renderScroll();
     this._bindListeners(true);
@@ -47,8 +54,16 @@ var Scrollable = Class.create(EventTarget, {
   /** @override */
   dispose: function() {
     Animator.cancelAnimationFrame(this._renderID);
+    this._clearListeners();
     this._scroller.dispose();
     this._events.dispose();
+  },
+
+  /**
+   * @return {Element}
+   */
+  getBody: function() {
+    return this._content;
   },
 
   scrollTo: function(left, top) {
@@ -85,12 +100,16 @@ var Scrollable = Class.create(EventTarget, {
   },
 
   reflow: function() {
-    this._scroller.setDimensions(
-      this._element.offsetWidth,
-      this._element.offsetHeight,
-      this._content.scrollWidth,
-      this._content.scrollHeight
-    );
+    if (this._dimentions) {
+      this._scroller.setDimensions.apply(this._scroller, this._dimentions);
+    } else {
+      this._scroller.setDimensions(
+        this._element.offsetWidth,
+        this._element.offsetHeight,
+        this._content.scrollWidth,
+        this._content.scrollHeight
+      );
+    }
     this._syncPaginator();
   },
 
@@ -134,7 +153,7 @@ var Scrollable = Class.create(EventTarget, {
       delete this._renderID;
       this._renderScroll();
     }
-    this.dispatchEvent('scroll');
+    this.dispatchEvent('scrollend');
   },
 
   /**
@@ -143,17 +162,32 @@ var Scrollable = Class.create(EventTarget, {
   _bindListeners: function(forTouchStart) {
     var root = this._element;
     var events = this._events;
+    events.listen(root, 'click', this._onClick);
     if (forTouchStart) {
       events.listen(root, TouchHelper.EVT_TOUCHSTART, this._onTouchStart);
     } else {
+      if (__DEV__) {
+        var doc = dom.getDocument();
+        if (doc.captureEvents && !TouchHelper.USE_TOUCH) {
+          // Event.MOUSEMOVE | Event.MOUSEUP
+          doc.captureEvents(16 | 2);
+          root = document;
+        }
+      }
       events.listen(root, TouchHelper.EVT_TOUCHMOVE, this._onTouchMove);
       events.listen(root, TouchHelper.EVT_TOUCHEND, this._onTouchEnd);
       events.listen(root, TouchHelper.EVT_TOUCHCANCEL, this._onTouchEnd);
     }
-    events.listen(root, 'click', this._onClick);
   },
 
   _clearListeners: function() {
+    if (__DEV__) {
+      var doc = dom.getDocument();
+      if (doc.releaseEvents && !TouchHelper.USE_TOUCH) {
+        // Event.MOUSEMOVE | Event.MOUSEUP
+        doc.releaseEvents(16 | 2);
+      }
+    }
     this._events.unlistenAll();
   },
 
@@ -231,6 +265,15 @@ var Scrollable = Class.create(EventTarget, {
       this._paginator.appendChild(fragment);
     }
   },
+
+  /**
+   * @type {Element}
+   */
+
+  /**
+   * @type {Array.<number>}
+   */
+  _dimentions: null,
 
   /**
    * @type {string}

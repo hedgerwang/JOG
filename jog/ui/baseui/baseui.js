@@ -22,12 +22,32 @@ var BaseUI = Class.create(EventTarget, {
    */
   _events: null,
 
+  /**
+   * @type {Events}
+   */
+  _mutationEvents: null,
+
+  /**
+   * @type {boolean}
+   */
+  _inDocument: false,
+
   /** @override */
   dispose : function() {
     if (this._events) {
       this._events.dispose();
     }
+    if (this._mutationEvents) {
+      this._mutationEvents.dispose();
+    }
     dom.remove(this._node);
+  },
+
+  /**
+   * @return {boolean}
+   */
+  isInDocument: function() {
+    return this._inDocument;
   },
 
   /**
@@ -37,27 +57,27 @@ var BaseUI = Class.create(EventTarget, {
   render : function(element, opt_nextSibling) {
     var node = this.getNode();
 
-    if (node.parentNode) {
-      throw new Error('UI was rendered');
+    if (node.parentNode || this._inDocument) {
+      throw new Error('UI has been rendered');
     }
 
     if (opt_nextSibling) {
-      opt_nextSibling.parentNode.insertBefore(node, opt_nextSibling);
+      element.insertBefore(node, opt_nextSibling);
     } else {
       element.appendChild(node);
-    }
-
-    if (this._inDocument) {
-      this.onExitDocument();
     }
 
     if (dom.isInDocument(node)) {
       this._inDocument = true;
       this.onDocumentReady();
     } else {
-      this._onDOMNodeInserted = lang.bind(this, this._onDOMNodeInserted);
-      this.getEvents().listen(
-        element, 'DOMNodeInserted', this._onDOMNodeInserted
+      var targetNode = element;
+      if (!dom.isInDocument(targetNode)) {
+        targetNode = dom.getDocument().body || dom.getRootNode();
+      }
+      this._mutationEvents = new Events(this);
+      this._mutationEvents.listen(
+        targetNode, 'DOMNodeInserted', this._onDOMNodeInserted
       );
     }
   },
@@ -108,9 +128,9 @@ var BaseUI = Class.create(EventTarget, {
     */
   _onDOMNodeInserted: function(event) {
     if (!this.disposed && dom.isInDocument(this._node)) {
-      this.getEvents().listen(
-        event.currentTarget, 'DOMNodeInserted', this._onDOMNodeInserted
-      );
+      this._mutationEvents.dispose();
+      delete this._mutationEvents;
+      this._inDocument = true;
       this.onDocumentReady();
     }
   }

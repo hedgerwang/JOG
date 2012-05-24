@@ -49,6 +49,7 @@ var Events = Class.create(null, {
    */
   dispose : function() {
     this.unlistenAll();
+    console.log(this);
   },
 
   /**

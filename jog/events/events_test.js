@@ -5,6 +5,7 @@
  * @url http://localhost:8888/jog/events/events_test.html
  */
 
+var Class = require('jog/class').Class;
 var Events = require('jog/events').Events;
 var EventTarget = require('jog/events/eventtarget').EventTarget;
 var TestCase = require('jog/testing').TestCase;

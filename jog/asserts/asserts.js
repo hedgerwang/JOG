@@ -68,11 +68,14 @@ var asserts = {
 
   arrayEqual:function(arr1, arr2) {
     if (arr1.length !== arr2.length) {
-      throw new Error('array not equal');
+      throw new Error('array length not equal.' +
+        arr1.join(',') + ';' +
+        arr2.join(','));
     }
     arr1.forEach(function(item, i) {
       if (arr2[i] !== item) {
-        throw new Error('array not equal');
+        var msg = 'array not equal:' + arr1.join(',') + ' ; ' + arr2.join(',');
+        throw new Error(msg);
       }
     });
   },

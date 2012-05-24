@@ -9,6 +9,8 @@ html_template = '''
 <head>
 <title>Test %s</title>
 <!-- http://localhost:8888/%s -->
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"/>
 <meta name="auto-generated" content="true" />
 %s
 </head>

@@ -25,15 +25,15 @@ var Class = {
    *   bind: function(){}
    * }
    * @param {Function=} superClass
-   * @param {Object=} config
+   * @param {Object=} prototype
    */
-  create: function(superClass, config) {
+  create: function(superClass, prototype) {
     if (__DEV__) {
       if (superClass && typeof superClass !== 'function') {
         throw new Error('superclass should be function');
       }
 
-      if (config && typeof config !== 'object') {
+      if (prototype && typeof prototype !== 'object') {
         throw new Error('class config should be an object');
       }
     }
@@ -44,7 +44,7 @@ var Class = {
       if (superKlass) {
         superKlass.apply(this, arguments);
       }
-      var main = this['main_' + klass._classID];
+      var main = this[klass._mainID];
       main && main.apply(this, arguments);
     };
 
@@ -54,25 +54,26 @@ var Class = {
 
     newClass.prototype.constructor = newClass;
     newClass._superClass = superClass;
-    newClass._classID = classID++;
+    newClass._mainID = 'main_' + classID++;
+    newClass._disposeID = 'dispose_' + classID++;
 
-    if (config) {
-      if (config.main) {
-        config['main_' + newClass._classID] = config.main;
-        delete config.main;
+    if (prototype) {
+      if (prototype.main) {
+        prototype[newClass._mainID] = prototype.main;
+        delete prototype.main;
       }
 
-      if (config.dispose) {
-        config['dispose_' + newClass._classID] = config.dispose;
+      if (prototype.dispose) {
+        prototype[newClass._disposeID] = prototype.dispose;
       }
 
-      config.dispose = classDispose;
-      config.bind = classBind;
+      prototype.dispose = classDispose;
+      prototype.bind = classBind;
     } else {
-      config = defaultClassConfig;
+      prototype = defaultClassConfig;
     }
 
-    Class.mixin(newClass.prototype, config);
+    Class.mixin(newClass.prototype, prototype);
 
     if (__DEV__) {
       var els = document.scripts;
@@ -138,7 +139,7 @@ function classDispose() {
   if (!this.disposed) {
     var klass = this.constructor;
     while (klass) {
-      var dispose = this['dispose_' + klass._classID];
+      var dispose = this[klass._disposeID];
       dispose && dispose.call(this);
       klass = klass._superClass;
     }
@@ -159,8 +160,6 @@ function classBind(fn) {
   return function() {
     if (!that.disposed) {
       return fn.apply(that, arguments);
-    } else {
-      that = null;
     }
   };
 }
