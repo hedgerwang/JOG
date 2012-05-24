@@ -10,12 +10,12 @@ html_template = '''
 <title>Test %s</title>
 <!-- http://localhost:8888/%s -->
 <meta name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1"/>
+      content="width=device-width, initial-scale=0.5, maximum-scale=0.5"/>
 <meta name="auto-generated" content="true" />
 %s
 </head>
 <body>
-<script src="/%s?mode=debug"></script>
+<script src="/%s?mode=all"></script>
 </body>
 </html>
 '''
@@ -77,18 +77,22 @@ def gen_js_test(dir_path) :
         print '>>> skip >>> %s' % path
         continue
 
-      css_file_path = path[0 :path.rfind('.js')] + '.css'
-      stylesheet_html = ''
-      if os.path.isfile(css_file_path) :
-        stylesheet_html = (
-          """
-          <link type="text/css" rel="stylesheet"
-                href="/%s?mode=debug"/>""" %
-          css_file_path
-          ).strip()
+      css_test_file_path = path[0 :path.rfind('.js')] + '_test.css'
+
+      if not os.path.isfile(css_test_file_path) :
+        css_test_file = open(css_test_file_path, 'w')
+        css_test_file.write('/* test */')
+        css_test_file.close()
+
+      stylesheet_html = (
+        """
+        <link type="text/css" rel="stylesheet" href="/%s?mode=all"/>""" %
+        css_test_file_path
+        ).strip()
 
       css_demo_file_path = path[0 :path.rfind('.js')] + '_demo.css'
       if os.path.isfile(css_demo_file_path) :
+        raise Exception(css_demo_file_path)
         stylesheet_html = (
           """
           %s \n<link type="text/css" rel="stylesheet"
@@ -101,7 +105,7 @@ def gen_js_test(dir_path) :
 
       module_name = get_js_module_name(path)
 
-      if not os.path.exists(html_test_file_path) :
+      if True or not os.path.exists(html_test_file_path) :
         html = html_template % (
           module_name,
           html_test_file_path,

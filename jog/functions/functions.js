@@ -8,6 +8,10 @@ var Functions = {
 //    if (__DEV__) {
 //      debugLog('empty function called', arguments.callee.caller);
 //    }
+  },
+
+  PREVENT_DEFAULT: function(evt) {
+    evt && evt.preventDefault();
   }
 };
 

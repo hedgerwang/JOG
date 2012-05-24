@@ -4,11 +4,21 @@ body {
 
 .jog-ui-chrome {
   background: #fff;
-  bottom: 0;
+  bottom: 0px;
   left: 0;
-  max-height: 580px;
-  max-width: 380px;
   position: absolute;
   right: 0;
   top: 0;
+  /*
+  outline: solid 10px #000;
+  outline-offset: -10px;
+  */
+}
+
+.jog-ui-chrome.pc {
+  height: 960px;
+  margin: 20px auto;
+  outline: solid 10px #000;
+  position: relative;
+  width: 640px;
 }

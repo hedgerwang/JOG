@@ -8,7 +8,9 @@
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
 
+var Chrome = require('jog/ui/chrome').Chrome;
 var ScrollList = require('jog/ui/scrolllist').ScrollList;
+
 var dom = require('jog/dom').dom;
 var lorem = 's assumenda est, omnis dolor repellendus. Temporibus autem ' +
   'quibusdam et aut officiis debitis aut rerum necessitatibus saepe' +
@@ -60,8 +62,11 @@ var makeEl = function(text, n) {
 (new TestCase('ScrollList Test'))
   .demo('Demo',
   function(body) {
+    var chrome = new Chrome();
+    chrome.render(body);
+
     var list = new ScrollList();
-    list.render(body);
+    chrome.appendChild(list, true);
     var n = 0;
     while (n++ < 500) {
       list.addContent(makeEl(n + '. ', n));

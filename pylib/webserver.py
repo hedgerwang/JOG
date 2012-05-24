@@ -98,8 +98,29 @@ class WebHandler(BaseHTTPRequestHandler) :
           content = 'Not supported "%s, %s"' % (type, path)
 
       self.send_response(200)
+
+      if mine is not None and mine.find('image') > -1 :
+        self.send_header('Cache-Control', 'max-age=864000')
+        self.send_header('Expires', 'Fri, 30 Jan 2099 12:00:00 GMT')
+
       if mine is not None :
         self.send_header('Content-type', mine)
+
+      self.end_headers()
+      self.wfile.write(content)
+      return
+
+      if mine is not None :
+        self.send_header('Content-type', mine)
+
+      if mine is not None and mine.find('image') > -1 :
+        status = 304
+        self.send_header('Cache-Control', 'max-age=864000')
+        self.send_header('Expires', 'Fri, 30 Jan 2099 12:00:00 GMT')
+        self.send_response(304)
+      else :
+        self.send_response(200)
+
       self.end_headers()
       self.wfile.write(content)
       return

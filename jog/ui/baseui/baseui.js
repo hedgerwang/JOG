@@ -11,6 +11,10 @@ var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;
 
 var BaseUI = Class.create(EventTarget, {
+  /**
+   * @type {BaseUI{
+   */
+  _parentUI: null,
 
   /**
    * @type {Node}
@@ -108,12 +112,22 @@ var BaseUI = Class.create(EventTarget, {
 
   /**
    * @param {BaseUI} ui
+   * @paran {boolean=} opt_render
    */
-  appendChild: function(ui) {
+  appendChild: function(ui, opt_render) {
     if (__DEV__) {
       if (!ui || !(ui instanceof BaseUI)) {
         throw new Error('child must be an instance of BaseUI');
       }
+
+      if (ui._parentUI) {
+        throw new Error('parent ui exists!');
+      }
+    }
+    ui._parentUI = this;
+
+    if (opt_render) {
+      ui.render(this.getNode());
     }
   },
 

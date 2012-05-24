@@ -1,0 +1,26 @@
+.jog-ui-scrolllist-chunk {
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0px;
+  z-index: 1;
+  width: 100%;
+  x-webkit-transform: translate3d(0, 0, 0);
+}
+
+.jog-ui-scrolllist-chunk-hidden {
+  display: none;
+}
+
+/*
+.jog-ui-scrolllist-chunk-fadein {
+  -webkit-transition-property: opacity;
+  -webkit-transition-duration: 300ms;
+  -webkit-transition-timing-function: ease-in;
+  opacity: 0.5;
+}
+
+.jog-ui-scrolllist-chunk-fadein-play {
+  opacity: 1;
+}
+*/

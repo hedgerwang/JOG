@@ -129,6 +129,7 @@ var classNames = [
 ];
 document.documentElement.className += ' ' + classNames.join(' ');
 
+/*
 if (useTouch && (isIOS || isAndroid)) {
   document.addEventListener('touchmove', function(evt) {
     evt.preventDefault();
@@ -159,3 +160,4 @@ if (useTouch && (isIOS || isAndroid)) {
   window.addEventListener('resize', onresize);
   onresize();
 }
+  */

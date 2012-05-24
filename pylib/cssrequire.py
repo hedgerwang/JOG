@@ -27,7 +27,11 @@ def get(path, mode=None) :
     for css_path in deps :
       css.append(template % css_path)
   else :
-    css.append(_get_file(path))
+    if os.path.isfile(path) :
+      css.append(_get_file(path))
+    else :
+      css.append('/* NOT FOUND: %s */' % path)
+
 
   return '\n\n'.join(css)
 
@@ -38,6 +42,9 @@ def get_deps(path) :
   js_path = path.replace('.css', '.js')
   required = {}
 
+  print '-' * 80
+  print js_path
+
   if os.path.isfile(js_path) :
     more_js_deps = jsrequire.get_deps(js_path)
     for more_js_file in more_js_deps :
@@ -47,8 +54,9 @@ def get_deps(path) :
           required[more_css_path] = True
           deps.append(more_css_path)
 
-  if not required.get(path) :
+  if not required.get(path) and os.path.isfile(path) :
     deps.append(path)
+
   return deps
 
 
