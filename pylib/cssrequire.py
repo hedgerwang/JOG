@@ -2,6 +2,7 @@ import re
 import jsrequire
 import os
 from os import curdir, sep
+import useragent
 
 MODULE_WRAP = """
 %s
@@ -32,8 +33,76 @@ def get(path, mode=None) :
     else :
       css.append('/* NOT FOUND: %s */' % path)
 
-
   return '\n\n'.join(css)
+
+
+CSS_TRANSLATE_TEMPLATE = '''[\s;\{]%s\s*:[^;]+;'''
+
+CSS_TRANSLATE_PROPERTIES = [
+  'margin',
+  'margin-[a-z]+',
+  'padding',
+  'padding-[a-z]+',
+  'width',
+  'height',
+  'left',
+  'top',
+  'right',
+  'bottom',
+  'text-indent',
+  'font-size',
+  'font',
+  'line-height',
+  'background',
+  'background-size',
+  'background-position',
+  'border-radius'
+]
+
+CSS_TRANSLATE_PROPERTIES_PATTERNS = [
+re.compile(CSS_TRANSLATE_TEMPLATE % property)
+for property in CSS_TRANSLATE_PROPERTIES
+]
+
+CSS_PX_PATTERN = re.compile(r'-?\d+px[/\s;]?')
+CSS_NUMBER_PATTERN = re.compile(r'[/\s-]?\d+')
+
+
+def translate(css_text, scale=1) :
+  if scale != 1 :
+    for re_pattern in CSS_TRANSLATE_PROPERTIES_PATTERNS :
+      matches = re_pattern.finditer(css_text)
+      for match in matches :
+        old_rule = match.group()
+        new_rule = _translate_rule(old_rule, scale)
+        css_text = css_text.replace(old_rule, new_rule)
+  return css_text
+
+
+def _translate_rule(rule, scale) :
+  value = rule[rule.find(':') :]
+  new_value = value
+
+  px_values = CSS_PX_PATTERN.finditer(value)
+
+  for px_value in px_values :
+    px_value = px_value.group()
+    new_px_value = px_value
+    numbers = CSS_NUMBER_PATTERN.finditer(px_value)
+
+    for num in numbers :
+      old_num = num.group()
+      new_num = int(old_num) * scale
+      new_px_value = new_px_value.replace(old_num, str(int(new_num)))
+
+    new_value = new_value.replace(px_value, new_px_value)
+
+  new_rule = rule[0 :rule.find(':')] + new_value
+  #  print '-' * 80
+  #  print rule
+  #  print new_rule
+
+  return new_rule + ' /***/'
 
 
 def get_deps(path) :
@@ -41,9 +110,6 @@ def get_deps(path) :
   deps = []
   js_path = path.replace('.css', '.js')
   required = {}
-
-  print '-' * 80
-  print js_path
 
   if os.path.isfile(js_path) :
     more_js_deps = jsrequire.get_deps(js_path)
@@ -99,7 +165,41 @@ def _get_file(abs_path) :
 
 
 def main() :
-  pass
+  css_text = """
+
+  .foo {
+    margin: -1px -2px 3px 4px;
+    margin: 110px 10px 0;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    padding: 10px  10px;
+    padding-top: -10px;
+    padding-left: -10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    left: 10px;
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: 10px;
+    height: 10px;
+    text-indent: 10px;
+    font-size: 10px;
+    font: 13px/140% aria;
+    font: 13px/12px aria;
+    line-height: 12px;
+    border-radius: 1px;
+    background-size : 100% auto;
+    background-size : 100px 100px;
+    background-size : 123px 321px;
+    background-position: -10px 10px;
+    background: #fff url(/image/foo.jpg) 10px 10px no-repeat;
+  }
+  """
+
+  print translate(css_text, 2)
 
 if __name__ == '__main__' :
   main()

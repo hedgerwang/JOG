@@ -16,10 +16,9 @@ body {
 }
 
 .jog-ui-chrome.pc {
-  height: 960px;
+  height: 480px;
   margin: 20px auto;
   outline: solid 10px #000;
   position: relative;
-  width: 640px;
-  zoom: 0.5;
+  width: 320px;
 }

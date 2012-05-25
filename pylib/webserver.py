@@ -13,11 +13,20 @@ import os
 import glob
 import fnmatch
 import get_local_ip
+import re
+import useragent
+import Cookie
 
 httpHandler = urllib2.HTTPHandler(debuglevel=1)
 httpsHandler = urllib2.HTTPSHandler(debuglevel=1)
 opener = urllib2.build_opener(httpHandler, httpsHandler)
 urllib2.install_opener(opener)
+
+HTML_META = """
+<script>window.__SCALE__ = '%s'</script>
+<meta name="viewport"
+      content="width=device-width, initial-scale=%s, maximum-scale=%s"/>
+"""
 
 def recursive_glob(rootdir='.') :
   files = []
@@ -38,11 +47,25 @@ def get_tests(rootdir='.') :
   ])
 
 
+DEVICE_PIXEL_RATIO = 1
+
 class WebHandler(BaseHTTPRequestHandler) :
   def do_GET(self) :
     try :
+      global DEVICE_PIXEL_RATIO
+
       parsed_url = urlparse.urlparse(self.path)
       query_params = urlparse.parse_qs(parsed_url.query)
+
+      dpr = query_params.get('dpr', None)
+
+      if dpr is not None and dpr[0].isdigit() :
+        DEVICE_PIXEL_RATIO = max(1, int(dpr[0]))
+
+      print 'self.DEVICE_PIXEL_RATIO = %s' % DEVICE_PIXEL_RATIO
+
+      self._scale = 1 / float(DEVICE_PIXEL_RATIO)
+
       path = parsed_url.path
       scheme = parsed_url.scheme.lower()
       mine = None
@@ -73,12 +96,10 @@ class WebHandler(BaseHTTPRequestHandler) :
         if path.endswith('tests') :
           mine = 'text/html'
           content = get_tests(rootdir='jog') + get_tests(rootdir='app')
-
-
         elif type == 'html' :
           path = self._normalize_html_file_path(path)
           mine = 'text/html'
-          content = self._get_file(path)
+          content = self._translate_html(self._get_file(path))
         elif type == 'ico' :
           mine = 'image/vnd.microsoft.icon'
           content = ''
@@ -88,6 +109,8 @@ class WebHandler(BaseHTTPRequestHandler) :
         elif  type == 'css' :
           mine = 'text/css'
           content = cssrequire.get(path, query_params.get('mode', [None])[0])
+          if self._scale != 1 :
+            content = cssrequire.translate(content, DEVICE_PIXEL_RATIO)
         elif type == 'png' :
           mine = 'image/png'
           content = self._get_file(path)
@@ -109,22 +132,6 @@ class WebHandler(BaseHTTPRequestHandler) :
 
       self.end_headers()
       self.wfile.write(content)
-      return
-
-      if mine is not None :
-        self.send_header('Content-type', mine)
-
-      if mine is not None and mine.find('image') > -1 :
-        status = 304
-        self.send_header('Cache-Control', 'max-age=864000')
-        self.send_header('Expires', 'Fri, 30 Jan 2099 12:00:00 GMT')
-        self.send_response(304)
-      else :
-        self.send_response(200)
-
-      self.end_headers()
-      self.wfile.write(content)
-      return
 
     except IOError as inst :
       self.send_error(404, 'File Not Found: "%s"' % inst)
@@ -193,6 +200,29 @@ class WebHandler(BaseHTTPRequestHandler) :
     content = f.read()
     f.close()
     return content
+
+  def _translate_html(self, html) :
+    meta = HTML_META % (self._scale, self._scale, self._scale)
+
+    if html.find('<head>') > -1 :
+      html = html.replace('<head>', '<head>' + meta)
+    elif html.find('<html>') > -1 :
+      html = html.replace('<html>', '<htm>' + meta)
+    else :
+      html = meta + html
+    return html
+
+  def _set_cookie(self, name, value) :
+    cookie = Cookie.SimpleCookie()
+    cookie[name] = value
+    self.send_header('Set-Cookie', cookie.output(header=''))
+
+  def _get_cookie(self, name, default=None) :
+    if "Cookie" in self.headers :
+      c = Cookie.SimpleCookie(self.headers["Cookie"])
+      if name in c :
+        return c[name].value
+    return default
 
 
 def main() :

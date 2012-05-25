@@ -26,14 +26,15 @@ var dom = require('jog/dom').dom;
     }
   });
 
-var lorem = 's assumenda est, omnis dolor repellendus. Temporibus autem ' +
-  'quibusdam et aut officiis debitis aut rerum necessitatibus saepe' +
-  ' eveniet ut et voluptates repudiandae sint et molestiae non r' +
-  's assumenda est, omnis dolor repellendus. Temporibus autem ' +
-  'quibusdam et aut officiis debitis aut rerum necessitatibus saepe' +
-  ' eveniet ut et voluptates repudiandae sint et molestiae non r';
 
 function makeEl(text, n) {
+  var lorem = 's assumenda est, omnis dolor repellendus. Temporibus autem ' +
+    'quibusdam et aut officiis debitis aut rerum necessitatibus saepe' +
+    ' eveniet ut et voluptates repudiandae sint et molestiae non r' +
+    's assumenda est, omnis dolor repellendus. Temporibus autem ' +
+    'quibusdam et aut officiis debitis aut rerum necessitatibus saepe' +
+    ' eveniet ut et voluptates repudiandae sint et molestiae non r';
+
   var bgUrl = (~~(Math.random() * 130));
 
   text += lorem.substr(

@@ -83,7 +83,7 @@ var Chrome = Class.create(BaseUI, {
       if (parseInt(this.getNode().style.height, 10) !== window.innerHeight) {
         this.getNode().style.height = window.innerHeight + 'px';
       }
-    }, 50);
+    }, 100);
     this.scheduleCall(function() {
       this._reflowing = false;
     }, 1000);

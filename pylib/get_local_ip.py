@@ -2,7 +2,7 @@ import commands
 import re
 import os
 
-local_ip_pattern = re.compile(
+RE_IP = re.compile(
   r'(\s[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)'
 )
 
@@ -10,7 +10,7 @@ local_ip_pattern = re.compile(
 def get_local_ip() :
   text = str(commands.getoutput('ifconfig'))
   # print text
-  for match in local_ip_pattern.findall(text) :
+  for match in RE_IP.findall(text) :
     if match.strip() != '127.0.0.1' :
       return match.strip()
 
