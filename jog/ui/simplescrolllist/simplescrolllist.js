@@ -17,6 +17,7 @@ var SimpleScrollList = Class.create(BaseUI, {
   main: function() {
     this._chunks = [];
     this._contentsQueue = [];
+    this._onScrollCheck = this.bind(this._onScrollCheck);
     this._toggleChunks = lang.throttle(this._toggleChunks, 200, this);
     this._processContent = lang.throttle(this._processContent, 200, this);
   },
@@ -32,11 +33,11 @@ var SimpleScrollList = Class.create(BaseUI, {
     this._processContent();
     var events = this.getEvents();
     events.listen(this.getNode(), 'scroll', this._onScroll);
-    events.listen(this.getNode(), 'touchend', this._processContent);
   },
 
   /** @override */
   dispose: function() {
+    clearInterval(this._onScrollTimer);
   },
 
   /**
@@ -54,10 +55,21 @@ var SimpleScrollList = Class.create(BaseUI, {
   },
 
   _onScroll: function(left, top) {
-    var now = Date.now();
-    if (now - this._lastScrollTime > 300) {
-      this._lastScrollTime = now;
-      this._processContent();
+    this.getEvents().unlisten(this.getNode(), 'scroll', this._onScroll);
+    this._onScrollTop = window.pageYOffset;
+    this._onScrollTimer = setInterval(this._onScrollCheck, 500);
+  },
+
+  _onScrollCheck :function() {
+    if (this._onScrollTimer) {
+      var scrollTop = this.getNode().scrollTop;
+      if (this._onScrollTop !== scrollTop) {
+        this._onScrollTop = scrollTop;
+        this._processContent();
+      } else {
+        clearInterval(this._onScrollTimer);
+        this.getEvents().listen(this.getNode(), 'scroll', this._onScroll);
+      }
     }
   },
 
@@ -157,7 +169,7 @@ var SimpleScrollList = Class.create(BaseUI, {
   /**
    * @type {number}
    */
-  _lastScrollTime: 0,
+  _onScrollTimer: 0,
 
   /**
    * @type {Chunk}
