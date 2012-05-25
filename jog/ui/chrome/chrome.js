@@ -44,8 +44,8 @@ var Chrome = Class.create(BaseUI, {
     }
 
     if (useTouch) {
-      this.getEvents().listen(
-        document, 'touchmove', Functions.PREVENT_DEFAULT);
+      // this.getEvents().listen(
+      //  document, 'touchmove', Functions.PREVENT_DEFAULT);
     }
   },
 

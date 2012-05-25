@@ -70,25 +70,22 @@ var Chunk = Class.create(BaseUI, {
     if (this._visible !== visible) {
       this._visible = visible;
       var node = this.getNode();
+      var contentNode = this._contentNode;
       if (visible) {
         if (!this._contentNode.parentNode) {
-          dom.removeClassName(this._contentNode,
+          dom.removeClassName(contentNode,
             cssx('jog-ui-scrolllist-chunk-hidden'));
-          dom.addClassName(this._contentNode,
+          dom.addClassName(contentNode,
             cssx('jog-ui-scrolllist-chunk-fadein'));
-          node.appendChild(this._contentNode);
+          node.appendChild(contentNode);
         }
-        // this._contentNode.style.display = '';
-        // this._contentNode.style.visibility = '';
-        // node.style.background = '';
         node.style.height = '';
+        this._reflow();
       } else {
-        // node.style.background = 'red';
-        node.style.height = this._contentNode.offsetHeight + 'px';
+        node.style.height = this._height + 'px';
         // this._contentNode.style.visibility = 'hidden';
-        node.removeChild(this._contentNode);
-        dom.addClassName(this._contentNode,
-          cssx('jog-ui-scrolllist-chunk-hidden'));
+        node.removeChild(contentNode);
+        dom.addClassName(contentNode, cssx('jog-ui-scrolllist-chunk-hidden'));
       }
     }
     this._reflow();
@@ -98,11 +95,7 @@ var Chunk = Class.create(BaseUI, {
    * @param {Element|BaseUI|string} content
    */
   addContent: function(content) {
-    if (!this._visible) {
-      alert('1xx')
-    }
     this.setVisible(true);
-
     var node;
 
     switch (typeof content) {
@@ -131,7 +124,9 @@ var Chunk = Class.create(BaseUI, {
   },
 
   _reflow: function() {
-    this._height = this.getNode().offsetHeight;
+    if (this._visible) {
+      this._height = this.getNode().scrollHeight;
+    }
   },
 
   /**

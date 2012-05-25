@@ -1,12 +1,17 @@
 .jog-ui-scrolllist-chunk {
   left: 0;
-  overflow: hidden;
   position: absolute;
-  top: 0px;
+  top: 0;
   z-index: 1;
   width: 100%;
-  x-webkit-transform: translate3d(0, 0, 0);
 }
+
+/*
+.jog-ui-scrolllist-chunk {
+  outline: solid 5px red;
+  outline-offset: -5px;
+}
+*/
 
 .jog-ui-scrolllist-chunk-hidden {
   display: none;

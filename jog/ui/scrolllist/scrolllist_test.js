@@ -10,8 +10,22 @@ var asserts = require('jog/asserts').asserts;
 
 var Chrome = require('jog/ui/chrome').Chrome;
 var ScrollList = require('jog/ui/scrolllist').ScrollList;
-
 var dom = require('jog/dom').dom;
+
+(new TestCase('ScrollList Test'))
+  .demo('Demo',
+  function(body) {
+    var chrome = new Chrome();
+    chrome.render(body);
+
+    var list = new ScrollList();
+    chrome.appendChild(list, true);
+    var n = 0;
+    while (n++ < 500) {
+      list.addContent(makeEl(n + '. ', n));
+    }
+  });
+
 var lorem = 's assumenda est, omnis dolor repellendus. Temporibus autem ' +
   'quibusdam et aut officiis debitis aut rerum necessitatibus saepe' +
   ' eveniet ut et voluptates repudiandae sint et molestiae non r' +
@@ -19,7 +33,7 @@ var lorem = 's assumenda est, omnis dolor repellendus. Temporibus autem ' +
   'quibusdam et aut officiis debitis aut rerum necessitatibus saepe' +
   ' eveniet ut et voluptates repudiandae sint et molestiae non r';
 
-var makeEl = function(text, n) {
+function makeEl(text, n) {
   var bgUrl = (~~(Math.random() * 130));
 
   text += lorem.substr(
@@ -27,7 +41,7 @@ var makeEl = function(text, n) {
     50 + ~~(Math.random() * lorem.length)
   );
 
-  if (n % 3 == 1) {
+  if (1 || n % 2 == 1) {
     return dom.createElement('div', 'demo-item',
       ['div', 'demo-item-header',
         ['div','demo-item-icon'],
@@ -57,18 +71,4 @@ var makeEl = function(text, n) {
       'Like - Comment'
     ]
   );
-};
-
-(new TestCase('ScrollList Test'))
-  .demo('Demo',
-  function(body) {
-    var chrome = new Chrome();
-    chrome.render(body);
-
-    var list = new ScrollList();
-    chrome.appendChild(list, true);
-    var n = 0;
-    while (n++ < 500) {
-      list.addContent(makeEl(n + '. ', n));
-    }
-  });
+}

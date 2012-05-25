@@ -80,10 +80,10 @@ var Scroller = Class.create(null, {
   _SCROLL_START_DELTA : 1,
 
   // Duration of paging animation.
-  _PAGING_DURATION: 650,
+  _PAGING_DURATION: 250,
 
   // Duration of post-touch scrolling animation.
-  _SCROLLING_DURATION: 1050,
+  _SCROLLING_DURATION: 600,
 
   // The factor that builds the tension when scrolling nearby tension points
   // (e.g. page top). Bigger value shall result in stronger tension. Value
@@ -98,6 +98,9 @@ var Scroller = Class.create(null, {
   // the tension point then bounce back. The bigger the value is, the further
   // the bouncing distance is. Value must be between 0 and 1.
   _BOUNCE_FACTOR: 0.35,
+
+  // Max scroll speed.
+  _MAX_SPEED: 1.7,
 
   /**
    * An Object that implements these methods:
@@ -358,7 +361,7 @@ var Scroller = Class.create(null, {
       }
     }
 
-    speed = this._clamp(speed, -1.7, 1.7);
+    speed = this._clamp(speed, -this._MAX_SPEED, this._MAX_SPEED);
 
     this._doPostTouchScrolling(p0, p1, p2, speed, duration);
     delete this._moveCoordStart;

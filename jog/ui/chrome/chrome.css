@@ -21,4 +21,5 @@ body {
   outline: solid 10px #000;
   position: relative;
   width: 640px;
+  zoom: 0.5;
 }

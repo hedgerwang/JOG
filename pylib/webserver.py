@@ -12,6 +12,7 @@ import urllib2
 import os
 import glob
 import fnmatch
+import get_local_ip
 
 httpHandler = urllib2.HTTPHandler(debuglevel=1)
 httpsHandler = urllib2.HTTPSHandler(debuglevel=1)
@@ -198,7 +199,8 @@ def main() :
   try :
     # port must not be smaller than 1024
     server = HTTPServer(('', 8888), WebHandler)
-    print 'started httpserver...'
+    print 'started httpserver...\n\nhttp://%s:%s/tests' % (
+      get_local_ip.get_local_ip(), 8888)
     server.serve_forever()
   except KeyboardInterrupt :
     print '^C received, shutting down server'

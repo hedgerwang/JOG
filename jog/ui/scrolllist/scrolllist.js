@@ -25,7 +25,7 @@ var ScrollList = Class.create(BaseUI, {
     );
     this._contentsQueue = [];
     this._toggleChunks = lang.throttle(this._toggleChunks, 200, this);
-    this._processContent = lang.throttle(this._processContentNow, 200, this);
+    this._processContent = lang.throttle(this._processContent, 200, this);
 
   },
 
@@ -42,8 +42,8 @@ var ScrollList = Class.create(BaseUI, {
     this._processContent();
     var events = this.getEvents();
     events.listen(this._scrollable, 'scroll', this._onScroll);
-    events.listen(this._scrollable, 'touchstart', this._onScrollStart);
-    events.listen(this._scrollable, 'scrollend', this._onScrollEnd);
+    // events.listen(this._scrollable, 'touchstart', this._onScrollStart);
+    events.listen(this._scrollable, 'scrollend', this._processContent);
   },
 
   /** @override */
@@ -62,23 +62,23 @@ var ScrollList = Class.create(BaseUI, {
     }
   },
 
-  _onScrollStart : function(evt) {
-    lang.unthrottle(this._toggleChunks);
-    lang.unthrottle(this._processContent);
-    this._processContentNow();
-  },
+//  _onScrollStart : function(evt) {
+//    lang.unthrottle(this._toggleChunks);
+//    lang.unthrottle(this._processContent);
+//    this._processContentNow();
+//  },
 
   _onScroll: function(left, top) {
     var now = Date.now();
-    if (now - this._lastScrollTime > 300) {
+    if (now - this._lastScrollTime > 800) {
       this._lastScrollTime = now;
       this._processContent();
     }
   },
 
-  _onScrollEnd : function(evt) {
-    this._processContent();
-  },
+//  _onScrollEnd : function(evt) {
+//    this._processContent();
+//  },
 
   _reflow: function() {
     var dimentions = this._scrollDimentions;
@@ -93,22 +93,17 @@ var ScrollList = Class.create(BaseUI, {
       this._scrollDimentions[3] = dimentions[1];
     }
 
-    // so we can scroll more.
-    // this._scrollDimentions[3] += dimentions[1] * 4;
-
     // Chunk height limit.
     this._maxChunkHeight = Math.max(
       dimentions[0],
-      dimentions[1],
-      window.innerWidth,
-      window.innerHeight
+      dimentions[1]
     ) * 3;
     this._scrollable.reflow();
   },
 
   _toggleChunks: function() {
     var dimentions = this._scrollDimentions;
-    var limitBuffer = this._maxChunkHeight;
+    var limitBuffer = dimentions[1] * 2; // this._maxChunkHeight;
     var scrollTop = this._scrollable.getScrollTop();
     var limitTop = scrollTop - limitBuffer;
     var limitBottom = scrollTop + dimentions[1] + limitBuffer;
@@ -117,16 +112,7 @@ var ScrollList = Class.create(BaseUI, {
     }
   },
 
-  /**
-   * @param {Element|BaseUI|string} content
-   */
   _processContent: function() {
-  },
-
-  /**
-   * @param {Element|BaseUI|string} content
-   */
-  _processContentNow: function(e) {
     this._reflow();
 
     if (!this._contentsQueue.length) {
@@ -152,15 +138,12 @@ var ScrollList = Class.create(BaseUI, {
 
     var targetChunk = this._lastChunk;
 
-//    if (targetChunk.getBottom() > limitBottom) {
-//      // this._toggleChunks();
-//      // return;
-//    }
+    if (targetChunk.getBottom() > limitBottom) {
+      this._toggleChunks();
+      return;
+    }
 
     var contents = this._contentsQueue;
-//    if (this._firstChunk === targetChunk) {
-//      limitBuffer += 1000;
-//    }
 
     while (contents.length) {
       targetChunk.addContent(contents.shift());
@@ -176,7 +159,6 @@ var ScrollList = Class.create(BaseUI, {
   },
 
   /**
-   *
    * @param {number} limitTop
    * @param {number} limitBottom
    * @param {Chunk} chunk
