@@ -101,7 +101,6 @@ var dom = require('jog/dom').dom;
     };
     events.listen(target, 'foo', fn);
     target.dispatchEvent('foo');
-    console.warn(calledContext);
     asserts.equal(calledContext, obj);
   })
   .test('dispose',

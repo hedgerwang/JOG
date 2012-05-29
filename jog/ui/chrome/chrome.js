@@ -74,17 +74,17 @@ var Chrome = Class.create(BaseUI, {
     var dpi = window.devicePixelRatio || 1;
     this._reflowing = true;
     this.getNode().style.height = screen.height * dpi + 'px';
-    this.scheduleCall(function() {
+    this.callLater(function() {
       if (!window.pageYOffset !== 1) {
         window.scrollTo(0, 1);
       }
     }, 1);
-    this.scheduleCall(function() {
+    this.callLater(function() {
       if (parseInt(this.getNode().style.height, 10) !== window.innerHeight) {
         this.getNode().style.height = window.innerHeight + 'px';
       }
     }, 100);
-    this.scheduleCall(function() {
+    this.callLater(function() {
       this._reflowing = false;
     }, 1000);
   },

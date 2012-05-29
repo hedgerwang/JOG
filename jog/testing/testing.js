@@ -8,6 +8,8 @@
  * @constructor
  */
 function TestCase(description) {
+  this._testsQueue = [];
+
   /**
    * @type {string}
    * @private
@@ -20,6 +22,11 @@ function TestCase(description) {
    */
   this._logsEl = document.createElement('div');
   this._logsEl.style.cssText = 'font:12px/140%  Monaco, monospace;';
+
+  var that = this;
+  this._testsTimer = setInterval(function() {
+    that._processTests();
+  }, 100);
 }
 
 /**
@@ -28,17 +35,11 @@ function TestCase(description) {
  * @param {Function} fn
  */
 TestCase.prototype.demo = function(description, fn) {
-  if (document.body) {
-    if (!this._logsEl.parentNode) {
-      document.body.appendChild(this._logsEl);
-    }
-    fn(document.body);
-  } else {
-    var that = this;
-    setTimeout(function() {
-      that.demo(fn);
-    }, 500);
-  }
+  this._testsQueue.push({
+    description: description,
+    fn: fn,
+    demo: true
+  });
   return this;
 };
 
@@ -49,18 +50,75 @@ TestCase.prototype.demo = function(description, fn) {
  * @param {Function} fn
  */
 TestCase.prototype.test = function(description, fn) {
-  if (document.body) {
-    if (!this._logsEl.parentNode) {
-      document.body.appendChild(this._logsEl);
-    }
-    this._test(description, fn);
-  } else {
-    var that = this;
-    setTimeout(function() {
-      that._test(description, fn);
-    }, 500);
-  }
+  this._testsQueue.push({
+    description: description,
+    fn: fn
+  });
   return this;
+};
+
+/**
+ * @param {number} ms
+ * @param {string=} description
+ */
+TestCase.prototype.wait = function(ms, description) {
+  this._testsQueue.push({
+    description: description || '',
+    waitTime: ms
+  });
+  return this;
+};
+
+
+/**
+ * @type {Array}
+ */
+TestCase.prototype._testsQueue = null;
+
+/**
+ * @type {number}
+ */
+TestCase.prototype._testsTimer = 0;
+
+
+TestCase.prototype._processTests = function() {
+  if (!document.body) {
+    return;
+  }
+
+  if (!this._logsEl.parentNode) {
+    document.body.appendChild(this._logsEl);
+  }
+
+  var now = Date.now();
+
+  if (this._waitStopTime && now < this._waitStopTime) {
+    return;
+  } else {
+    delete this._waitStopTime;
+  }
+
+  var test = this._testsQueue.shift();
+
+  if (!test) {
+    this._log('Tests finished');
+    clearInterval(this._testsTimer);
+    delete this._testsTimer;
+    return;
+  }
+
+  if (test.demo) {
+    test.fn(document.body);
+    return;
+  }
+
+  if (typeof test.waitTime === 'number') {
+    this._log('Wait ' + test.description + ' for ' + test.waitTime);
+    this._waitStopTime = Date.now() + test.waitTime;
+    return;
+  }
+
+  this._test(test.description, test.fn);
 };
 
 
@@ -113,51 +171,3 @@ TestCase.prototype._logToPage = function(success, objs) {
 };
 
 exports.TestCase = TestCase;
-
-
-////////////////////////////////////////////////////////////////////////////////
-var useTouch = 'ontouchstart' in document;
-var ua = window.navigator.userAgent;
-var isAndroid = /Android/g.test(ua);
-var isIOS = /iPhone/g.test(ua);
-
-var classNames = [
-  isAndroid ? 'android' : undefined,
-  isIOS ? 'ios' : undefined,
-  useTouch ? 'touch' : undefined,
-  (isIOS || isAndroid) ? 'mobile' : 'desktop'
-];
-document.documentElement.className += ' ' + classNames.join(' ');
-
-/*
-if (useTouch && (isIOS || isAndroid)) {
-  document.addEventListener('touchmove', function(evt) {
-    evt.preventDefault();
-  });
-
-  document.addEventListener('touchend', function(evt) {
-    scrollTo(0, 1);
-  });
-
-  var pageNode = document.createElement('div');
-  pageNode.style.cssText = 'position:absolute;left:0;top:0;width:1px;background:red;';
-  var onresize = function() {
-    if (!document.body) {
-      setTimeout(onresize, 16);
-      return;
-    }
-
-    if (!pageNode.parentNode) {
-      document.body.appendChild(pageNode);
-    }
-
-    var h = Math.max(window.outerHeight, window.innerHeight);
-    pageNode.style.height = h + 50 + 'px';
-    setTimeout(function() {
-      scrollTo(0, 1);
-    });
-  };
-  window.addEventListener('resize', onresize);
-  onresize();
-}
-  */

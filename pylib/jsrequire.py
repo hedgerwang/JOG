@@ -41,7 +41,7 @@ def get(path, mode=None) :
         contents.append(module_text)
   else :
     js_path = path
-    if js_path == CORE_JS_PATH :
+    if js_path == CORE_JS_PATH or js_path.endswith('.user.js') :
       contents.append(_get_file(js_path))
     else :
       module_name = _normalize_module_name(js_path)
@@ -49,7 +49,7 @@ def get(path, mode=None) :
       contents.append('/* %s */' % js_path)
       contents.append(module_text)
 
-  if module_name is not None and module_name.endswith('_test'):
+  if module_name is not None and module_name.endswith('_test') :
     # This will run the test.
     contents.append('require(\'%s\');' % module_name)
 

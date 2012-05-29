@@ -103,7 +103,7 @@ var SimpleScrollList = Class.create(BaseUI, {
 
     if (this._firstChunk !== this._lastChunk &&
       this._lastChunk.getTop() > limitBottom) {
-      // console.log('// We already have enough chunks to show',  scrollTop);
+      // We already have enough chunks to show',  scrollTop);
       this._toggleChunks();
       return;
     }

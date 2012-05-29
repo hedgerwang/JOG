@@ -8,11 +8,56 @@ var lang = require('jog/lang').lang;
 
 var Deferred = Class.create(null, {
 
+  main: function() {
+    this._callbacks = [];
+  },
+
   /**
-   * @type {Array.<Function>}    PC@nc6000
-   *
+   * @type {Array.<Function>}
    */
   _callbacks : null,
+
+  /**
+   * @type {Array}
+   */
+  _waitForQueue: null,
+
+  /**
+   * @type {Object}
+   */
+  _waitForThing: null,
+
+  /**
+   * @type {boolean}
+   */
+  _done: false,
+
+  dispose: function() {
+    this._clearWaitFor();
+  },
+
+  /**
+   * @param {Deferred} deferred
+   */
+  attachTo: function(deferred) {
+    deferred.addCallback(this.bind(this.succeed), this.bind(this.fail));
+    return deferred;
+  },
+
+  /**
+   * @param {Function} fn
+   */
+  then: function(fn) {
+    var df = new Deferred();
+    this.addCallback(function(more) {
+      var newDeferred = fn.apply(null, arguments);
+      if (!newDeferred || !(newDeferred instanceof Deferred)) {
+        throw new Error('Not Deferred');
+      }
+      df.attachTo(newDeferred);
+    });
+    return df;
+  },
 
   /**
    * @param {Function} onSuccess
@@ -20,49 +65,43 @@ var Deferred = Class.create(null, {
    * @return {Deferred}
    */
   addCallback: function(onSuccess, opt_onError) {
-    if (!this._callbacks) {
-      this._callbacks = [];
-    }
     this._callbacks.push(onSuccess, opt_onError);
     return this;
   },
 
   /**
-   * @param {Object} context
-   * @param {Function} onSuccess
-   * @param {Function=} opt_onError
+   * @param {*} result
+   * @param {*...} more
    * @return {Deferred}
    */
-  bindCallback: function(context, onSuccess, opt_onError) {
-    if (context) {
-      onSuccess = onSuccess ?
-        lang.bind(context, onSuccess) :
-        onSuccess;
-
-      opt_onError = opt_onError ?
-        lang.bind(context, opt_onError) :
-        opt_onError;
+  succeed: function(result, more) {
+    if (this._done || this.disposed) {
+      throw new Error('Deferred already succeed');
     }
 
-    return this.addCallback(onSuccess, opt_onError);
-  },
+    this._clearWaitFor();
+    this._done = true;
 
-  /**
-   * @param {*} result
-   * @return {Deferred}
-   */
-  succeed: function(result) {
-    setTimeout(lang.bind(this, function() {
+    if (arguments.length > 1) {
+      more = lang.toArray(arguments);
+    } else {
+      more = undefined;
+    }
+
+    this.callLater(function() {
       if (this._callbacks) {
         for (var i = 0, j = this._callbacks.length; i < j; i += 2) {
           var callback = this._callbacks[i];
-          callback && callback(result);
+          if (callback) {
+            more === undefined ? callback(result) : callback.apply(null, more);
+          }
         }
-        this._callbacks.length = 0;
-        result = null;
       }
+
+      result = null;
+      more = null;
       this.dispose();
-    }), 10);
+    }, 0);
 
     return this;
   },
@@ -72,7 +111,14 @@ var Deferred = Class.create(null, {
    * @return {Deferred}
    */
   fail: function(opt_error) {
-    setTimeout(lang.bind(this, function() {
+    if (this._done || this.disposed) {
+      throw new Error('Deferred already fail');
+    }
+
+    this._clearWaitFor();
+    this._done = true;
+
+    this.callLater(function() {
       if (this._callbacks) {
         for (var i = 1, j = this._callbacks.length; i < j; i += 2) {
           var callback = this._callbacks[i];
@@ -80,9 +126,10 @@ var Deferred = Class.create(null, {
         }
         this._callbacks.length = 0;
       }
+
       opt_error = null;
       this.dispose();
-    }), 0);
+    }, 0);
 
     return this;
   },
@@ -93,28 +140,62 @@ var Deferred = Class.create(null, {
    * @return {Deferred}
    */
   waitForValue: function(object, key) {
-    // Kill self since we'll return a new instance.
-    this.dispose();
+    if (!this._waitForQueue) {
+      this._waitForQueue = [];
+    }
 
-    var df = new Deferred();
-
-    var onWaitForValue = lang.bind(df, function() {
-      if (object[key]) {
-        clearTimeout(timeout);
-        clearInterval(interval);
-        df.succeed(object[key]);
+    this._waitForQueue.push(
+      {
+        object: object,
+        key: key,
+        time: Date.now()
       }
-    });
+    );
 
-    var onWaitForValueTimeout = lang.bind(df, function() {
-      clearTimeout(timeout);
-      clearInterval(interval);
-      df.fail('wait timeout');
-    }, 100);
+    if (!this._waitForTimer) {
+      this._waitForTimer = setInterval(this.bind(this._processWaitFor), 100);
+    }
 
-    var interval = setInterval(onWaitForValue);
-    var timeout = setTimeout(onWaitForValueTimeout, 60000);
-    return df;
+    return this;
+  },
+
+  _processWaitFor: function() {
+    if (!this._waitForThing) {
+      this._waitForThing = this._waitForQueue.shift();
+    }
+
+    var thing = this._waitForThing;
+    var value = thing ? thing.object[thing.key] : null;
+    if (value !== undefined && value !== null) {
+      if (!this._waitForResults) {
+        this._waitForResults = [];
+      }
+
+      this._waitForResults.push(value);
+
+      if (this._waitForQueue.length) {
+        delete this._waitForThing;
+        // Then we'll continue to wait for the next one.
+      } else {
+        this.succeed.apply(this, this._waitForResults);
+        this._clearWaitFor();
+      }
+      return;
+    }
+
+    if (((Date.now() - thing.time) > 60000)) {
+      this.fail('Wait for timeout');
+      this._clearWaitFor();
+    }
+  },
+
+  _clearWaitFor: function() {
+    if (this._waitForResults) {
+      this._waitForResults.length = 0;
+    }
+    delete this._waitForThing;
+    clearInterval(this._waitForTimer);
+    delete this._waitForTimer;
   }
 });
 

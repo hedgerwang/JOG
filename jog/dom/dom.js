@@ -4,7 +4,9 @@
  */
 
 var Class = require('jog/class').Class;
+var lang = require('jog/lang').lang;
 var objectPrototypeToString = Object.prototype.toString;
+
 
 var DOM = Class.create(null, {
   /**

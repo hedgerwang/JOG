@@ -174,4 +174,19 @@ var Class = require('jog/class').Class;
       }
     });
     new App();
-  });
+  })
+  .test('bind',
+  function() {
+    var Klass = Class.create();
+    var obj = new Klass();
+    obj.x = 0;
+    var fn1 = obj.bind(function() {
+      this.x++;
+    });
+    var fn2 = obj.bind(fn1);
+    fn1();
+    fn2();
+    asserts.equal(fn1, fn2);
+    asserts.equal(obj.x, 2);
+  }
+);

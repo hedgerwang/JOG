@@ -69,8 +69,7 @@ def gen_js_test(dir_path) :
       js_file_name = path[path.rfind('/') + 1 :]
 
       if (js_file_name == 'core.js' or
-          js_file_name == 'asserts.js' or
-          js_file_name == 'testing.js') :
+          js_file_name == 'asserts.js') :
         print '>>> skip >>> %s' % path
         continue
 

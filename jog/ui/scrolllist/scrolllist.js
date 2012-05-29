@@ -24,8 +24,9 @@ var ScrollList = Class.create(BaseUI, {
       {dimentions: this._scrollDimentions}
     );
     this._contentsQueue = [];
+    this._processContentNow = this.bind(this._processContentNow);
     this._toggleChunks = lang.throttle(this._toggleChunks, 200, this);
-    this._processContent = lang.throttle(this._processContent, 200, this);
+    this._processContent = lang.throttle(this._processContentNow, 200);
 
   },
 
@@ -42,14 +43,14 @@ var ScrollList = Class.create(BaseUI, {
     this._processContent();
     var events = this.getEvents();
     events.listen(this._scrollable, 'scroll', this._onScroll);
-    // events.listen(this._scrollable, 'touchstart', this._onScrollStart);
-    events.listen(this._scrollable, 'scrollend', this._processContent);
   },
 
   /** @override */
   dispose: function() {
+    clearTimeout(this._onScrollTimer);
     this._scrollable.dispose();
-    // lang.unthrottle(this.reflow);
+    lang.unthrottle(this._toggleChunks);
+    lang.unthrottle(this._processContent);
   },
 
   /**
@@ -62,23 +63,30 @@ var ScrollList = Class.create(BaseUI, {
     }
   },
 
-//  _onScrollStart : function(evt) {
-//    lang.unthrottle(this._toggleChunks);
-//    lang.unthrottle(this._processContent);
-//    this._processContentNow();
-//  },
 
   _onScroll: function(left, top) {
-    var now = Date.now();
-    if (now - this._lastScrollTime > 800) {
-      this._lastScrollTime = now;
-      this._processContent();
+    this.getEvents().unlistenAll();
+
+    if (!this._onScrollTimer) {
+      this._onScrollTimer = setInterval(this.bind(function() {
+        var scrollTop = this._scrollable.getScrollTop();
+        if (this._onScrollTop !== scrollTop) {
+          this._onScrollTop = scrollTop;
+          this._processContentNow();
+        } else {
+          this._onScrollEnd();
+        }
+      }), 500);
     }
   },
 
-//  _onScrollEnd : function(evt) {
-//    this._processContent();
-//  },
+  _onScrollEnd: function() {
+    clearTimeout(this._onScrollTimer);
+    delete this._onScrollTimer;
+    this.getEvents().listen(this._scrollable, 'scroll', this._onScroll);
+    this._processContent();
+  },
+
 
   _reflow: function() {
     var dimentions = this._scrollDimentions;
@@ -113,6 +121,9 @@ var ScrollList = Class.create(BaseUI, {
   },
 
   _processContent: function() {
+  },
+
+  _processContentNow: function() {
     this._reflow();
 
     if (!this._contentsQueue.length) {
@@ -131,7 +142,7 @@ var ScrollList = Class.create(BaseUI, {
 
     if (this._firstChunk !== this._lastChunk &&
       this._lastChunk.getTop() > limitBottom) {
-      // console.log('// We already have enough chunks to show',  scrollTop);
+      // We already have enough chunks to show',  scrollTop);
       this._toggleChunks();
       return;
     }
@@ -229,7 +240,7 @@ var ScrollList = Class.create(BaseUI, {
   /**
    * @type {number}
    */
-  _lastScrollTime: 0,
+  _onScrollTimer: 0,
 
   /**
    * @type {Scrollable}

@@ -14,7 +14,7 @@ var classID = 1;
 var defaultClassConfig = {
   dispose: classDispose,
   bind: classBind,
-  scheduleCall: classScheduleCall
+  callLater: classCallLater
 };
 
 var Class = {
@@ -68,7 +68,7 @@ var Class = {
         prototype[newClass._disposeID] = prototype.dispose;
       }
 
-      prototype.scheduleCall = classScheduleCall;
+      prototype.callLater = classCallLater;
       prototype.dispose = classDispose;
       prototype.bind = classBind;
     } else {
@@ -146,8 +146,8 @@ function classDispose() {
       klass = klass._superClass;
     }
 
-    if (this._scheduleCallTimers) {
-      for (var id in this._scheduleCallTimers) {
+    if (this._callLaterTimers) {
+      for (var id in this._callLaterTimers) {
         clearTimeout(id);
       }
     }
@@ -164,12 +164,19 @@ function classDispose() {
  * @return {Function}
  */
 function classBind(fn) {
+  if (fn._bound_by_class) {
+    return fn;
+  }
+
   var that = this;
-  return function() {
+  var fn2 = function() {
     if (!that.disposed) {
-      return fn.apply(that, arguments);
+      return fn.apply(that, arguments)
     }
   };
+
+  fn2._bound_by_class = true;
+  return fn2;
 }
 
 /**
@@ -177,23 +184,23 @@ function classBind(fn) {
  * @param {number} delay
  * @return {number}
  */
-function classScheduleCall(fn, delay) {
+function classCallLater(fn, delay) {
   var that = this;
   var id;
 
-  if (!that._scheduleCallTimers) {
-    that._scheduleCallTimers = {};
+  if (!that._callLaterTimers) {
+    that._callLaterTimers = {};
   }
 
   var wfn = function() {
-    delete that._scheduleCallTimers[id];
+    delete that._callLaterTimers[id];
     fn.apply(that, arguments);
     that = null;
     id = null;
   };
 
   id = setTimeout(wfn, delay);
-  that._scheduleCallTimers[id] = true;
+  that._callLaterTimers[id] = true;
   return id;
 }
 

@@ -28,7 +28,7 @@ var Chunk = Class.create(BaseUI, {
   /** @override */
   onDocumentReady: function() {
     dom.addClassName(this.getNode(), cssx('jog-ui-scrolllist-chunk-fadein'));
-    this.scheduleCall(function() {
+    this.callLater(function() {
       dom.addClassName(this.getNode(), cssx('jog-ui-scrolllist-chunk-fadein-play'));
     }, 16);
     this._reflow();

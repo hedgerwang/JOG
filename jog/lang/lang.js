@@ -22,8 +22,8 @@ var lang = {
 
     if (fn._bound_by_lang) {
       return fn;
-
     }
+
     var fn2 = function() {
       return fn.apply(context, arguments)
     };
@@ -35,6 +35,22 @@ var lang = {
     }
 
     return fn2;
+  },
+
+  /**
+   * @param {*} obj
+   * @return {boolean}
+   */
+  isArray: function(obj) {
+    return obj && obj.slice ?
+      Object.prototype.toString.call(obj) === '[object Array]' : false;
+  },
+
+  /**
+   * @param {Arguments} args
+   */
+  toArray: function(args) {
+    return Array.prototype.slice.call(args, 0);
   },
 
   /**
@@ -56,7 +72,6 @@ var lang = {
     };
 
     var time1 = 0;
-    var firstTime = true;
 
     var wfn2 = function() {
       var time2 = Date.now();
@@ -72,17 +87,6 @@ var lang = {
         wfn1();
         wfn2._throttleTimer = 1;
       }
-
-
-//      if (firstTime) {
-//        firstTime = null;
-//        wfn1();
-//      } else if (dt > delay) {
-//        time1 = time2;
-//        wfn2._throttleTimer = setTimeout(wfn1, 0);
-//      } else {
-//        wfn2._throttleTimer = setTimeout(wfn1, delay - dt);
-//      }
     };
 
     return wfn2;
