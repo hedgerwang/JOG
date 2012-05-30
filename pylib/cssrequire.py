@@ -56,8 +56,8 @@ CSS_TRANSLATE_PROPERTIES = [
   'background',
   'background-size',
   'background-position',
-  'border-radius'
-]
+  'border-radius',
+  ]
 
 CSS_TRANSLATE_PROPERTIES_PATTERNS = [
 re.compile(CSS_TRANSLATE_TEMPLATE % property)
@@ -67,6 +67,17 @@ for property in CSS_TRANSLATE_PROPERTIES
 CSS_PX_PATTERN = re.compile(r'-?\d+px[/\s;]?')
 CSS_NUMBER_PATTERN = re.compile(r'[/\s-]?\d+')
 
+CSS_VENDER_PROPERTIES = [
+  'transform',
+  'user-select',
+  'box-shadow',
+  ]
+
+CSS_VENDER_PROPERTIES_PATTERNS = [
+re.compile(CSS_TRANSLATE_TEMPLATE % property)
+for property in CSS_VENDER_PROPERTIES
+]
+
 
 def translate(css_text, scale=1) :
   if scale != 1 :
@@ -74,12 +85,32 @@ def translate(css_text, scale=1) :
       matches = re_pattern.finditer(css_text)
       for match in matches :
         old_rule = match.group()
-        new_rule = _translate_rule(old_rule, scale)
+        new_rule = _translate_px_rule(old_rule, scale)
         css_text = css_text.replace(old_rule, new_rule)
+
+  for re_pattern in CSS_VENDER_PROPERTIES_PATTERNS :
+    matches = re_pattern.finditer(css_text)
+
+    for match in matches :
+      old_rule = match.group()
+      new_rule = _translate_vender_rule(old_rule)
+      css_text = css_text.replace(old_rule, new_rule)
+
   return css_text
 
 
-def _translate_rule(rule, scale) :
+def _translate_vender_rule(rule) :
+  prefix = ''
+  if (rule.startswith('{')
+      or rule.startswith(';')
+      or rule.startswith(' ')) :
+    prefix = rule[0 :1]
+    rule = rule[1 :]
+  rule = prefix + '-webkit-' + rule + ' /***/'
+  return rule
+
+
+def _translate_px_rule(rule, scale) :
   value = rule[rule.find(':') :]
   new_value = value
 
@@ -168,6 +199,8 @@ def main() :
   css_text = """
 
   .foo {
+    transform: translate3d(0,0,0);
+    user-select: none;
     margin: -1px -2px 3px 4px;
     margin: 110px 10px 0;
     margin-top: 10px;
@@ -196,6 +229,7 @@ def main() :
     background-size : 123px 321px;
     background-position: -10px 10px;
     background: #fff url(/image/foo.jpg) 10px 10px no-repeat;
+    box-shadow: 0 0 0 10px;
   }
   """
 
