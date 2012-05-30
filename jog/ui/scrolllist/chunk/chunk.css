@@ -1,31 +1,11 @@
-.jog-ui-scrolllist-chunk {
+.jog-ui-scrolllist-chunk {  
   left: 0;
   position: absolute;
   top: 0;
-  z-index: 1;
   width: 100%;
+  z-index: 1;
 }
 
-/*
-.jog-ui-scrolllist-chunk {
-  outline: solid 5px red;
-  outline-offset: -5px;
-}
-*/
-
-.jog-ui-scrolllist-chunk-hidden {
+.jog-ui-scrolllist-chunk-hidden {  
   display: none;
 }
-
-/*
-.jog-ui-scrolllist-chunk-fadein {
-  -webkit-transition-property: opacity;
-  -webkit-transition-duration: 300ms;
-  -webkit-transition-timing-function: ease-in;
-  opacity: 0.5;
-}
-
-.jog-ui-scrolllist-chunk-fadein-play {
-  opacity: 1;
-}
-*/

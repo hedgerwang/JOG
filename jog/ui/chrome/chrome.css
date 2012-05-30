@@ -1,21 +1,19 @@
-body {
+body {  
   background: #133783;
 }
 
-.jog-ui-chrome {
+.jog-ui-chrome {  
+  /* outline-offset: -10px; */
+  /* outline: solid 10px #000; */
   background: #fff;
   bottom: 0;
   left: 0;
   position: absolute;
   right: 0;
   top: 0;
-  /*
-  outline: solid 10px #000;
-  outline-offset: -10px;
-  */
 }
 
-.jog-ui-chrome.pc {
+.jog-ui-chrome.pc {  
   height: 480px;
   margin: 20px auto;
   outline: solid 10px #000;

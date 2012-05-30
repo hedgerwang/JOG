@@ -21,13 +21,6 @@ var FBAPI = {
   queryGraph: function(query) {
     var deferred = new Deferred();
 
-    try {
-      var response = JSON.parse(localStorage[query]);
-      return deferred.succeed(response);
-    } catch (ex) {
-      //
-    }
-
     isLoggedIn().addCallback(function(pass) {
       if (!pass) {
         return deferred.fail('not logged in');
@@ -43,12 +36,6 @@ var FBAPI = {
         deferred = null;
         script.parentNode.removeChild(script);
         script = null;
-
-        try {
-          localStorage[query] = JSON.stringify(response);
-        } catch (ex) {
-          console.error(ex);
-        }
       };
 
       var url = 'https://graph.facebook.com/graphql' +

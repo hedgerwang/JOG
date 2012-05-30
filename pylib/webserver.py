@@ -109,8 +109,7 @@ class WebHandler(BaseHTTPRequestHandler) :
         elif  type == 'css' :
           mine = 'text/css'
           content = cssrequire.get(path, query_params.get('mode', [None])[0])
-          if self._scale != 1 :
-            content = cssrequire.translate(content, DEVICE_PIXEL_RATIO)
+          content = cssrequire.translate(content, DEVICE_PIXEL_RATIO)
         elif type == 'png' :
           mine = 'image/png'
           content = self._get_file(path)

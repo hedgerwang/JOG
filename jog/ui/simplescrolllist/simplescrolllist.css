@@ -1,8 +1,8 @@
-.jog-ui-simplescrolllist {
-  height: 100%;
-  overflow: auto;
-  overflow-x: hidden;
+.jog-ui-simplescrolllist {  
   -webkit-overflow-scrolling: touch;
+  height: 100%;
+  overflow-x: hidden;
+  overflow: auto;
   position: absolute;
   width: 100%;
 }

@@ -4,6 +4,39 @@ import os
 from os import curdir, sep
 import useragent
 
+
+CSS_TRANSLATE_PROPERTIES = [
+  'margin',
+  'margin-[a-z]+',
+  'padding',
+  'padding-[a-z]+',
+  'width',
+  'height',
+  'left',
+  'top',
+  'right',
+  'bottom',
+  'text-indent',
+  'font-size',
+  'font',
+  'line-height',
+  'background',
+  'background-size',
+  'background-position',
+  'border-radius',
+  ]
+
+CSS_VENDER_PROPERTIES = [
+  'transform',
+  'user-select',
+  'box-shadow',
+  'box-align',
+  'box-orient',
+  'box-pack',
+  'tap-highlight-color',
+  'text-size-adjust',
+  ]
+
 MODULE_WRAP = """
 %s
 %s
@@ -38,40 +71,14 @@ def get(path, mode=None) :
 
 CSS_TRANSLATE_TEMPLATE = '''[\s;\{]%s\s*:[^;]+;'''
 
-CSS_TRANSLATE_PROPERTIES = [
-  'margin',
-  'margin-[a-z]+',
-  'padding',
-  'padding-[a-z]+',
-  'width',
-  'height',
-  'left',
-  'top',
-  'right',
-  'bottom',
-  'text-indent',
-  'font-size',
-  'font',
-  'line-height',
-  'background',
-  'background-size',
-  'background-position',
-  'border-radius',
-  ]
-
 CSS_TRANSLATE_PROPERTIES_PATTERNS = [
 re.compile(CSS_TRANSLATE_TEMPLATE % property)
 for property in CSS_TRANSLATE_PROPERTIES
 ]
 
 CSS_PX_PATTERN = re.compile(r'-?\d+px[/\s;]?')
-CSS_NUMBER_PATTERN = re.compile(r'[/\s-]?\d+')
 
-CSS_VENDER_PROPERTIES = [
-  'transform',
-  'user-select',
-  'box-shadow',
-  ]
+CSS_NUMBER_PATTERN = re.compile(r'[/\s-]?\d+')
 
 CSS_VENDER_PROPERTIES_PATTERNS = [
 re.compile(CSS_TRANSLATE_TEMPLATE % property)
