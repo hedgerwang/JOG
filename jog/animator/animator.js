@@ -9,6 +9,14 @@ var animInterval = 16;
 var lastAnimTime = 0;
 
 var Animator = Class.create(null, {
+  /**
+   * @param {number=} opt_interval
+   */
+  main: function(opt_interval) {
+    this._interval = opt_interval === undefined ?
+      animInterval : opt_interval;
+  },
+
   dispose:function() {
     this.stop();
   },
@@ -67,10 +75,10 @@ var Animator = Class.create(null, {
         return;
       }
 
-      this._animID = Animator.requestAnimationFrame(frameFn);
+      this._animID = Animator.requestAnimationFrame(frameFn, this._interval);
     }, this);
 
-    this._animID = Animator.requestAnimationFrame(frameFn);
+    this._animID = Animator.requestAnimationFrame(frameFn, this._interval);
   },
 
   stop: function() {
@@ -86,7 +94,8 @@ var Animator = Class.create(null, {
   _onStopCallback: null,
   _animating: false,
   _value: 0,
-  _animID: ''
+  _animID: '',
+  _interval: 0
 });
 
 Class.mixin(Animator, {
@@ -115,13 +124,15 @@ Class.mixin(Animator, {
   /**
    * Implementation of requestAnimationFrame.
    * @param {Function} callback
+   * @param {number=} opt_interval
    * @return {string}
    */
-  requestAnimationFrame : function(callback) {
+  requestAnimationFrame : function(callback, opt_interval) {
     // TODO(hedger): Use requestAnimationFrame when possible.
     var currTime = Date.now();
     var timeDelta = currTime - lastAnimTime;
-    var timeToCall = Math.max(0, animInterval - timeDelta);
+    var interval = opt_interval || animInterval;
+    var timeToCall = Math.max(0, interval - timeDelta);
     lastAnimTime = currTime + timeToCall;
     return setTimeout(callback, timeToCall);
   },

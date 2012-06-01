@@ -34,6 +34,7 @@ CSS_VENDER_PROPERTIES = [
   'box-orient',
   'box-pack',
   'hyphens',
+  'mask-image',
   'tap-highlight-color',
   'text-size-adjust',
   ]

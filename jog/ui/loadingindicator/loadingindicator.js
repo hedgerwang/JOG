@@ -11,7 +11,7 @@ var dom = require('jog/dom').dom;
 
 var LoadingIndicator = Class.create(BaseUI, {
   main: function() {
-    this._animator = new Animator();
+    this._animator = new Animator(32);
   },
 
   /** @override */
@@ -28,21 +28,24 @@ var LoadingIndicator = Class.create(BaseUI, {
 
   /** @override */
   onDocumentReady: function() {
-    this._play();
+    this.play();
   },
 
-  _play: function() {
-    this._animator.start(
-      this.bind(this._stepFn),
-      this.bind(this._verifyFn),
-      this.bind(this._completedFn),
-      2000,
-      Animator.linear
-    );
+  play: function() {
+    if (!this._playing) {
+      this._playing = true;
+      this._animator.start(
+        this.bind(this._stepFn),
+        this.bind(this._verifyFn),
+        this.bind(this._completedFn),
+        1000,
+        Animator.linear
+      );
+    }
   },
 
   _stepFn: function(value) {
-    var degree = ((value * 10) % 10) * 36;
+    var degree = ~~(value * 360);
     if (this._degree !== degree) {
       this._degree = degree;
       var style = this.getNode().style;
@@ -51,7 +54,9 @@ var LoadingIndicator = Class.create(BaseUI, {
   },
 
   _verifyFn: function() {
-    if (this._degree === 0) {
+    if (!this._playing) {
+      return false;
+    } else if (this._degree === 0) {
       return this.getNode() && this.getNode().offsetHeight > 0;
     }
     return true;
@@ -59,10 +64,11 @@ var LoadingIndicator = Class.create(BaseUI, {
 
   _completedFn: function() {
     if (this._verifyFn()) {
-      this._play();
+      this._playing = false;
+      this.play();
     }
   },
-
+  _playing: false,
   _animator: null,
   _animID: 0,
   _degree: 0,

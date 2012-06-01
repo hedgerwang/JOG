@@ -110,7 +110,7 @@ var ScrollList = Class.create(BaseUI, {
 
   _toggleChunks: function() {
     var dimentions = this._scrollDimentions;
-    var buffer = dimentions[1] * 2;
+    var buffer = dimentions[1] * 3;
     var scrollTop = this._scrollable.getScrollTop();
     var top = scrollTop;
     var bottom = scrollTop + dimentions[1];
