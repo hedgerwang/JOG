@@ -17,6 +17,11 @@ var BaseUI = Class.create(EventTarget, {
   _parentUI: null,
 
   /**
+   * @type {Array.<BaseUI>
+   */
+  _childrenUI: null,
+
+  /**
    * @type {Node}
    */
   _node: null,
@@ -45,6 +50,16 @@ var BaseUI = Class.create(EventTarget, {
       this._mutationEvents.dispose();
     }
     dom.remove(this._node);
+
+    if (this._parentUI) {
+      this._parentUI.removeChild(this);
+    }
+
+    if (this._childrenUI) {
+      for (var i = 0, j = this._childrenUI.length; i < j; i++) {
+        this._childrenUI[i].dispose();
+      }
+    }
   },
 
   /**
@@ -126,9 +141,33 @@ var BaseUI = Class.create(EventTarget, {
     }
     ui._parentUI = this;
 
+    if (!this._childrenUI) {
+      this._childrenUI = [];
+    }
+
+    this._childrenUI.push(ui);
+
     if (opt_render) {
       ui.render(this.getNode());
     }
+  },
+
+  /**
+   * @param {BaseUI} ui
+   */
+  removeChild: function(ui) {
+    if (__DEV__) {
+      if (!ui || !(ui instanceof BaseUI)) {
+        throw new Error('child must be an instance of BaseUI');
+      }
+
+      if (ui._parentUI !== this) {
+        throw new Error('parent ui mismatch');
+      }
+    }
+
+    ui._parentUI._childrenUI.splice(ui._parentUI._childrenUI.indexOf(ui), 0);
+    delete ui._parentUI;
   },
 
   /**

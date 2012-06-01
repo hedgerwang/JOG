@@ -19,16 +19,22 @@ html_template = '''
 
 js_template = '''
 /**
- * @fileOverview %s Test
+ * @fileOverview %(module_name)s Test
  * @author Hedger Wang
  *
- * @url http://localhost:8888/%s
+ * @url http://localhost:8888/%(html_test_file_path)s
  */
 
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
 
-(new TestCase('%s Test'))
+var %(module_name)s = require('%(module_path)s').%(module_name)s;
+
+(new TestCase('%(module_name)s Test'))
+  .demo('demo',
+  function(body){
+    // var obj = new %(module_name)s();
+  })
   .test('test 1',
   function() {
     asserts.equal(1, 1);
@@ -114,7 +120,12 @@ def gen_js_test(dir_path) :
         print 'gen >> ' + html_test_file_path
 
       if not os.path.exists(js_test_file_path) :
-        js = js_template % (module_name, html_test_file_path, module_name)
+        js = js_template % {
+          'module_name' : module_name,
+          'module_path' : path[0 :path.rfind('/')],
+          'html_test_file_path' : html_test_file_path
+        }
+        #(module_name, html_test_file_path, module_name)
         js_file = open(js_test_file_path, 'w')
         js_file.write(js.strip())
         js_file.close()

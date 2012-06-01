@@ -48,6 +48,7 @@ def get_tests(rootdir='.') :
 
 
 DEVICE_PIXEL_RATIO = 1
+NUMERIC_PATTERN = re.compile('\d+(\.\d+)?')
 
 class WebHandler(BaseHTTPRequestHandler) :
   def do_GET(self) :
@@ -59,8 +60,10 @@ class WebHandler(BaseHTTPRequestHandler) :
 
       dpr = query_params.get('dpr', None)
 
-      if dpr is not None and dpr[0].isdigit() :
-        DEVICE_PIXEL_RATIO = max(1, int(dpr[0]))
+      if dpr is not None and NUMERIC_PATTERN.match(dpr[0]):
+        print '-' * 80
+        print dpr
+        DEVICE_PIXEL_RATIO = max(0.1, float(dpr[0]))
 
       print 'self.DEVICE_PIXEL_RATIO = %s' % DEVICE_PIXEL_RATIO
 

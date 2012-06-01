@@ -33,6 +33,7 @@ CSS_VENDER_PROPERTIES = [
   'box-align',
   'box-orient',
   'box-pack',
+  'hyphens',
   'tap-highlight-color',
   'text-size-adjust',
   ]

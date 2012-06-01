@@ -35,6 +35,15 @@ var Animator = Class.create(null, {
     this._animating = true;
     this._onStopCallback = completedFn;
 
+    if (__DEV__) {
+      if (typeof stepFn !== 'function' ||
+        typeof verifyFn !== 'function' ||
+        typeof completedFn !== 'function' ||
+        typeof easingFn !== 'function') {
+        throw new Error('Invalid Animator functions');
+      }
+    }
+
     var frameFn = this.bind(function() {
       var now = Date.now();
 
@@ -70,7 +79,6 @@ var Animator = Class.create(null, {
       Animator.cancelAnimationFrame(this._animID);
       this._onStopCallback(this._value, this._animating, Date.now());
       delete this._animID;
-      delete this._onStopCallback;
       this._value = 0;
     }
   },
@@ -87,6 +95,10 @@ Class.mixin(Animator, {
    */
   easeOutCubic :function(value) {
     return (Math.pow((value - 1), 3) + 1);
+  },
+
+  linear: function(value) {
+    return value;
   },
 
   /**

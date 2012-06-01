@@ -6,14 +6,20 @@
 var Deferred = require('jog/deferred').Deferred;
 var FBAPI = require('jog/fbapi').FBAPI;
 
+var CACHE_DURATION = 30 * 60 * 1000;
+
+
+// See https://our.intern.facebook.com/intern/graphiql
 var FBData = {
   /**
    * @return {Deferred}
    */
   getHomeStories: function() {
-    var query = 'me(){home_stories.first(50){' +
-      'nodes{message,title,id,url,creation_time,actors,attachments{' +
-      'media{src,url,id,message},source,description}}}}';
+    var query = 'me(){id,name,home_stories.first(50){' +
+      'nodes{title,id,url,creation_time,actors{' +
+      'profile_picture,name,id},attachments{' +
+      'title,url,media{image,url,id}},message{text}}}}';
+
 
     return queryGraph(query);
   }
@@ -29,7 +35,10 @@ function queryGraph(query) {
 
   try {
     var data = JSON.parse(localStorage[query]);
-    if (!data._cacheTime || (Date.now() - data._cacheTime > 60000)) {
+    if (!data ||
+      data.error ||
+      !data._cacheTime ||
+      (Date.now() - data._cacheTime > CACHE_DURATION)) {
       localStorage.removeItem(query);
       console.warn('FBData cache expired');
     } else {

@@ -1,5 +1,5 @@
 body {  
-  background: #133783;
+  background: #606c88;
 }
 
 .jog-ui-chrome {  
@@ -14,9 +14,10 @@ body {
 }
 
 .jog-ui-chrome.pc {  
+  box-shadow: 0 0 6px #000;
   height: 480px;
-  margin: 20px auto;
-  outline: solid 10px #000;
-  position: relative;
+  left: 50%;
+  margin: -240px 0 0 -160px;
+  top: 50%;
   width: 320px;
 }

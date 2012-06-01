@@ -32,7 +32,16 @@ var FBAPI = {
         delete window[callbackName];
         response.userid = userID;
         callbackName = null;
-        deferred.succeed(response);
+
+        if (response.error) {
+          deferred.fail(response);
+          if (__DEV__) {
+            alert('FBAPI ERROR:\n\n' + url + '\n\n' + JSON.stringify(response));
+          }
+        } else {
+          deferred.succeed(response);
+        }
+
         deferred = null;
         script.parentNode.removeChild(script);
         script = null;
@@ -41,6 +50,7 @@ var FBAPI = {
       var url = 'https://graph.facebook.com/graphql' +
         '?access_token=' + accessToken +
         '&q=' + encodeURIComponent(query) +
+        '&passthru_domain=trunkstable' +
         '&callback=' + callbackName;
 
       var script = dom.createElement('script', {
@@ -269,7 +279,13 @@ function ensureSession() {
     if (!result) {
       redirectToLogin();
     } else {
-      deferred.attachTo(checkPermissions());
+      checkPermissions().addCallback(function(pass) {
+        if (!pass) {
+          redirectToLogin();
+        } else {
+          deferred.succeed(true);
+        }
+      });
     }
   });
   return deferred;
@@ -284,14 +300,14 @@ function checkPermissions() {
     var data = results.data;
     if (lang.isArray(data)) {
       var userPermissions = data[0];
-      var denied;
+      var pass = true;
       permissions.some(function(key) {
         if (!userPermissions[key]) {
-          denied = true;
-          return false;
+          pass = false;
+          return pass;
         }
       });
-      deferred.succeed(!denied);
+      deferred.succeed(pass);
     } else {
       deferred.succeed(false);
     }

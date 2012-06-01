@@ -67,6 +67,19 @@ var DOM = Class.create(null, {
   },
 
   /**
+   * @param {Node} parentNode
+   * @param {Node} childNode
+   * @return {Node}
+   */
+  append: function(parentNode, childNode) {
+    if (parentNode && childNode) {
+      parentNode.appendChild(childNode);
+      return childNode;
+    }
+    return null;
+  },
+
+  /**
    *
    * @param {Node} node
    * @param {Node} parentNode

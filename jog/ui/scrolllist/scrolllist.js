@@ -42,7 +42,8 @@ var ScrollList = Class.create(BaseUI, {
   onDocumentReady: function() {
     this._processContent();
     var events = this.getEvents();
-    events.listen(this._scrollable, 'scroll', this._onScroll);
+    events.listen(this._scrollable, 'scrollstart', this._onScrollStart);
+    events.listen(this._scrollable, 'scrollend', this._onScrollEnd);
   },
 
   /** @override */
@@ -64,26 +65,24 @@ var ScrollList = Class.create(BaseUI, {
   },
 
 
-  _onScroll: function(left, top) {
-    this.getEvents().unlistenAll();
+  _onScrollStart: function(left, top) {
+    clearInterval(this._onScrollTimer);
+    this._onScrollTimer = setInterval(this.bind(this._onScroll), 500);
+  },
 
-    if (!this._onScrollTimer) {
-      this._onScrollTimer = setInterval(this.bind(function() {
-        var scrollTop = this._scrollable.getScrollTop();
-        if (this._onScrollTop !== scrollTop) {
-          this._onScrollTop = scrollTop;
-          this._processContentNow();
-        } else {
-          this._onScrollEnd();
-        }
-      }), 500);
+  _onScroll: function() {
+    var scrollTop = this._scrollable.getScrollTop();
+    if (this._onScrollTop !== scrollTop) {
+      this._onScrollTop = scrollTop;
+      this._processContentNow();
+    } else {
+      this._onScrollEnd();
     }
   },
 
-  _onScrollEnd: function() {
+  _onScrollEnd: function(left, top) {
     clearTimeout(this._onScrollTimer);
     delete this._onScrollTimer;
-    this.getEvents().listen(this._scrollable, 'scroll', this._onScroll);
     this._processContent();
   },
 
@@ -111,12 +110,12 @@ var ScrollList = Class.create(BaseUI, {
 
   _toggleChunks: function() {
     var dimentions = this._scrollDimentions;
-    var limitBuffer = dimentions[1] * 2; // this._maxChunkHeight;
+    var buffer = dimentions[1] * 2;
     var scrollTop = this._scrollable.getScrollTop();
-    var limitTop = scrollTop - limitBuffer;
-    var limitBottom = scrollTop + dimentions[1] + limitBuffer;
+    var top = scrollTop;
+    var bottom = scrollTop + dimentions[1];
     for (var i = 0, chunk; chunk = this._chunks[i]; i++) {
-      chunk.setVisible(this._shouldShowChunk(limitTop, limitBottom, chunk));
+      chunk.setVisible(this._shouldShowChunk(top, bottom, buffer, chunk));
     }
   },
 
@@ -127,6 +126,7 @@ var ScrollList = Class.create(BaseUI, {
     this._reflow();
 
     if (!this._contentsQueue.length) {
+      this._toggleChunks();
       return;
     }
 
@@ -170,20 +170,28 @@ var ScrollList = Class.create(BaseUI, {
   },
 
   /**
-   * @param {number} limitTop
-   * @param {number} limitBottom
+   * @param {number} top
+   * @param {number} bottom
+   * @param {number} buffer
    * @param {Chunk} chunk
    * @reutrn {boolean}
    */
-  _shouldShowChunk: function(limitTop, limitBottom, chunk) {
+  _shouldShowChunk: function(top, bottom, buffer, chunk) {
     if (!chunk.getHeight()) {
       return true;
     }
 
-    var hidden = chunk.getBottom() < limitTop ||
-      chunk.getTop() > limitBottom;
+    var chunkBottom = chunk.getBottom();
+    if (chunkBottom < top) {
+      return (top - chunkBottom) < buffer;
+    }
+    var chunkTop = chunk.getTop();
 
-    return !hidden;
+    if (chunkTop > bottom) {
+      return (chunkTop - bottom) > buffer;
+    }
+
+    return true;
   },
 
   /**

@@ -1,0 +1,11 @@
+.jog-ui-loading-indicator {
+  font-size: 8px;
+  border-radius: 2em;
+  border-width: 0.7em;
+  border-color: #ccc transparent #ccc #ccc;
+  border-style: solid;
+  height: 2em;
+  margin: 10px auto;
+  position: relative;
+  width: 2em;
+}

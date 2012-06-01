@@ -44,8 +44,8 @@ var Chrome = Class.create(BaseUI, {
     }
 
     if (useTouch) {
-      // this.getEvents().listen(
-      //  document, 'touchmove', Functions.PREVENT_DEFAULT);
+      this.getEvents().listen(
+        document, 'touchmove', Functions.PREVENT_DEFAULT);
     }
   },
 
@@ -72,18 +72,21 @@ var Chrome = Class.create(BaseUI, {
       return;
     }
     var dpi = window.devicePixelRatio || 1;
+    if (document.documentElement.offsetWidth > window.outerWidth) {
+      dpi = document.documentElement.offsetWidth / window.outerWidth;
+    }
     this._reflowing = true;
     this.getNode().style.height = screen.height * dpi + 'px';
     this.callLater(function() {
       if (!window.pageYOffset !== 1) {
         window.scrollTo(0, 1);
       }
-    }, 1);
+    }, 100);
     this.callLater(function() {
       if (parseInt(this.getNode().style.height, 10) !== window.innerHeight) {
         this.getNode().style.height = window.innerHeight + 'px';
       }
-    }, 100);
+    }, 500);
     this.callLater(function() {
       this._reflowing = false;
     }, 1000);
