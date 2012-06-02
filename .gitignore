@@ -1,4 +1,5 @@
 */.DS_Store
+pylib/.*
 .DS_Store
 pylib/*.pyc
 explorer_pkg

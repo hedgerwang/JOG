@@ -33,11 +33,11 @@ var TouchHelper = {
    */
   getTouches : function(event) {
     var results;
-    if (__DEV__) {
-      if (!useTouch) {
-        return [event];
-      }
+    // if (__DEV__) {
+    if (!useTouch) {
+      return [event];
     }
+    // }
 
     if (event.targetTouches && event.targetTouches[0]) {
       results = event.targetTouches;
@@ -52,15 +52,15 @@ var TouchHelper = {
   }
 };
 
-if (__DEV__) {
-  if (!useTouch) {
-    Class.mixin(TouchHelper, {
-      EVT_TOUCHSTART : 'mousedown',
-      EVT_TOUCHEND : 'mouseup',
-      EVT_TOUCHMOVE : 'mousemove',
-      EVT_TOUCHCANCEL : 'mouseup'
-    });
-  }
+// if (__DEV__) {
+if (!useTouch) {
+  Class.mixin(TouchHelper, {
+    EVT_TOUCHSTART : 'mousedown',
+    EVT_TOUCHEND : 'mouseup',
+    EVT_TOUCHMOVE : 'mousemove',
+    EVT_TOUCHCANCEL : 'mouseup'
+  });
 }
+//}
 
 exports.TouchHelper = TouchHelper;

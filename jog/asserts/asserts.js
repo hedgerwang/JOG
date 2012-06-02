@@ -66,6 +66,43 @@ var asserts = {
     }
   },
 
+  /**
+   * @param {Object} obj1
+   * @param {Object} obj2
+   * @param {string=} opt_description
+   */
+  objectEqual: function(obj1, obj2, opt_description) {
+    if (obj1 === obj2) {
+      return;
+    }
+
+    opt_description = opt_description || '';
+
+    for (var key in obj1) {
+      if (obj1[key] !== obj2[key]) {
+        if (typeof obj1[key] && obj1[key]) {
+          asserts.objectEqual(obj1[key], obj2[key]);
+        } else {
+          throw new Error(
+            opt_description + ': ' + 'Expect objects equals at ' + key
+          );
+        }
+      }
+    }
+
+    for (var key in obj2) {
+      if (obj1[key] !== obj2[key]) {
+        if (typeof obj1[key] && obj1[key]) {
+          asserts.objectEqual(obj1[key], obj2[key]);
+        } else {
+          throw new Error(
+            opt_description + ': ' + 'Expect objects equals at ' + key
+          );
+        }
+      }
+    }
+  },
+
   arrayEqual:function(arr1, arr2) {
     if (arr1.length !== arr2.length) {
       throw new Error('array length not equal.' +

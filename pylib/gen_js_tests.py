@@ -117,7 +117,7 @@ def gen_js_test(dir_path) :
         html_file = open(html_test_file_path, 'w')
         html_file.write(html.strip())
         html_file.close()
-        print 'gen >> ' + html_test_file_path
+        print '.gen >> ' + html_test_file_path
 
       if not os.path.exists(js_test_file_path) :
         js = js_template % {
@@ -129,7 +129,7 @@ def gen_js_test(dir_path) :
         js_file = open(js_test_file_path, 'w')
         js_file.write(js.strip())
         js_file.close()
-        print 'gen >> ' + js_test_file_path
+        print '.gen >> ' + js_test_file_path
 
 if __name__ == '__main__' :
   dir_names = [

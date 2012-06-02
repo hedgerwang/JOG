@@ -3,6 +3,8 @@ import threading
 import re
 import signal
 import sys
+import get_local_ip
+
 
 # Source
 # http://logicbomblabs.wordpress.com/2010/10/25/python-threads-and-sockets-example-dns-server-and-client/
@@ -47,7 +49,7 @@ class RequestHandler(threading.Thread) :
 server_sock = socket.socket()
 # Setting this option avoids the TIME_WAIT state so that we can rebind faster
 server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-print 'start DNS server backend 127.0.0.1:6052'
+print 'start DNS server backend %s:6052' % get_local_ip.get_local_ip()
 server_sock.bind(('127.0.0.1', 6052))
 server_sock.listen(2)
 threads = []

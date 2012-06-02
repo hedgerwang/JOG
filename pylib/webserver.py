@@ -23,7 +23,6 @@ opener = urllib2.build_opener(httpHandler, httpsHandler)
 urllib2.install_opener(opener)
 
 HTML_META = """
-<script>window.__SCALE__ = '%s'</script>
 <meta name="viewport"
       content="width=device-width, initial-scale=%s, maximum-scale=%s"/>
 """
@@ -60,7 +59,7 @@ class WebHandler(BaseHTTPRequestHandler) :
 
       dpr = query_params.get('dpr', None)
 
-      if dpr is not None and NUMERIC_PATTERN.match(dpr[0]):
+      if dpr is not None and NUMERIC_PATTERN.match(dpr[0]) :
         print '-' * 80
         print dpr
         DEVICE_PIXEL_RATIO = max(0.1, float(dpr[0]))
@@ -204,7 +203,10 @@ class WebHandler(BaseHTTPRequestHandler) :
     return content
 
   def _translate_html(self, html) :
-    meta = HTML_META % (self._scale, self._scale, self._scale)
+    if html.find('initial-scale') > -1 :
+      return html
+
+    meta = HTML_META % (self._scale, self._scale)
 
     if html.find('<head>') > -1 :
       html = html.replace('<head>', '<head>' + meta)

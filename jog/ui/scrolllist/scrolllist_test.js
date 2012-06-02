@@ -52,7 +52,7 @@ function makeEl(text, n) {
       ['div',
         {
           style: 'background-image:url(/images/test/' + bgUrl + '.jpg)',
-          class: 'demo-item-img'
+          className: 'demo-item-img'
         }
       ],
       [

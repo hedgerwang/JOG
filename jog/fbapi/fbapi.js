@@ -275,6 +275,15 @@ function updateSession() {
  */
 function ensureSession() {
   var deferred = new Deferred();
+
+  if (__DEV__) {
+    if (window.location.hostname === 'localhost') {
+      // Don't enforce logging for testing locally.
+      return deferred.succeed(false);
+    }
+  }
+
+
   updateSession().addCallback(function(result) {
     if (!result) {
       redirectToLogin();

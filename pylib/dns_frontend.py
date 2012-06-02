@@ -4,6 +4,8 @@ import signal
 import sys
 import commands
 import re
+import get_local_ip
+
 
 # Source http://code.activestate.com/recipes/491264
 
@@ -56,6 +58,9 @@ signal.signal(signal.SIGTERM, cleanup_client_sock)
 def get_ip_by_domain(domain) :
   global client_sock
 
+  if domain.find('gqlapp') > -1 :
+    return get_local_ip.get_local_ip()
+
   client_sock = socket.socket()
   client_sock.connect(('127.0.0.1', 6052))
   client_sock.send(domain)
@@ -64,21 +69,11 @@ def get_ip_by_domain(domain) :
   return ip
 
 
-local_ip_pattern = re.compile(
-  r'\sinet\s(?P<ip>192\.168\.[0-9]+\.[0-9]+)')
-
-def get_local_ip() :
-  text = commands.getoutput('ifconfig')
-  for match in local_ip_pattern.finditer(text) :
-    return match.group('ip')
-  return None
-
-
 def main() :
   print '#' * 80
   print ''
   print 'Note that you can only run this service as a root user (sudo su root)'
-  print 'DNS server address is %s' % get_local_ip()
+  print 'DNS server address is %s' % get_local_ip.get_local_ip()
   print ''
   print '#' * 80
   print 'start DNS Server frontend'
