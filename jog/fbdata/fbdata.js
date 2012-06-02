@@ -18,7 +18,7 @@ var FBData = {
    * @return {Deferred}
    */
   getHomeStories: function() {
-    var query = 'me(){id,name,home_stories.first(50){' +
+    var query = 'me(){id,name,home_stories.first(70){' +
       'nodes{title,id,url,creation_time,actors{' +
       'profile_picture,name,id},attachments{' +
       'title,url,media{image,url,id}},message{text}}}}';

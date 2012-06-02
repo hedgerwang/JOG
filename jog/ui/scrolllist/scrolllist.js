@@ -67,7 +67,9 @@ var ScrollList = Class.create(BaseUI, {
 
   _onScrollStart: function(left, top) {
     clearInterval(this._onScrollTimer);
-    this._onScrollTimer = setInterval(this.bind(this._onScroll), 500);
+    this._onScrollTimer = setInterval(this.bind(this._onScroll), 250);
+    this._onScrollTop = null;
+    this._onScroll();
   },
 
   _onScroll: function() {
@@ -104,18 +106,18 @@ var ScrollList = Class.create(BaseUI, {
     this._maxChunkHeight = Math.max(
       dimentions[0],
       dimentions[1]
-    ) * 3;
+    ) * 4;
     this._scrollable.reflow();
   },
 
   _toggleChunks: function() {
     var dimentions = this._scrollDimentions;
-    var buffer = dimentions[1] * 3;
+    var buffer = this._maxChunkHeight;
     var scrollTop = this._scrollable.getScrollTop();
-    var top = scrollTop;
-    var bottom = scrollTop + dimentions[1];
+    var top = scrollTop - buffer;
+    var bottom = scrollTop + dimentions[1] + buffer;
     for (var i = 0, chunk; chunk = this._chunks[i]; i++) {
-      chunk.setVisible(this._shouldShowChunk(top, bottom, buffer, chunk));
+      chunk.setVisible(this._shouldShowChunk(top, bottom, chunk));
     }
   },
 
@@ -164,7 +166,6 @@ var ScrollList = Class.create(BaseUI, {
       }
     }
 
-
     this._reflow();
     this._toggleChunks();
   },
@@ -172,26 +173,16 @@ var ScrollList = Class.create(BaseUI, {
   /**
    * @param {number} top
    * @param {number} bottom
-   * @param {number} buffer
    * @param {Chunk} chunk
    * @reutrn {boolean}
    */
-  _shouldShowChunk: function(top, bottom, buffer, chunk) {
+  _shouldShowChunk: function(top, bottom, chunk) {
     if (!chunk.getHeight()) {
       return true;
+    } else {
+      return !(chunk.getTop() > bottom ||
+        chunk.getBottom() < top);
     }
-
-    var chunkBottom = chunk.getBottom();
-    if (chunkBottom < top) {
-      return (top - chunkBottom) < buffer;
-    }
-    var chunkTop = chunk.getTop();
-
-    if (chunkTop > bottom) {
-      return (chunkTop - bottom) > buffer;
-    }
-
-    return true;
   },
 
   /**

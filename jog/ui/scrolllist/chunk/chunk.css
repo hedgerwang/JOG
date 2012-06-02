@@ -1,11 +1,13 @@
-.jog-ui-scrolllist-chunk {  
+.jog-ui-scrolllist-chunk {
   left: 0;
+  overflow: hidden;
   position: absolute;
   top: 0;
   width: 100%;
   z-index: 1;
 }
 
-.jog-ui-scrolllist-chunk-hidden {  
-  display: none;
+.jog-ui-scrolllist-chunk-hidden {
+  xdisplay: none;
+  visibility: hidden;
 }

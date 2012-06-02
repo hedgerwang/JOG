@@ -27,10 +27,6 @@ var Chunk = Class.create(BaseUI, {
 
   /** @override */
   onDocumentReady: function() {
-    dom.addClassName(this.getNode(), cssx('jog-ui-scrolllist-chunk-fadein'));
-    this.callLater(function() {
-      dom.addClassName(this.getNode(), cssx('jog-ui-scrolllist-chunk-fadein-play'));
-    }, 16);
     this._reflow();
   },
 
@@ -73,18 +69,17 @@ var Chunk = Class.create(BaseUI, {
       var contentNode = this._contentNode;
       if (visible) {
         if (!this._contentNode.parentNode) {
-          dom.removeClassName(contentNode,
-            cssx('jog-ui-scrolllist-chunk-hidden'));
-          dom.addClassName(contentNode,
-            cssx('jog-ui-scrolllist-chunk-fadein'));
           node.appendChild(contentNode);
         }
-        node.style.height = '';
+        dom.removeClassName(contentNode,
+          cssx('jog-ui-scrolllist-chunk-hidden'));
+
+        // node.style.height = '';
         this._reflow();
       } else {
-        node.style.height = this._height + 'px';
+        // node.style.height = this._height + 'px';
         // this._contentNode.style.visibility = 'hidden';
-        node.removeChild(contentNode);
+        // node.removeChild(contentNode);
         dom.addClassName(contentNode, cssx('jog-ui-scrolllist-chunk-hidden'));
       }
     }
