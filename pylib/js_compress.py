@@ -13,9 +13,9 @@ VAR_DEBUG_PATTERN = re.compile(r'var\s+__DEV__\s*=\s*[a-z]+\s*;')
 CONSOLE_PATTERN = re.compile(r'[\s;\}\{]console\.(log|warn|error)\(')
 
 
-def compress(path) :
+def compress(path, cssx_map=None) :
   print 'Compress JS file'
-  
+
   if not os.path.isfile(CLOSURE_COMPRESSOR_PATH) :
     raise 'Error: %s does not exist' % CLOSURE_COMPRESSOR_PATH
 
@@ -33,6 +33,34 @@ def compress(path) :
     os.makedirs(build_dir_path)
 
   source = jsrequire.get(path, 'all')
+
+  matches = jsrequire.RE_REQUIRE.finditer(source)
+  new_module_names = {}
+  next_module_id = 0
+
+  for match in matches :
+    module_name = match.group('path')
+    if not module_name in new_module_names :
+      new_module_names[module_name] = 'm' + str(next_module_id)
+      next_module_id += 1
+    expression = match.group()
+    new_expression = expression.replace(
+      "require('%s')" % module_name,
+      "require('%s')" % new_module_names[module_name])
+    print 'Replace "%s" with "%s"' % (expression, new_expression)
+    source = source.replace(expression, new_expression)
+
+    expression = "define('%s'" % module_name
+    new_expression = "define('%s'" % new_module_names[module_name]
+    print 'Replace "%s" with "%s"' % (expression, new_expression)
+    source = source.replace(expression, new_expression)
+
+  if cssx_map is not None :
+    for key in cssx_map :
+      expression = 'cssx(\'%s\')' % key
+      new_expression = "'%s'" % cssx_map[key]
+      print 'Replace "%s" with "%s"' % (expression, new_expression)
+      source = source.replace(expression, new_expression)
 
   matches = VAR_DEBUG_PATTERN.finditer(source)
 
@@ -80,4 +108,4 @@ def compress(path) :
 
 
 if __name__ == '__main__' :
-  print compress('app/app.js')
+  compress('app/app.js')

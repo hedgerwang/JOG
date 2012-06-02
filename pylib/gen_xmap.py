@@ -5,19 +5,7 @@ import json
 
 
 CSSX_PATTERN = re.compile(
-  r'[\+\|\&\?,:\s;\}\{]+cssx\([a-zA-Z0-9-_\']+\)[\+\|\&,:\s;\}\{]+')
-
-
-def get_all_js_files(rootdir='.') :
-  files = []
-  for rootdir, dirnames, filenames in os.walk(rootdir) :
-    for filename in filenames :
-      if filename.endswith('_test.html') :
-        if rootdir.find('google_app_engine_host') < 0 :
-          path = os.path.join(rootdir, filename)
-          files.append(path)
-  sorted(files)
-  return files
+  r'[\+\|&\?,:\s;\}\{\[]+cssx\([a-zA-Z0-9-_\']+\)')
 
 
 def process_file(path, map, next_id) :
@@ -39,18 +27,21 @@ def gen_cssx_map(dir_path) :
   map = {}
   next_id = 0
 
-  for rootdir, dirnames, filenames in os.walk(dir_path) :
+  for rootdir, dirnames, filenames in os.walk(dir_path, True, None, True) :
+    if (rootdir.find('google_app_engine_host') > -1 or
+        rootdir.find('.git') > -1 or
+        rootdir.find('.idea') > -1) :
+      continue
+
     for filename in filenames :
       if filename.endswith('.js') :
-        if rootdir.find('google_app_engine_host') < 0 :
-          path = os.path.join(rootdir, filename)
-          next_id = process_file(path, map, next_id)
-
-  text = json.dumps(map, indent=True)
-  out_file = open('pylib/.gen/cssx.json', 'w')
-  out_file.write(text)
-  out_file.close()
-  return text
+        path = os.path.join(rootdir, filename)
+        next_id = process_file(path, map, next_id)
+        text = json.dumps(map, indent=True)
+        out_file = open('pylib/.gen/cssx.json', 'w')
+        out_file.write(text)
+        out_file.close()
+  return map
 
 
 if __name__ == '__main__' :

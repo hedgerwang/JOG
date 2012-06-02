@@ -1,9 +1,10 @@
 import cssrequire
 import os
+import re
 
 YUI_COMPRESSOR_PATH = 'pylib/external/yuicompressor/yuicompressor-2.4.6.jar'
 
-def compress(path, scale) :
+def compress(path, scale, cssx_map=None) :
   print 'Compress CSS file'
 
   if not os.path.isfile(YUI_COMPRESSOR_PATH) :
@@ -24,6 +25,16 @@ def compress(path, scale) :
 
   source = cssrequire.get(path, 'all')
   source = cssrequire.translate(source, scale)
+
+  if cssx_map is not None :
+    for key in cssx_map :
+      pattern = re.compile(r'\.%s[\s\.\{:]' % key)
+      matches = pattern.finditer(source)
+      for match  in matches :
+        selector = match.group()
+        new_selector = selector.replace('.' + key, '.' + cssx_map[key])
+        print 'Replace "%s" with "%s"' % (selector, new_selector)
+        source = source.replace(selector, new_selector)
 
   css_file = open(input_file_path, 'w')
   css_file.write(source)

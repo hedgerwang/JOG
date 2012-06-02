@@ -29,12 +29,11 @@ HTML_META = """
 
 def recursive_glob(rootdir='.') :
   files = []
-  for rootdir, dirnames, filenames in os.walk(rootdir) :
+  for rootdir, dirnames, filenames in os.walk(rootdir, True, None, True) :
     for filename in filenames :
       if filename.endswith('_test.html') :
-        if rootdir.find('google_app_engine_host') < 0 :
-          path = os.path.join(rootdir, filename)
-          files.append(path)
+        path = os.path.join(rootdir, filename)
+        files.append(path)
   sorted(files)
   return files
 

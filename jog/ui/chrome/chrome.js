@@ -41,6 +41,14 @@ var Chrome = Class.create(BaseUI, {
       this.getEvents().listen(document, 'orientationchange', this._onresize);
       this.getEvents().listen(document, 'touchstart', this._onTouch);
       this._reflow();
+    } else {
+      var re = /(initial-scale\s*=\s*)([0-9\.]+)/g;
+      var match = document.head.innerHTML.match(re);
+      var scale = match ? parseFloat(match[0].split('=')[1]) : 1;
+      if (scale) {
+        // This would make PC debugging easier.
+        this.getNode().style.webkitTransform = 'scale(' + scale + ')';
+      }
     }
 
     if (useTouch) {
