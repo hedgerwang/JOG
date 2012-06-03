@@ -66,28 +66,15 @@ var ScrollList = Class.create(BaseUI, {
 
 
   _onScrollStart: function(left, top) {
-    clearInterval(this._onScrollTimer);
-    this._onScrollTimer = setInterval(this.bind(this._onScroll), 250);
-    this._onScrollTop = null;
-    this._onScroll();
-  },
-
-  _onScroll: function() {
-    var scrollTop = this._scrollable.getScrollTop();
-    if (this._onScrollTop !== scrollTop) {
-      this._onScrollTop = scrollTop;
-      this._processContentNow();
-    } else {
-      this._onScrollEnd();
-    }
-  },
-
-  _onScrollEnd: function(left, top) {
     clearTimeout(this._onScrollTimer);
     delete this._onScrollTimer;
     this._processContent();
   },
 
+  _onScrollEnd: function(left, top) {
+    clearTimeout(this._onScrollTimer);
+    this._onScrollTimer = this.callLater(this._processContentNow, 100);
+  },
 
   _reflow: function() {
     var dimentions = this._scrollDimentions;

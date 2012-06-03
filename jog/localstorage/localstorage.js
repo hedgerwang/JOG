@@ -11,6 +11,8 @@ var dataBase = typeof openDatabase === 'function' ?
   openDatabase('local_storage_db', '1.0', 'cache', 2 * 1024 * 1024) :
   null;
 
+var readOnlyArray = [];
+
 var LocalStorage = {
   /**
    * @param {string} key
@@ -77,9 +79,12 @@ function ensureTableExist(sqlTransaction, callback) {
  * @param {Function} callback
  */
 function deleteItem(sqlTransaction, key, callback) {
+  readOnlyArray.length = 0;
+  readOnlyArray.push(key);
+
   sqlTransaction.executeSql(
     'DELETE FROM  ' + TABLE_NAME + ' WHERE key =?',
-    [key],
+    readOnlyArray,
     callback);
 }
 
@@ -122,9 +127,12 @@ function insertItem(sqlTransaction, key, value, callback) {
       value = String(value);
   }
 
+  readOnlyArray.length = 0;
+  readOnlyArray.push(key, type, value);
+
   sqlTransaction.executeSql('INSERT INTO ' + TABLE_NAME + ' (key, type, value) ' +
     'VALUES (?, ?, ?)',
-    [key, type, value],
+    readOnlyArray,
     callback);
 }
 
@@ -134,8 +142,11 @@ function insertItem(sqlTransaction, key, value, callback) {
  * @param {Function} callback
  */
 function selectItem(sqlTransaction, key, callback) {
+  readOnlyArray.length = 0;
+  readOnlyArray.push(key);
+
   sqlTransaction.executeSql('SELECT * FROM ' + TABLE_NAME + ' WHERE key =?',
-    [key],
+    readOnlyArray,
     function(sqlTransaction, sqlResultSet) {
       var rows = sqlResultSet.rows;
       if (rows.length === 0) {
