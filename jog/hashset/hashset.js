@@ -6,7 +6,7 @@
 var Class = require('jog/class').Class;
 var HashCode = require('jog/hashcode').HashCode;
 
-var HashMap = Class.create(null, {
+var HashSet = Class.create(null, {
   main: function() {
     this._data = {};
   },
@@ -17,14 +17,13 @@ var HashMap = Class.create(null, {
 
   /**
    * @param {*} key
-   * @param {*} value
    */
-  add: function(key, value) {
+  add: function(key) {
     var hash = HashCode.getHashCode(key);
     if (!(hash in this._data)) {
       this._size++;
+      this._data[hash] = key;
     }
-    this._data[hash] = value;
   },
 
   /**
@@ -38,13 +37,13 @@ var HashMap = Class.create(null, {
     }
   },
 
-  /**
-   * @param {*} key
-   */
-  get: function(key) {
-    var hash = HashCode.getHashCode(key);
-    return this._data[hash];
+  removeAll: function() {
+    for (var key in this._data) {
+      delete this._data[key];
+    }
+    this._size = 0;
   },
+
 
   /**
    * @param {*} key
@@ -52,13 +51,6 @@ var HashMap = Class.create(null, {
   contains: function(key) {
     var hash = HashCode.getHashCode(key);
     return hash in this._data;
-  },
-
-  removeAll: function() {
-    for (var key in this._data) {
-      delete this._data[key];
-    }
-    this._size = 0;
   },
 
   /**
@@ -72,4 +64,4 @@ var HashMap = Class.create(null, {
   _data: null
 });
 
-exports.HashMap = HashMap;
+exports.HashSet = HashSet;

@@ -13,7 +13,11 @@ var Tappable = require('jog/behavior/tappable').Tappable;
 (new TestCase('Tappable Test'))
   .demo('demo',
   function(body){
-    // var obj = new Tappable();
+    var obj = new Tappable(body);
+    var btn = document.createElement('button');
+    btn.innerHTML = 'tappable';
+
+    
   })
   .test('test 1',
   function() {

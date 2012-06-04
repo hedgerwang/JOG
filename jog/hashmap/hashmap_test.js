@@ -8,30 +8,30 @@
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
 
-var HasgMap = require('jog/hashmap').HashMap;
+var HashMap = require('jog/hashmap').HashMap;
 
 (new TestCase('HasgMap Test'))
   .test('test hashmap',
   function() {
-    var map = new HasgMap();
+    var map = new HashMap();
     var key1 = {};
     var key2 = {};
     var value = 1234;
 
     asserts.equal(map.getSize(), 0);
 
-    map.set(key1, value);
+    map.add(key1, value);
 
     asserts.equal(map.getSize(), 1);
     asserts.equal(map.get(key1), value);
 
-    map.unset(key1);
+    map.remove(key1);
     asserts.equal(map.getSize(), 0);
 
-    map.set(key1, value);
-    map.set(key2, value);
+    map.add(key1, value);
+    map.add(key2, value);
     asserts.equal(map.getSize(), 2);
 
-    map.clear();
+    map.removeAll();
     asserts.equal(map.getSize(), 0);
   });
