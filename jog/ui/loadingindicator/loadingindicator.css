@@ -1,4 +1,4 @@
-.jog-ui-loading-indicator {
+.jog-ui-loading-indicator {  
   border-color: #666 transparent #666 #666;
   border-radius: 8em;
   border-style: solid;
@@ -10,7 +10,7 @@
   width: 4em;
 }
 
-.jog-ui-loading-indicator:before {
+.jog-ui-loading-indicator:before {  
   border-color: #fff transparent #fff #fff;
   border-radius: 8em;
   border-style: solid;

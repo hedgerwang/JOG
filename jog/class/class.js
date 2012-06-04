@@ -3,6 +3,8 @@
  * @author Hedger Wang
  */
 
+var lang = require('jog/lang').lang;
+
 /**
  * @type {number}
  */
@@ -14,7 +16,8 @@ var classID = 1;
 var defaultClassConfig = {
   dispose: classDispose,
   bind: classBind,
-  callLater: classCallLater
+  callLater: classCallLater,
+  callAfter: classCallAfter
 };
 
 var Class = {
@@ -68,6 +71,7 @@ var Class = {
         prototype[newClass._disposeID] = prototype.dispose;
       }
 
+      prototype.callAfter = classCallAfter;
       prototype.callLater = classCallLater;
       prototype.dispose = classDispose;
       prototype.bind = classBind;
@@ -203,5 +207,35 @@ function classCallLater(fn, delay) {
   that._callLaterTimers[id] = true;
   return id;
 }
+
+
+/**
+ *
+ * @param {Function} fn
+ * @param {number} delay
+ */
+function classCallAfter(fn, delay) {
+  var start = Date.now();
+  return this.bind(function() {
+    if (!this.disposed) {
+      var dt = Date.now() - start;
+      if (dt < delay) {
+        var args = lang.toArray(arguments);
+        var wfn = this.bind(function() {
+          fn.apply(this, args);
+          fn = null;
+          args = null;
+        });
+        this.callLater(wfn, delay - dt);
+      } else {
+        fn.apply(this, arguments);
+        fn = null;
+      }
+    }
+    start = null;
+    delay = null;
+  });
+}
+
 
 exports.Class = Class;

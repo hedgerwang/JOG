@@ -52,7 +52,7 @@ def get_js_module_name(path) :
   for match in js_module_name_pattern.finditer(content) :
     return match.group('path')
 
-  return path
+  raise Exception('Unable to get module name from %s' % path)
 
 
 def gen_js_test(dir_path) :
