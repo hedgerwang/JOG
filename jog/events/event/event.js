@@ -6,7 +6,7 @@ var Event = Class.create(null, {
 
   _readonly: true,
 
-  _prevented: false,
+  defaultPrevented: false,
 
   type: null,
 
@@ -23,7 +23,7 @@ var Event = Class.create(null, {
   stopPropagation: Functions.EMPTY,
 
   preventDefault: function() {
-    this._prevented = true;
+    this.defaultPrevented = true;
   }
 });
 

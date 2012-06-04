@@ -7,19 +7,60 @@
 
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
+var dom = require('jog/dom').dom;
 
 var Tappable = require('jog/behavior/tappable').Tappable;
 
 (new TestCase('Tappable Test'))
   .demo('demo',
-  function(body){
-    var obj = new Tappable(body);
+  function(body) {
     var btn = document.createElement('button');
     btn.innerHTML = 'tappable';
 
-    
-  })
-  .test('test 1',
-  function() {
-    asserts.equal(1, 1);
+    var btn1 = btn.cloneNode(true);
+    var btn2 = btn.cloneNode(true);
+
+    body.appendChild(btn1);
+    body.appendChild(btn2);
+
+    var tappable = new Tappable(body);
+    tappable.addTarget(btn1);
+    tappable.addTarget(btn2);
+
+    tappable.addEventListener('tap', function(evt) {
+      console.log(evt.type, evt.data);
+    });
+
+    tappable.addEventListener('tapstart', function(evt) {
+      console.log(evt.type, evt.data);
+      dom.removeClassName(evt.data, 'selected');
+      dom.removeClassName(evt.data, 'dbltapped');
+      dom.addClassName(evt.data, 'tapped');
+    });
+
+    tappable.addEventListener('tapend', function(evt) {
+      console.log(evt.type, evt.data);
+      dom.removeClassName(evt.data, 'tapped');
+    });
+
+    tappable.addEventListener('dbltap', function(evt) {
+      console.log(evt.type, evt.data);
+    });
+
+    tappable.addEventListener('tapin', function(evt) {
+      console.log(evt.type, evt.data);
+      dom.addClassName(evt.data, 'selected');
+    });
+
+    tappable.addEventListener('tapout', function(evt) {
+      console.log(evt.type, evt.data);
+      dom.removeClassName(evt.data, 'selected');
+      dom.removeClassName(evt.data, 'dbltapped');
+    });
+
+    tappable.addEventListener('dbltap', function(evt) {
+      console.log(evt.type, evt.data);
+      dom.addClassName(evt.data, 'dbltapped');
+    });
+
   });
