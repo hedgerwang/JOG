@@ -80,7 +80,7 @@ def compress(path, cssx_map=None) :
     source = source.replace(expression, new_expression)
 
   # Use closure so that __DEV__ can be removed safely.
-  source = '(function(){\n%s\n})()' % source
+  source = '(function(window, document){\n%s\n})(window, document)' % source
 
   js_file = open(input_file_path, 'w')
   js_file.write(source)
