@@ -1,0 +1,6 @@
+.imageable {
+  border: solid 1px red;
+  height: 100px;
+  margin: 10px;
+  width: 100px;
+}

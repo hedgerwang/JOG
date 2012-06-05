@@ -15,7 +15,7 @@ var dom = require('jog/dom').dom;
 var tappedElement = null;
 
 /**
- * Fires events "tapstart, tapend, tap, dbltap"
+ * Fires events "tapstart, tapend, tap, dbltap, tapin, tapout"
  */
 var Tappable = Class.create(EventTarget, {
   /**

@@ -142,8 +142,8 @@ var Deferred = Class.create(null, {
   waitForValue: function(object, key) {
     if (__DEV__) {
       if (key.charAt(0) === '_') {
-        throw new Error('wait for a private(?) member that could be ' +
-          'renamed after compression')
+        throw new Error('wait for a private(?) member "' + key +
+          '" that could be renamed after compression')
       }
     }
 

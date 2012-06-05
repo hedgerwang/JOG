@@ -1,24 +1,24 @@
 /* test */
-body {
+body {  
   background: #ffcccc;
 }
 
-button {
+button {  
   background: #aaa;
-  border: solid 1px #aaa;
   border-radius: 3px;
+  border: solid 1px #aaa;
   padding: 20px;
   user-select: none;
 }
 
-button.selected {
+button.selected {  
   background: #efefef;
 }
 
-button.tapped {
+button.tapped {  
   border: solid 1px #000;
 }
 
-button.dbltapped {
+button.dbltapped {  
   background: #ffffcc;
 }

@@ -92,6 +92,15 @@ var Class = {
   },
 
   /**
+   * @param {Object} obj
+   */
+  dispose: function(obj) {
+    if (obj && obj.dispose) {
+      obj.dispose();
+    }
+  },
+
+  /**
    * @param {Object} target
    * @param {Object} source
    */

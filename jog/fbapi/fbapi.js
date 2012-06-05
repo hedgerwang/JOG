@@ -12,7 +12,7 @@ var objects = require('jog/objects').objects;
 
 
 var FBAPI = {
-  _fbApi: null,
+  fbApi: null,
 
   /**
    * @param {string} query
@@ -176,8 +176,8 @@ function redirectToLogin() {
  * @return {Deferred}
  */
 function getApi() {
-  if (FBAPI._fbApi) {
-    return (new Deferred()).succeed(FBAPI._fbApi);
+  if (FBAPI.fbApi) {
+    return (new Deferred()).succeed(FBAPI.fbApi);
   } else {
     return installFBApi();
   }
@@ -210,7 +210,7 @@ function installFBApi() {
       });
   }
 
-  (new Deferred()).waitForValue(FBAPI, '_fbApi').addCallback(
+  (new Deferred()).waitForValue(FBAPI, 'fbApi').addCallback(
     function (api) {
       if (!fbAPIInitialized) {
         fbAPIInitialized = true;
@@ -354,9 +354,7 @@ function queryConnect(path) {
 
 window.fbAsyncInit = function() {
   console.log('window.fbAsyncInit called', window.FB);
-  FBAPI._fbApi = window.FB;
-  // Export to be waited for.
-  FBAPI['_fbApi'] = FBAPI._fbApi;
+  FBAPI.fbApi = window.FB;
   delete window.fbAsyncInit;
 };
 
