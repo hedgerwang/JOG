@@ -140,6 +140,14 @@ var Deferred = Class.create(null, {
    * @return {Deferred}
    */
   waitForValue: function(object, key) {
+    if (__DEV__) {
+      if (key.charAt(0) === '_') {
+        throw new Error('wait for a private(?) member that could be ' +
+          'renamed after compression')
+      }
+    }
+
+
     if (!this._waitForQueue) {
       this._waitForQueue = [];
     }
@@ -184,6 +192,7 @@ var Deferred = Class.create(null, {
     }
 
     if (((Date.now() - thing.time) > 60000)) {
+      console.warn('waitForValue timeout', thing.key);
       this.fail('Wait for timeout');
       this._clearWaitFor();
     }

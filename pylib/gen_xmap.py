@@ -17,7 +17,7 @@ def process_file(path, map, next_id) :
   for match in matches :
     expression = match.group()
     token = expression[expression.find("'") + 1 :expression.rfind("'")]
-    map[token] = 'a' + str(next_id)
+    map[token] = 'c' + hex(next_id)
     next_id += 1
 
   return next_id

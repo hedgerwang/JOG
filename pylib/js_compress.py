@@ -11,6 +11,8 @@ CLOSURE_FLAGS = [
 DEV_MODE = False
 VAR_DEBUG_PATTERN = re.compile(r'var\s+__DEV__\s*=\s*[a-z]+\s*;')
 CONSOLE_PATTERN = re.compile(r'[\s;\}\{]console\.(log|warn|error)\(')
+PRIVATE_MEMBER_PATTERN = re.compile(
+  r'[\s;\{\.](?P<name>_[a-zA-Z0-9]+)[><\?:|&\-\+\[\]\.\(\);\s=,\{\}]')
 
 
 def compress(path, cssx_map=None) :
@@ -34,14 +36,17 @@ def compress(path, cssx_map=None) :
 
   source = jsrequire.get(path, 'all')
 
+  # Crush require('module/name').
   matches = jsrequire.RE_REQUIRE.finditer(source)
   new_module_names = {}
+
+  # TODO(hedger): should module id use timestamp?
   next_module_id = 0
 
   for match in matches :
     module_name = match.group('path')
     if not module_name in new_module_names :
-      new_module_names[module_name] = 'm' + str(next_module_id)
+      new_module_names[module_name] = 'm' + hex(next_module_id)[2 :]
       next_module_id += 1
     expression = match.group()
     new_expression = expression.replace(
@@ -55,6 +60,7 @@ def compress(path, cssx_map=None) :
     print 'Replace "%s" with "%s"' % (expression, new_expression)
     source = source.replace(expression, new_expression)
 
+  # Crush css('css-selector-name').
   if cssx_map is not None :
     for key in cssx_map :
       expression = 'cssx(\'%s\')' % key
@@ -62,6 +68,7 @@ def compress(path, cssx_map=None) :
       print 'Replace "%s" with "%s"' % (expression, new_expression)
       source = source.replace(expression, new_expression)
 
+  # Crush __DEV__
   matches = VAR_DEBUG_PATTERN.finditer(source)
 
   for match in matches :
@@ -70,6 +77,7 @@ def compress(path, cssx_map=None) :
     print '>> Replace "%s" with "%s"' % (expression, new_expression)
     source = source.replace(expression, new_expression)
 
+  # Crush console.log()
   matches = CONSOLE_PATTERN.finditer(source)
   for match in matches :
     expression = match.group()
@@ -79,7 +87,26 @@ def compress(path, cssx_map=None) :
     print '>> Replace "%s" with "%s"' % (expression, new_expression)
     source = source.replace(expression, new_expression)
 
-  # Use closure so that __DEV__ can be removed safely.
+  # Crush _privateMethod
+  # This is very dangerous!!!
+  next_member_id = 0
+  new_member_names = {}
+  matches = PRIVATE_MEMBER_PATTERN.finditer(source)
+  for match in matches :
+    expression = match.group()
+    member_name = match.group('name')
+
+    if not (member_name in new_member_names) :
+      new_member_names[member_name] = '$p' + hex(next_member_id)[2 :]
+      next_member_id += 1
+
+    new_expression = expression.replace(member_name,
+                                        new_member_names[member_name])
+
+    print '>> Replace "%s" with "%s"' % (expression, new_expression)
+    source = source.replace(expression, new_expression)
+
+  # Use closure so that __DEV__ can be removed safely by the compiler.
   source = '(function(window, document){\n%s\n})(window, document)' % source
 
   js_file = open(input_file_path, 'w')

@@ -154,6 +154,7 @@ var permissions = [
  */
 function isLoggedIn() {
   if (!!(accessToken && userID)) {
+    console.log('FBAPI::isLoggedIn', true);
     return (new Deferred()).succeed(true);
   } else {
     return updateSession();
@@ -189,6 +190,7 @@ function installFBApi() {
   var deferred = new Deferred();
   if (!scriptInstalled) {
     scriptInstalled = true;
+    console.log('FBAPI::installFBApi');
 
     (new Deferred()).waitForValue(dom.getDocument(), 'body').addCallback(
       function(body) {
@@ -204,6 +206,7 @@ function installFBApi() {
 
         body.insertBefore(el, body.firstChild);
         el.appendChild(script);
+        console.log('FBAPI::installFBApi > script tnstalled', script);
       });
   }
 
@@ -211,6 +214,8 @@ function installFBApi() {
     function (api) {
       if (!fbAPIInitialized) {
         fbAPIInitialized = true;
+
+        console.log('FBAPI::installFBApi > fbAPIInitialized', true);
 
         api.init({
           'appId': appID,
@@ -230,9 +235,12 @@ function installFBApi() {
  * @return {Deferred}
  */
 function updateSession() {
+  console.log('FBAPI::updateSession');
+
   var deferred = new Deferred();
 
   var timeout = setTimeout(function() {
+    console.warn('FBAPI::updateSession > timeout');
     if (deferred) {
       deferred.succeed(false);
       timeout = null;
@@ -242,6 +250,7 @@ function updateSession() {
 
   getApi().addCallback(function(api) {
     api.getLoginStatus(function(response) {
+      console.warn('FBAPI::updateSession > loginStatus', response);
       if (deferred) {
         accessToken = objects.getValueByName(
           'authResponse.accessToken', response);
@@ -344,7 +353,10 @@ function queryConnect(path) {
 }
 
 window.fbAsyncInit = function() {
+  console.log('window.fbAsyncInit called', window.FB);
   FBAPI._fbApi = window.FB;
+  // Export to be waited for.
+  FBAPI['_fbApi'] = FBAPI._fbApi;
   delete window.fbAsyncInit;
 };
 
