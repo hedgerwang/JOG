@@ -15,12 +15,12 @@ var lang = {
         throw new Error('bound context is null');
       }
 
-      if (fn._bound_context && fn._bound_context !== context) {
+      if (fn._jogLangBoundContext && fn._jogLangBoundContext !== context) {
         throw new Error('context already bound');
       }
     }
 
-    if (fn._bound_by_lang) {
+    if (fn._jogLangBound) {
       return fn;
     }
 
@@ -28,10 +28,10 @@ var lang = {
       return fn.apply(context, arguments)
     };
 
-    fn2._bound_by_lang = true;
+    fn2._jogLangBound = true;
 
     if (__DEV__) {
-      fn2._bound_context = context;
+      fn2._jogLangBoundContext = context;
     }
 
     return fn2;

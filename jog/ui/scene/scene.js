@@ -21,9 +21,11 @@ var Scene = Class.create(BaseUI, {
 
   /** @override */
   dispose: function() {
-    if (this._animator) {
-      this._animator.dispose();
-    }
+    Class.dispose(this._animator);
+  },
+
+  moveTo: function(x, y) {
+
   },
 
   /**
@@ -33,12 +35,14 @@ var Scene = Class.create(BaseUI, {
    */
   faceOut: function(duration, opt_dispose) {
     this.getEvents().unlistenAll();
+    Class.dispose(this._animator);
 
     var df = new Deferred();
 
     if (this._animator) {
       this._animator.dispose();
     }
+
 
     this._animator = new Animator(32);
     var stepFn = this.bind(function(value) {

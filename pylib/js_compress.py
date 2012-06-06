@@ -9,10 +9,16 @@ CLOSURE_FLAGS = [
   ]
 
 DEV_MODE = False
+
+# var __DEV__ = ....
 VAR_DEBUG_PATTERN = re.compile(r'var\s+__DEV__\s*=\s*[a-z]+\s*;')
-CONSOLE_PATTERN = re.compile(r'[\s;\}\{]console\.(log|warn|error)\(')
+
+# console.log(...);
+CONSOLE_PATTERN = re.compile(r'[\s;\}\{]console\.(log|warn|error)\(.+\)\s*;')
+
+# this._fooBar
 PRIVATE_MEMBER_PATTERN = re.compile(
-  r'[\s;\{\.](?P<name>_[a-zA-Z0-9]+)[><\?:|&\-\+\[\]\.\(\);\s=,\{\}]')
+  r'[\s;\{\.](?P<name>(_[a-zA-Z0-9]+)+)[><\?:|&\-\+\[\]\.\(\);\s=,\{\}]')
 
 
 def compress(path, cssx_map=None) :
@@ -81,11 +87,8 @@ def compress(path, cssx_map=None) :
   matches = CONSOLE_PATTERN.finditer(source)
   for match in matches :
     expression = match.group()
-    prefix = expression[0 : expression.find('console.')]
-    suffix = expression[expression.find('console.') :]
-    new_expression = prefix + '__DEV__ && ' + suffix
-    print '>> Replace "%s" with "%s"' % (expression, new_expression)
-    source = source.replace(expression, new_expression)
+    print '>> Remove "%s"' % expression
+    source = source.replace(expression, '')
 
   # Crush _privateMethod
   # This is very dangerous!!!

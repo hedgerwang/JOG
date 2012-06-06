@@ -177,7 +177,7 @@ function classDispose() {
  * @return {Function}
  */
 function classBind(fn) {
-  if (fn._bound_by_class) {
+  if (fn._jogClassBound) {
     return fn;
   }
 
@@ -188,7 +188,7 @@ function classBind(fn) {
     }
   };
 
-  fn2._bound_by_class = true;
+  fn2._jogClassBound = true;
   return fn2;
 }
 
