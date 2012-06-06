@@ -2,11 +2,11 @@
  * @provides m-scroll-area-css
  */
 
-.jog-bebavior-scrollable {  
+.jog-bebavior-scrollable {
   overflow: hidden;
 }
 
-.jog-bebavior-scrollable_content {  
+.jog-bebavior-scrollable_content {
   position: relative;
   z-index: 1; /* must be less than 10 to prevent overlaying the notifications */
 }
