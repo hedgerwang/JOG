@@ -5,10 +5,9 @@
  * @url http://localhost:8888/jog/localstorage/localstorage_test.html
  */
 
+var LocalStorage = require('jog/localstorage').LocalStorage;
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
-
-var LocalStorage = require('jog/localstorage').LocalStorage;
 
 var meta1;
 var meta2;

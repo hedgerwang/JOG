@@ -5,9 +5,9 @@
  * @url http://localhost:8888/jog/animator/animator_test.html
  */
 
+var Animator = require('jog/animator').Animator;
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
-var Animator = require('jog/animator').Animator;
 
 (new TestCase('jog/animator/animator.js Test'))
   .demo('demo 1',

@@ -5,12 +5,10 @@
  * @url http://localhost:8888/jog/behavior/scrollable/scrollable_test.html
  */
 
+var Scrollable = require('jog/behavior/scrollable').Scrollable;
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
-
-var Scrollable = require('jog/behavior/scrollable').Scrollable;
 var dom = require('jog/dom').dom;
-
 
 (new TestCase('jog/behavior/scrollable/scrollable.js Test'))
   .demo('demo',

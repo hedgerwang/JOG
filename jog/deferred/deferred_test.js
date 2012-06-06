@@ -5,10 +5,10 @@
  * @url http://localhost:8888/jog/deferred/deferred_test.html
  */
 
+var Deferred = require('jog/deferred').Deferred;
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
 
-var Deferred = require('jog/deferred').Deferred;
 var meta = {};
 var delay = 100;
 var delayLong = 600;

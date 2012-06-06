@@ -10,7 +10,6 @@ var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;
 var objects = require('jog/objects').objects;
 
-
 var FBAPI = {
   fbApi: null,
 

@@ -5,10 +5,9 @@
  * @url http://localhost:8888/jog/behavior/imageable/imageable_test.html
  */
 
+var Imageable = require('jog/behavior/imageable').Imageable;
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
-
-var Imageable = require('jog/behavior/imageable').Imageable;
 
 (new TestCase('Imageable Test'))
   .demo('demo',

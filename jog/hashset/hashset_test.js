@@ -5,10 +5,9 @@
  * @url http://localhost:8888/jog/hashset/hashset_test.html
  */
 
+var HashSet = require('jog/hashset').HashSet;
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
-
-var HashSet = require('jog/hashset').HashSet;
 
 (new TestCase('HashSet Test'))
   .test('test 1',

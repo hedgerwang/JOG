@@ -5,11 +5,9 @@
  * @link http://localhost:8888/jog/hashcode/hashcode_test.html
  */
 
+var HashCode = require('jog/hashcode').HashCode;
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
-
-var HashCode = require('jog/hashcode').HashCode;
-
 
 (new TestCase('HashCode Test'))
   .test('getHashCode',

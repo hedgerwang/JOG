@@ -5,10 +5,9 @@
  * @url http://localhost:8888/jog/hashmap/hashmap_test.html
  */
 
+var HashMap = require('jog/hashmap').HashMap;
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
-
-var HashMap = require('jog/hashmap').HashMap;
 
 (new TestCase('HasgMap Test'))
   .test('test hashmap',

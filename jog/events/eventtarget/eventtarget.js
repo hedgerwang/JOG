@@ -4,9 +4,9 @@
  */
 
 var Class = require('jog/class').Class;
-
 var Event = require('jog/events/event').Event;
 var HashCode = require('jog/hashcode').HashCode;
+
 var hashCodeGetHashCode = HashCode.getHashCode;
 
 // For perf reason, we should re-use the event singleton.

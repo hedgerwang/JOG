@@ -5,11 +5,10 @@
  * @url http://localhost:8888/jog/behavior/tappable/tappable_test.html
  */
 
+var Tappable = require('jog/behavior/tappable').Tappable;
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
 var dom = require('jog/dom').dom;
-
-var Tappable = require('jog/behavior/tappable').Tappable;
 
 (new TestCase('Tappable Test'))
   .demo('demo',
