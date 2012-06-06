@@ -24,8 +24,40 @@ var Scene = Class.create(BaseUI, {
     Class.dispose(this._animator);
   },
 
-  moveTo: function(x, y) {
+  /**
+   * @param {number} x
+   * @return {Deferred}
+   */
+  translateXTo: function(x) {
+    Class.dispose(this._animator);
+    this._animator = new Animator();
 
+    var df = new Deferred();
+    var x0 = this._x;
+    var dx = x - this._x;
+
+    var stepFn = this.bind(function(value) {
+      this._x = x0 + ~~(dx * value);
+      this.getNode().style.webkitTransform =
+        'translate3d(' + this._x + 'px,0,0)';
+    });
+
+    var verifyFn = this.bind(function() {
+      return this._x !== x;
+    });
+
+    var completedFn = this.bind(function() {
+      Class.dispose(this._animator);
+      df.succeed(true);
+      df = null;
+    });
+
+    if (dx !== 0) {
+      this._animator.start(stepFn, verifyFn, completedFn, 250);
+    } else {
+      df.succeed(true);
+    }
+    return df;
   },
 
   /**
@@ -34,17 +66,11 @@ var Scene = Class.create(BaseUI, {
    * @return {Deferred}
    */
   faceOut: function(duration, opt_dispose) {
-    this.getEvents().unlistenAll();
     Class.dispose(this._animator);
+    this._animator = new Animator(32);
 
     var df = new Deferred();
 
-    if (this._animator) {
-      this._animator.dispose();
-    }
-
-
-    this._animator = new Animator(32);
     var stepFn = this.bind(function(value) {
       this._opacity = 1 - (~~(value * 10) / 10);
       this.getNode().style.opacity = this._opacity;
@@ -55,16 +81,12 @@ var Scene = Class.create(BaseUI, {
     });
 
     var completedFn = this.bind(function() {
-      this._opacity = 0;
-      this.getNode().style.opacity = this.opacity;
-      this._animator.dispose();
-      delete this._animator;
+      Class.dispose(this._animator);
       df.succeed(true);
 
       if (opt_dispose) {
         this.dispose();
       }
-
       df = null;
     });
 
@@ -72,6 +94,8 @@ var Scene = Class.create(BaseUI, {
     return df;
   },
 
+  _x: 0,
+  _y: 0,
   _animator: null,
   _opacity: 1
 });
