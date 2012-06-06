@@ -30,14 +30,6 @@ var Scrollable = Class.create(EventTarget, {
     this._scroller = new Scroller(this, opt_options);
     this._events = new Events(this);
 
-    if (opt_options &&
-      opt_options.showpaginator &&
-      opt_options.direction === 'horizontal') {
-      this._paginator = dom.createElement(
-        'div', cssx('jog-bebavior-scrollable_paginator'));
-      element.appendChild(this._paginator);
-    }
-
     if (opt_options && opt_options.dimentions) {
       this._dimentions = opt_options.dimentions;
     }
@@ -110,7 +102,6 @@ var Scrollable = Class.create(EventTarget, {
         this._content.scrollHeight
       );
     }
-    this._syncPaginator();
   },
 
   /**
@@ -145,7 +136,6 @@ var Scrollable = Class.create(EventTarget, {
    * @param {number} top
    */
   onScrollEnd: function(left, top) {
-    this._syncPaginator();
     if (this._renderSlowly) {
       // Cancel the asynchronous scroll-rendering that was set up at
       // TOUCHSTART.
@@ -248,24 +238,6 @@ var Scrollable = Class.create(EventTarget, {
     }
   },
 
-  _syncPaginator: function() {
-    if (this._paginator) {
-      var dot = dom.createElement('i', cssx('jog-bebavior-scrollable_dot'));
-      var fragment = dom.createDocumentFragment();
-      var index = this._scroller.pageIndex;
-
-      for (var i = 0; i < this._scroller.pagesCount; i++) {
-        var newDot = dot.cloneNode(false);
-        if (i === index) {
-          dom.addClassName(newDot, cssx('jog-bebavior-scrollable_dot_on'));
-        }
-        fragment.appendChild(newDot);
-      }
-      this._paginator.textContent = '';
-      this._paginator.appendChild(fragment);
-    }
-  },
-
   /**
    * @type {Element}
    */
@@ -284,16 +256,6 @@ var Scrollable = Class.create(EventTarget, {
    * @type {boolean}
    */
   _renderSlowly: (/android/gi).test(navigator.appVersion),
-
-  /**
-   * @type {Element}
-   */
-  _paginatorEl: null,
-
-  /**
-   * @type {Element}
-   */
-  _paginator : null,
 
   /**
    * @type {Element}

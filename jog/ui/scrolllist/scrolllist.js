@@ -27,7 +27,6 @@ var ScrollList = Class.create(BaseUI, {
     this._processContentNow = this.bind(this._processContentNow);
     this._toggleChunks = lang.throttle(this._toggleChunks, 200, this);
     this._processContent = lang.throttle(this._processContentNow, 200);
-
   },
 
   /** @override */
