@@ -12,7 +12,7 @@ var lang = require('jog/lang').lang;
 
 var BaseUI = Class.create(EventTarget, {
   /**
-   * @type {BaseUI{
+   * @type {BaseUI}
    */
   _parentUI: null,
 
@@ -59,6 +59,14 @@ var BaseUI = Class.create(EventTarget, {
       for (var i = 0, j = this._childrenUI.length; i < j; i++) {
         this._childrenUI[i].dispose();
       }
+    }
+  },
+
+  /** @override */
+  dispatchEvent : function(type, opt_data, opt_bubble) {
+    EventTarget.prototype.dispatchEvent.call(this, type, opt_data, opt_bubble);
+    if (opt_bubble && this._parentUI) {
+      this._parentUI.dispatchEvent(type, opt_data, opt_bubble);
     }
   },
 
@@ -126,30 +134,32 @@ var BaseUI = Class.create(EventTarget, {
   },
 
   /**
-   * @param {BaseUI} ui
+   * @param {BaseUI} child
    * @paran {boolean=} opt_render
    */
-  appendChild: function(ui, opt_render) {
+  appendChild: function(child, opt_render) {
     if (__DEV__) {
-      if (!ui || !(ui instanceof BaseUI)) {
+      if (!child || !(child instanceof BaseUI)) {
         throw new Error('child must be an instance of BaseUI');
       }
 
-      if (ui._parentUI) {
+      if (child._parentUI) {
         throw new Error('parent ui exists!');
       }
     }
-    ui._parentUI = this;
+    child._parentUI = this;
 
     if (!this._childrenUI) {
       this._childrenUI = [];
     }
 
-    this._childrenUI.push(ui);
+    this._childrenUI.push(child);
 
     if (opt_render) {
-      ui.render(this.getNode());
+      child.render(this.getNode());
     }
+
+    return child;
   },
 
   /**

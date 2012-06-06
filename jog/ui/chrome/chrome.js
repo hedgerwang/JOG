@@ -50,11 +50,6 @@ var Chrome = Class.create(BaseUI, {
         this.getNode().style.webkitTransform = 'scale(' + scale + ')';
       }
     }
-
-    if (useTouch) {
-      this.getEvents().listen(
-        document, 'touchmove', Functions.PREVENT_DEFAULT);
-    }
   },
 
   _onresize: function() {
@@ -67,12 +62,14 @@ var Chrome = Class.create(BaseUI, {
    * @param {Event} event
    */
   _onTouch: function(event) {
-    var now = Date.now();
-    if (now - this._touchedTime < 500) {
-      event.preventDefault();
-      this._reflow();
+    if (!event.defaultPrevented) {
+      var now = Date.now();
+      if (now - this._touchedTime < 500) {
+        event.preventDefault();
+        this._reflow();
+      }
+      this._touchedTime = now;
     }
-    this._touchedTime = now;
   },
 
   _reflow: function() {

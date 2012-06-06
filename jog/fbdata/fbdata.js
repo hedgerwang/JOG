@@ -31,6 +31,44 @@ var FBData = {
       '}';
 
     return queryGraph(query, useCache);
+  },
+
+  /**
+   * @param {boolean} useCache
+   * @return {Deferred}
+   */
+  getProfile: function(useCache) {
+    var query = 'me(){id,name,profile_picture}';
+    return queryGraph(query, useCache);
+  },
+
+  /**
+   * @param {number} count
+   * @param {string?} startCursor
+   * @param {boolean} useCache
+   * @return {Deferred}
+   */
+  getGroups: function(count, startCursor, useCache) {
+    var query = 'me(){id,groups' +
+      (startCursor ? '.after(' + startCursor + ')' : '') +
+      '.first(' + count + '){' +
+      'count,page_info{start_cursor,end_cursor,has_next_page},' +
+      'nodes{name,profile_picture,id,url}}}';
+    return queryGraph(query, useCache);
+  },
+
+  /**
+   * @param {number} count
+   * @param {string?} startCursor
+   * @param {boolean} useCache
+   * @return {Deferred}
+   */
+  getFriendsList: function(count, startCursor, useCache) {
+    var query = 'me(){id,friend_lists' +
+      (startCursor ? '.after(' + startCursor + ')' : '') +
+      '.first(' + count + '){' +
+      'page_info{start_cursor,end_cursor,has_next_page},nodes{name,id,url}}}';
+    return queryGraph(query, useCache);
   }
 };
 

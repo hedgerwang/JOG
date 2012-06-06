@@ -5,7 +5,7 @@ import json
 
 
 CSSX_PATTERN = re.compile(
-  r'[\+\|&\?,:\s;\}\{\[]+cssx\([a-zA-Z0-9-_\']+\)')
+  r'[+-=\?\&|:><\(\)\{\}\[\]\s,]cssx\(\'(?P<name>[a-zA-Z0-9-_]+)\'\)')
 
 
 def process_file(path, map, next_id) :
@@ -16,9 +16,10 @@ def process_file(path, map, next_id) :
 
   for match in matches :
     expression = match.group()
-    token = expression[expression.find("'") + 1 :expression.rfind("'")]
-    map[token] = 'c' + hex(next_id)
+    token = match.group('name')
+    map[token] = 'c' + hex(next_id)[2 :]
     next_id += 1
+    print expression
 
   return next_id
 

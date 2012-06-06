@@ -1,8 +1,16 @@
-.jog-ui-simplescrolllist {  
+.jog-ui-simplescrolllist {
   -webkit-overflow-scrolling: touch;
   height: 100%;
   overflow-x: hidden;
   overflow: auto;
   position: absolute;
   width: 100%;
+}
+
+.jog-ui-simplescrolllist_spacer {
+  left: 0;
+  background: red;
+  position: absolute;
+  top: 0;
+  width: 2px;
 }

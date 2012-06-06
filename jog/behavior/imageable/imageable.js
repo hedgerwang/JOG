@@ -99,8 +99,11 @@ function updateVisibleImageables() {
     }
 
     if (imageable._size) {
-      var rect = imageable._element.getBoundingClientRect();
-      if (rect.top > -1 && rect.top < 1200) {
+      var el = imageable._element;
+      var rect = el.getBoundingClientRect();
+      if (rect.top > -1 &&
+        rect.top < 1200 &&
+        el === document.elementFromPoint(rect.left + 1, rect.top + 1)) {
         visibleImageablesToLoad.push(imageable);
       }
     }
@@ -146,6 +149,10 @@ function handleOnloadOrError(event) {
 
   img.src = null;
   imageable.dispose();
+
+  delete this._size;
+  delete this._element;
+  delete this._src;
 
   processingCount--;
   setTimeout(processImageables, 16);

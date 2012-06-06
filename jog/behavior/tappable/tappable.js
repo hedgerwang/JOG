@@ -36,10 +36,12 @@ var Tappable = Class.create(EventTarget, {
 
   /**
    * @param {Element} element
+   * @return {Tappable}
    */
   addTarget: function(element) {
     this._targets.add(element);
     element._tappaple = true;
+    return this;
   },
 
   /**
@@ -52,12 +54,15 @@ var Tappable = Class.create(EventTarget, {
       return;
     }
 
+
     var target = event.target;
     if (target === this._element || this._element.contains(target)) {
 
       while (target) {
         if (target._tappaple) {
           if (this._targets.contains(target)) {
+            event.preventDefault();
+
             this.dispatchEvent('tapstart', target);
 
             this._tapStartNode = target;
@@ -116,6 +121,7 @@ var Tappable = Class.create(EventTarget, {
     }
 
     if (tapped) {
+      event.preventDefault();
       this.dispatchEvent('tapend', touchTarget);
       this.dispatchEvent('tap', touchTarget);
       this.dispatchEvent('tapin', touchTarget);

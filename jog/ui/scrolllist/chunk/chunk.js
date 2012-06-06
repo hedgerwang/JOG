@@ -99,7 +99,8 @@ var Chunk = Class.create(BaseUI, {
         break;
 
       case 'object':
-        if (content.nodeType === 1) {
+        if (content.nodeType === 1 || content.nodeType === 11) {
+          // Element OR DocumentFragment.
           node = content;
         } else if (content instanceof BaseUI) {
           node = content.getNode();

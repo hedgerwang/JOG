@@ -24,7 +24,10 @@ var SimpleScrollList = Class.create(BaseUI, {
 
   /** @override */
   createNode: function() {
-    var node = dom.createElement('div', cssx('jog-ui-simplescrolllist'));
+    this._spacer = dom.createElement(
+      'div', cssx('jog-ui-simplescrolllist_spacer'));
+    var node = dom.createElement(
+      'div', cssx('jog-ui-simplescrolllist'), this._spacer);
     return node;
   },
 
@@ -52,12 +55,18 @@ var SimpleScrollList = Class.create(BaseUI, {
 
   _reflow: function() {
     // reflow all chunks?
+    // this.getNode().style.border = 'solid 3px red';
+    // this.getNode().style.height = '100%';
+    var height = this._lastChunk ?
+      this._lastChunk.getBottom() :
+      0;
+    this._spacer.style.height = height + 'px';
   },
 
   _onScroll: function(left, top) {
     this.getEvents().unlisten(this.getNode(), 'scroll', this._onScroll);
     this._onScrollTop = window.pageYOffset;
-    this._onScrollTimer = setInterval(this._onScrollCheck, 500);
+    this._onScrollTimer = setInterval(this._onScrollCheck, 300);
   },
 
   _onScrollCheck :function() {
@@ -68,6 +77,8 @@ var SimpleScrollList = Class.create(BaseUI, {
         this._processContent();
       } else {
         clearInterval(this._onScrollTimer);
+        delete this._onScrollTimer;
+        this._processContent();
         this.getEvents().listen(this.getNode(), 'scroll', this._onScroll);
       }
     }
@@ -80,7 +91,8 @@ var SimpleScrollList = Class.create(BaseUI, {
     var limitTop = scrollTop - limitBuffer;
     var limitBottom = scrollTop + height + limitBuffer;
     for (var i = 0, chunk; chunk = this._chunks[i]; i++) {
-      chunk.setVisible(this._shouldShowChunk(limitTop, limitBottom, chunk));
+      chunk.setVisible(true);
+      // chunk.setVisible(this._shouldShowChunk(limitTop, limitBottom, chunk));
     }
   },
 
@@ -88,6 +100,7 @@ var SimpleScrollList = Class.create(BaseUI, {
     this._reflow();
 
     if (!this._contentsQueue.length) {
+      this._toggleChunks();
       return;
     }
 
@@ -170,6 +183,11 @@ var SimpleScrollList = Class.create(BaseUI, {
    * @type {number}
    */
   _onScrollTimer: 0,
+
+  /**
+   * @type {Element}
+   */
+  _spacer: null,
 
   /**
    * @type {Chunk}

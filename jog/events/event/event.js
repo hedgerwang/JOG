@@ -14,6 +14,8 @@ var Event = Class.create(null, {
 
   data: null,
 
+  bubbles: false,
+
   clear : function() {
     for (var key in this) {
       delete this[key];
