@@ -1,4 +1,7 @@
 */.DS_Store
+jog/.do_not_submit
+app
+images
 pylib/.*
 .DS_Store
 pylib/*.pyc

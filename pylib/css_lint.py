@@ -4,14 +4,18 @@ import re
 
 
 def css_lint_dir(dir_path) :
-  paths = glob.glob(dir_path)
-  for path in paths :
-    if os.path.isdir(path) :
-      css_lint_dir(path + '/*')
-    elif os.path.isfile(path) :
-      if path.endswith('css') :
-        css_lint_file(path)
+  for rootdir, dirnames, filenames in os.walk(dir_path, True, None, True) :
+    if (rootdir.find('google_app_engine_host') > -1 or
+        rootdir.find('.git') > -1 or
+        rootdir.find('pylib') > -1 or
+        rootdir.find('explorer_pkg') > -1 or
+        rootdir.find('.idea') > -1) :
+      continue
 
+    for filename in filenames :
+      if filename.endswith('.css') :
+        path = os.path.join(rootdir, filename)
+        css_lint_file(path)
 
 CSS_BLOCK_CONTENT_PATTERN = re.compile(r'{[^}]+}')
 
@@ -57,9 +61,4 @@ def _get_file(abs_path) :
   return str(content)
 
 if __name__ == '__main__' :
-  dir_names = [
-    'app',
-    'jog'
-  ]
-  for dir_name in dir_names :
-    css_lint_dir(dir_name)
+  css_lint_dir('.')

@@ -31,6 +31,8 @@ def gen_cssx_map(dir_path) :
   for rootdir, dirnames, filenames in os.walk(dir_path, True, None, True) :
     if (rootdir.find('google_app_engine_host') > -1 or
         rootdir.find('.git') > -1 or
+        rootdir.find('pylib') > -1 or
+        rootdir.find('explorer_pkg') > -1 or
         rootdir.find('.idea') > -1) :
       continue
 
