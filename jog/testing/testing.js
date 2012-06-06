@@ -101,7 +101,9 @@ TestCase.prototype._processTests = function() {
   var test = this._testsQueue.shift();
 
   if (!test) {
-    this._log('Tests finished');
+    if (this._tested) {
+      this._log('Tests finished');
+    }
     clearInterval(this._testsTimer);
     delete this._testsTimer;
     return;
@@ -128,6 +130,7 @@ TestCase.prototype._processTests = function() {
  * @param {Function} fn
  */
 TestCase.prototype._test = function(description, fn) {
+  this._tested = true;
   var label = this._description + '#' + description;
   try {
     this._log(label);
@@ -139,6 +142,11 @@ TestCase.prototype._test = function(description, fn) {
   return this;
 };
 
+
+/**
+ * @type {boolean}
+ */
+TestCase.prototype._tested = false;
 
 /**
  * @param {*...} var_obj

@@ -25,7 +25,7 @@ var visibleImageablesToLoad = [];
  * Load image asynchronously and lazily.
  * TODO(hedger): Hide image when it's off-screen?
  */
-var Imageable = Class.create(EventTarget, {
+var Imageable = Class.create(null, {
   /**
    * @param {Element} element
    * @param {string} src
@@ -71,7 +71,7 @@ function processImageables() {
     return;
   }
 
-  updateVisibleImageables();
+  collectSomeVisibleImageables();
   var imageable = visibleImageablesToLoad[0];
 
   if (!imageable) {
@@ -90,7 +90,7 @@ function processImageables() {
   img.src = imageable._src;
 }
 
-function updateVisibleImageables() {
+function collectSomeVisibleImageables() {
   visibleImageablesToLoad.length = 0;
 
   for (var i = 0, imageable; imageable = imageablesToLoad[i]; i++) {
@@ -124,11 +124,6 @@ function handleOnloadOrError(event) {
   var img = event.currentTarget;
   var imageable = imagesMap.get(img);
 
-  img.onload = null;
-  img.onerror = null;
-
-  imagesMap.remove(img);
-
   if (!imageable.disposed) {
     if (event.type === 'load') {
       var elStyle = imageable._element.style;
@@ -145,15 +140,13 @@ function handleOnloadOrError(event) {
       }
       elStyle.backgroundImage = 'url(' + img.src + ')';
     }
+    imageable.dispose();
   }
 
+  img.onload = null;
+  img.onerror = null;
+  imagesMap.remove(img);
   img.src = null;
-  imageable.dispose();
-
-  delete this._size;
-  delete this._element;
-  delete this._src;
-
   processingCount--;
   setTimeout(processImageables, 16);
 }
