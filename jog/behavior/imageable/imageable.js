@@ -102,7 +102,8 @@ function collectSomeVisibleImageables() {
       var rect = el.getBoundingClientRect();
       if (rect.top > -1 &&
         rect.top < 1200 &&
-        el === document.elementFromPoint(rect.left + 1, rect.top + 1)) {
+        el === document.elementFromPoint(rect.left + 1, rect.top + 1) ||
+        el === document.elementFromPoint(rect.right - 1, rect.bottom - 1)) {
         visibleImageablesToLoad.push(imageable);
       }
     }

@@ -182,6 +182,7 @@ function classBind(fn) {
   }
 
   var that = this;
+
   var fn2 = function() {
     if (!that.disposed) {
       return fn.apply(that, arguments)
@@ -189,6 +190,7 @@ function classBind(fn) {
   };
 
   fn2._jogClassBound = true;
+
   return fn2;
 }
 

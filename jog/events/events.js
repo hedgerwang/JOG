@@ -84,11 +84,13 @@ var Events = Class.create(null, {
       capture: capture,
       handleEvent: handleEvent
     };
+
     this._eventsHandlers[key] = handler;
 
     // TODO(hedger): This won't work in IE since IE does not support interface
     // handleEvent & addEventListener.
     target.addEventListener(type, handler, capture);
+
     return key;
   },
 
@@ -103,7 +105,7 @@ var Events = Class.create(null, {
    */
   unlisten : function(target, type, listener, opt_context, opt_capture,
                       opt_more) {
-    var context = opt_context || null;
+    var context = opt_context || this._context;
     var capture = !!opt_capture;
     // if opt_more is provided, there is no easy way to getHashCode from args
     // since it's a new Array. For perf sake, use a dummy object for args
@@ -154,7 +156,7 @@ var Events = Class.create(null, {
       hashCodeGetHashCode(context),
       hashCodeGetHashCode(capture),
       hashCodeGetHashCode(args)
-    ].join('_');
+    ].join('|');
   }
 });
 
