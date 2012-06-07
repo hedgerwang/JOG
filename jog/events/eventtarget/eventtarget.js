@@ -49,9 +49,11 @@ var EventTarget = Class.create(null, {
    * @param {boolean=} opt_capture
    */
   removeEventListener : function(type, listener, opt_capture) {
-    var capture = !!opt_capture;
-    var key = this._getKey(type, listener, capture);
-    delete this._eventTargetHandlers[key];
+    if (this._eventTargetHandlers) {
+      var capture = !!opt_capture;
+      var key = this._getKey(type, listener, capture);
+      delete this._eventTargetHandlers[key];
+    }
   },
 
   /**

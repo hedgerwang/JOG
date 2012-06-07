@@ -63,6 +63,12 @@ var Events = Class.create(null, {
    */
   listen : function(target, type, listener, opt_context, opt_capture,
                     opt_more) {
+    if (__DEV__) {
+      if (opt_context && typeof opt_context !== 'object') {
+        throw new Error('context should be an object.');
+      }
+    }
+
     var context = opt_context || this._context;
 
     var capture = !!opt_capture;
@@ -105,6 +111,12 @@ var Events = Class.create(null, {
    */
   unlisten : function(target, type, listener, opt_context, opt_capture,
                       opt_more) {
+    if (__DEV__) {
+      if (opt_context && typeof opt_context !== 'object') {
+        throw new Error('context should be an object.');
+      }
+    }
+
     var context = opt_context || this._context;
     var capture = !!opt_capture;
     // if opt_more is provided, there is no easy way to getHashCode from args

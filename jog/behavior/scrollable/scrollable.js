@@ -92,6 +92,10 @@ var Scrollable = Class.create(EventTarget, {
   },
 
   reflow: function() {
+    if (this.disposed) {
+      return;
+    }
+
     if (this._dimentions) {
       this._scroller.setDimensions.apply(this._scroller, this._dimentions);
     } else {

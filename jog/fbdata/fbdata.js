@@ -48,6 +48,22 @@ var FBData = {
    * @param {boolean} useCache
    * @return {Deferred}
    */
+  getFriends: function(count, startCursor, useCache) {
+    var query = 'me(){id,friends' +
+      '.orderby(importance)' +
+      (startCursor ? '.after(' + startCursor + ')' : '') +
+      '.first(' + count + '){' +
+      'nodes{name,profile_picture{uri}}}}';
+
+    return queryGraph(query, useCache);
+  },
+
+  /**
+   * @param {number} count
+   * @param {string?} startCursor
+   * @param {boolean} useCache
+   * @return {Deferred}
+   */
   getGroups: function(count, startCursor, useCache) {
     var query = 'me(){id,groups' +
       (startCursor ? '.after(' + startCursor + ')' : '') +

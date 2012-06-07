@@ -62,6 +62,19 @@ var ScrollList = Class.create(BaseUI, {
     }
   },
 
+  clearContent: function() {
+    this._contentsQueue.length = 0;
+
+    for (var i = 0, chunk; chunk = this._chunks[i]; i++) {
+      this.removeChild(chunk);
+    }
+
+    this._chunks.length = 0;
+    this._lastChunk = null;
+    this._reflow();
+    this._scrollable.scrollTo(0, 0);
+  },
+
 
   _onScrollStart: function(left, top) {
     clearTimeout(this._onScrollTimer);
@@ -75,6 +88,10 @@ var ScrollList = Class.create(BaseUI, {
   },
 
   _reflow: function() {
+    if (this.disposed) {
+      return;
+    }
+
     var dimentions = this._scrollDimentions;
     dimentions[1] = this._scrollElement.offsetHeight;
 
@@ -107,6 +124,9 @@ var ScrollList = Class.create(BaseUI, {
   },
 
   _processContent: function() {
+    if (__DEV__) {
+      throw new Error('Function noy implemented');
+    }
   },
 
   _processContentNow: function() {
