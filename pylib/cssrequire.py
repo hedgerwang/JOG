@@ -233,6 +233,8 @@ def main() :
     font: 13px/12px aria;
     line-height: 12px;
     border-radius: 1px;
+    border-top-left-radius: 10px 15px;
+    border-bottom-left-radius: 10px 15px;
     background-size : 100% auto;
     background-size : 100px 100px;
     background-size : 123px 321px;

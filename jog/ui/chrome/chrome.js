@@ -48,10 +48,18 @@ var Chrome = Class.create(BaseUI, {
       var scale = match ? parseFloat(match[0].split('=')[1]) : 1;
       if (scale) {
         // This would make PC debugging easier.
+        this._scale = scale;
         this.getNode().style.webkitTransform = 'scale(' + scale + ')';
       }
     }
   },
+
+  /**
+   * @return {number}
+   */
+  getScale: function() {
+    return this._scale;
+  } ,
 
   _onresize: function() {
     if (!this._reflowing) {
@@ -98,6 +106,7 @@ var Chrome = Class.create(BaseUI, {
     }, 1000);
   },
 
+  _scale: 1,
   _touchedTime: 0,
   _reflowing: false
 });

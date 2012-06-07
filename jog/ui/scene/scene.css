@@ -13,19 +13,6 @@
   pointer-events: none;
 }
 
-.jog-ui-scene-disabled:after {  
-  background: rgba(255, 255, 255, 0.5);
-  bottom: 0;
-  content: '';
-  display: block;
-  left: 0;
-  position: absolute;
-  position: absolute;
-  right: 0;
-  top: 0;
-  z-index: 1000;
-}
-
 .jog-ui-scene-hidden {  
   visibility: hidden;
 }

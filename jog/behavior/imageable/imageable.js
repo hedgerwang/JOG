@@ -92,6 +92,23 @@ function processImageables() {
 function collectSomeVisibleImageables() {
   visibleImageablesToLoad.length = 0;
 
+  var viewHeight = Math.max(
+    window.outerHeight,
+    window.innerHeight,
+    screen.height,
+    document.documentElement.offsetHeight
+  );
+
+  if (__DEV__) {
+    // TODO(hedger): Remove this.
+    var chrome = document.querySelector('.jog-ui-chrome');
+    if (chrome) {
+      viewHeight = chrome.offsetHeight + 100;
+    }
+  }
+
+  var viewHeight2 = ~~(viewHeight * 2);
+
   for (var i = 0, imageable; imageable = imageablesToLoad[i]; i++) {
     if (!imageable._size && !imageable.disposed) {
       imageable._reflow();
@@ -100,10 +117,22 @@ function collectSomeVisibleImageables() {
     if (imageable._size) {
       var el = imageable._element;
       var rect = el.getBoundingClientRect();
-      if (rect.top > -1 &&
-        rect.top < 1200 &&
-        el === document.elementFromPoint(rect.left + 1, rect.top + 1) ||
-        el === document.elementFromPoint(rect.right - 1, rect.bottom - 1)) {
+      if (rect.top > -1) {
+        if (rect.top < viewHeight) {
+          var thatEl = document.elementFromPoint(rect.left + 10, rect.top + 1);
+
+          if (!thatEl || el === thatEl) {
+            visibleImageablesToLoad.push(imageable);
+            continue;
+          }
+
+          thatEl = document.elementFromPoint(rect.right - 10, rect.bottom - 1);
+          if (!thatEl || el === thatEl) {
+            visibleImageablesToLoad.push(imageable);
+            continue;
+          }
+        }
+      } else if (rect.top < viewHeight2) {
         visibleImageablesToLoad.push(imageable);
       }
     }

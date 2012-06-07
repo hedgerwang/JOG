@@ -22,6 +22,13 @@ var Scroller = Class.create(null, {
    *        setting.
    */
   main : function(handler, opt_options) {
+    if (__DEV__) {
+      if (!handler || !handler.onScroll ||
+        !handler.onScrollEnd || !handler.onScrollStart) {
+        throw new Error('Improper Scroller handler provided');
+      }
+    }
+
     // Ensure that these functions are always called as instance's methods.
     this._canAnimate = this.bind(this._canAnimate);
 
@@ -495,6 +502,12 @@ var Scroller = Class.create(null, {
   },
 
   _syncPaging: function() {
+    if (!this.width || !this.height) {
+      this.pageIndex = 0;
+      this.pagesCount = 0;
+      return;
+    }
+
     if (this._usePaging) {
       this.pageIndex = this._canScrollX ?
         Math.floor(this.left / this.width) :
