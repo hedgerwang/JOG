@@ -65,6 +65,7 @@ def compress(path, cssx_map=None) :
     new_expression = expression.replace(constant_name,
                                         new_constant_names[constant_name])
     print 'Replace %s with %s' % (expression, new_expression)
+    source = source.replace(expression, new_expression)
 
 
   # Crush require('module/name').
