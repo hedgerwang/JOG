@@ -24,3 +24,11 @@
   transform: scale(1.04);
   width: 100%;
 }
+
+.jog-ui-loading-indicator-centered {  
+  display: block;
+  left: 50%;
+  margin: 0 0 0 -2em;
+  position: absolute;
+  top: 50%;
+}

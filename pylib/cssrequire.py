@@ -229,6 +229,7 @@ def main() :
     height: 10px;
     text-indent: 10px;
     font-size: 10px;
+    font-size: 30px;
     font: 13px/140% aria;
     font: 13px/12px aria;
     line-height: 12px;
@@ -241,6 +242,10 @@ def main() :
     background-position: -10px 10px;
     background: #fff url(/image/foo.jpg) 10px 10px no-repeat;
     box-shadow: 0 0 0 10px;
+  }
+
+  .bar {
+     font-size: 10px;
   }
   """
 

@@ -39,11 +39,24 @@ var FBData = {
   },
 
   /**
+   * @param {number} uid
    * @param {boolean} useCache
    * @return {Deferred}
    */
-  getProfile: function(useCache) {
-    var query = 'me(){id,name,profile_picture}';
+  getProfile: function(uid, useCache) {
+    var query = (uid ? 'node(' + uid + ')' : 'me()') +
+      '{id,name,profile_picture}';
+    return queryGraph(query, useCache);
+  },
+
+  /**
+   * @param {number} uid
+   * @param {boolean} useCache
+   * @return {Deferred}
+   */
+  getLargeProfile: function(uid, useCache) {
+    var query = (uid ? 'node(' + uid + ')' : 'me()') +
+      '{id,name,profile_picture.size(320,320){uri},username,birthday}';
     return queryGraph(query, useCache);
   },
 

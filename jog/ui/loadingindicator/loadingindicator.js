@@ -31,6 +31,10 @@ var LoadingIndicator = Class.create(BaseUI, {
     this.play();
   },
 
+  center: function() {
+    dom.addClassName(this.getNode(), cssx('jog-ui-loading-indicator-centered'));
+  },
+
   play: function() {
     if (!this._playing) {
       this._playing = true;

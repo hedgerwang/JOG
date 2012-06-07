@@ -21,6 +21,13 @@ PRIVATE_MEMBER_PATTERN = re.compile(
   r'[\s;\{\.](?P<name>(_[a-zA-Z0-9]+)+)[><\?:|&\-\+\[\]\.\(\);\s=,\{\}]')
 
 
+# this._fooBar
+ENUM_PATTERN = re.compile(
+  r'[\s;\{\.](?P<name>([A-Z]+(_[A-Z]+)+))')
+
+# [><\?:|&\-\+\[\]\.\(\);\s=,\{\}]
+
+
 def compress(path, cssx_map=None) :
   print 'Compress JS file'
 
@@ -42,27 +49,45 @@ def compress(path, cssx_map=None) :
 
   source = jsrequire.get(path, 'all')
 
+  # Dangerous. (it may rename browser built-in constants or enums).
+  # Crush constants or enum.
+  matches = ENUM_PATTERN.finditer(source)
+  new_constant_names = {}
+  next_const_name_id = 0
+  for match in matches :
+    constant_name = match.group('name')
+
+    if not constant_name in new_constant_names :
+      next_const_name_id += 1
+      new_constant_names[constant_name] = '$_' + hex(next_const_name_id)[2 :]
+
+    expression = match.group()
+    new_expression = expression.replace(constant_name,
+                                        new_constant_names[constant_name])
+    print 'Replace %s with %s' % (expression, new_expression)
+
+
   # Crush require('module/name').
   matches = jsrequire.RE_REQUIRE.finditer(source)
-  new_module_names = {}
+  new_constant_names = {}
 
   # TODO(hedger): should module id use timestamp?
   next_module_id = 0
 
   for match in matches :
     module_name = match.group('path')
-    if not module_name in new_module_names :
-      new_module_names[module_name] = 'm' + hex(next_module_id)[2 :]
+    if not module_name in new_constant_names :
+      new_constant_names[module_name] = 'm' + hex(next_module_id)[2 :]
       next_module_id += 1
     expression = match.group()
     new_expression = expression.replace(
       "require('%s')" % module_name,
-      "require('%s')" % new_module_names[module_name])
+      "require('%s')" % new_constant_names[module_name])
     print 'Replace "%s" with "%s"' % (expression, new_expression)
     source = source.replace(expression, new_expression)
 
     expression = "define('%s'" % module_name
-    new_expression = "define('%s'" % new_module_names[module_name]
+    new_expression = "define('%s'" % new_constant_names[module_name]
     print 'Replace "%s" with "%s"' % (expression, new_expression)
     source = source.replace(expression, new_expression)
 
