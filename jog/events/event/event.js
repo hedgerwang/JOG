@@ -13,6 +13,8 @@ var Event = Class.create(null, {
 
   data: null,
 
+  currentTarget: null,
+
   bubbles: false,
 
   clear : function() {

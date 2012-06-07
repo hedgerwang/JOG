@@ -110,6 +110,13 @@ var BaseUI = Class.create(EventTarget, {
   },
 
   /**
+   * @return {number}
+   */
+  getWidth: function() {
+    return this._node ? this._node.offsetWidth : 0;
+  },
+
+  /**
    * @return {Node}
    */
   getNode : function() {

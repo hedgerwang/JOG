@@ -52,7 +52,12 @@ var Deferred = Class.create(null, {
     this.addCallback(function(more) {
       var newDeferred = fn.apply(null, arguments);
       if (!newDeferred || !(newDeferred instanceof Deferred)) {
-        throw new Error('Not Deferred');
+        var msg = 'Not Deferred';
+        if (__DEV__) {
+          msg = 'deferred.then() expects a function that returns ' +
+            'a Deferred instance';
+        }
+        throw new Error(msg);
       }
       df.attachTo(newDeferred);
     });

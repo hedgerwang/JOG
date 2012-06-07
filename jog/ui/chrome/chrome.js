@@ -40,6 +40,7 @@ var Chrome = Class.create(BaseUI, {
       this.getEvents().listen(document, 'resize', this._onresize);
       this.getEvents().listen(document, 'orientationchange', this._onresize);
       this.getEvents().listen(document, 'touchstart', this._onTouch);
+      // this.getEvents().listen(document, 'focusin', this._reflow);
       this._reflow();
     } else {
       var re = /(initial-scale\s*=\s*)([0-9\.]+)/g;

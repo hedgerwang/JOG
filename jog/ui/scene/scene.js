@@ -24,15 +24,48 @@ var Scene = Class.create(BaseUI, {
     Class.dispose(this._animator);
   },
 
+
+  /**
+   * @param {boolean} disabled
+   * @return {Scene}
+   */
+  setDisabled: function(disabled) {
+    if (this._disabled !== disabled) {
+      this._disabled = disabled;
+      dom.alterClassName(
+        this.getNode(), cssx('jog-ui-scene-disabled'), disabled);
+    }
+    return this;
+  },
+
+  /**
+   * @param {boolean} hidden
+   * @return {Scene}
+   */
+  setHidden: function(hidden) {
+    if (this._hidden !== hidden) {
+      this._hidden = hidden;
+      dom.alterClassName(this.getNode(), cssx('jog-ui-scene-hidden'), hidden);
+    }
+    return this;
+  },
+
   /**
    * @param {number} x
    * @return {Deferred}
    */
   translateXTo: function(x) {
     Class.dispose(this._animator);
-    this._animator = new Animator();
 
     var df = new Deferred();
+
+    if (!this.isInDocument() || !this.getWidth()) {
+      this._x = x;
+      this.getNode().style.webkitTransform =
+        'translate3d(' + this._x + 'px,0,0)';
+      return df.succeed(this);
+    }
+
     var x0 = this._x;
     var dx = x - this._x;
 
@@ -48,14 +81,15 @@ var Scene = Class.create(BaseUI, {
 
     var completedFn = this.bind(function() {
       Class.dispose(this._animator);
-      df.succeed(true);
+      df.succeed(this);
       df = null;
     });
 
     if (dx !== 0) {
+      this._animator = new Animator();
       this._animator.start(stepFn, verifyFn, completedFn, 250);
     } else {
-      df.succeed(true);
+      df.succeed(this);
     }
     return df;
   },
@@ -82,7 +116,7 @@ var Scene = Class.create(BaseUI, {
 
     var completedFn = this.bind(function() {
       Class.dispose(this._animator);
-      df.succeed(true);
+      df.succeed(this);
 
       if (opt_dispose) {
         this.dispose();
@@ -96,6 +130,8 @@ var Scene = Class.create(BaseUI, {
 
   _x: 0,
   _y: 0,
+  _hidden: false,
+  _disabled: false,
   _animator: null,
   _opacity: 1
 });

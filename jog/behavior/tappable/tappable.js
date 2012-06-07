@@ -122,7 +122,7 @@ var Tappable = Class.create(EventTarget, {
     if (tapped) {
       event.preventDefault();
       this.dispatchEvent('tapend', touchTarget);
-      this.dispatchEvent('tap', touchTarget);
+      this.dispatchEvent('tap', touchTarget, false, target);
       this.dispatchEvent('tapin', touchTarget);
       tappedElement = touchTarget;
       if (dbltapped) {

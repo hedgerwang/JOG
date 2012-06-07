@@ -60,13 +60,15 @@ var EventTarget = Class.create(null, {
    * @param {string} type
    * @param {Object=} opt_data
    * @param {boolean=} opt_bubble
+   * @param {Object=} opt_target
    */
-  dispatchEvent : function(type, opt_data, opt_bubble) {
+  dispatchEvent : function(type, opt_data, opt_bubble, opt_target) {
     if (this.disposed) {
       return;
     }
     staticReadOnlyEvent.type = type;
-    staticReadOnlyEvent.target = this;
+    staticReadOnlyEvent.target = opt_target || this;
+    staticReadOnlyEvent.currentTarget = this;
     staticReadOnlyEvent.data = opt_data ? opt_data : null;
     staticReadOnlyEvent.bubbles = opt_bubble;
 
