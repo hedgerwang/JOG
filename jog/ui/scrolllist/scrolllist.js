@@ -13,6 +13,9 @@ var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;
 
 var ScrollList = Class.create(BaseUI, {
+  scrollLeft: 0,
+  scrollTop: 0,
+
   /** @override */
   main: function() {
     this._chunks = [];
@@ -42,6 +45,7 @@ var ScrollList = Class.create(BaseUI, {
     this._processContent();
     var events = this.getEvents();
     events.listen(this._scrollable, 'scrollstart', this._onScrollStart);
+    events.listen(this._scrollable, 'scroll', this._onScroll);
     events.listen(this._scrollable, 'scrollend', this._onScrollEnd);
   },
 
@@ -76,14 +80,20 @@ var ScrollList = Class.create(BaseUI, {
     this._scrollable.scrollTo(0, 0);
   },
 
+  _onScroll: function(event) {
+    var scrollable = event.target;
+    this.scrollLeft = scrollable.getScrollLeft();
+    this.scrollTop = scrollable.getScrollTop();
+    this.dispatchEvent('scroll');
+  },
 
-  _onScrollStart: function(left, top) {
+  _onScrollStart: function() {
     clearTimeout(this._onScrollTimer);
     delete this._onScrollTimer;
     this._processContent();
   },
 
-  _onScrollEnd: function(left, top) {
+  _onScrollEnd: function() {
     clearTimeout(this._onScrollTimer);
     this._onScrollTimer = this.callLater(this._processContentNow, 300);
   },
