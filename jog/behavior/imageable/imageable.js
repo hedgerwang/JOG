@@ -107,7 +107,7 @@ function collectSomeVisibleImageables() {
     }
   }
 
-  var viewHeight2 = ~~(viewHeight * 2);
+  var viewHeight2 = ~~(viewHeight * 1.25);
 
   for (var i = 0, imageable; imageable = imageablesToLoad[i]; i++) {
     if (!imageable._size && !imageable.disposed) {

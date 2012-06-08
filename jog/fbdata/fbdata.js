@@ -56,7 +56,8 @@ var FBData = {
    */
   getLargeProfile: function(uid, useCache) {
     var query = (uid ? 'node(' + uid + ')' : 'me()') +
-      '{id,name,profile_picture.size(320,320){uri},username,birthday}';
+      '{id,name,profile_picture.size(200,200),birthday,albums.first(1){' +
+      'nodes{cover_photo{image,src}}}}';
     return queryGraph(query, useCache);
   },
 
@@ -71,7 +72,7 @@ var FBData = {
       '.orderby(importance)' +
       (startCursor ? '.after(' + startCursor + ')' : '') +
       '.first(' + count + '){' +
-      'nodes{name,profile_picture{uri}}}}';
+      'nodes{id,name,profile_picture{uri}}}}';
 
     return queryGraph(query, useCache);
   },

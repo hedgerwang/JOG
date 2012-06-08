@@ -35,6 +35,26 @@ var Tappable = Class.create(EventTarget, {
 
   /**
    * @param {Element} element
+   */
+  tap: function(element) {
+    if (this._targets.contains(element)) {
+      if (tappedElement === element) {
+        return;
+      }
+
+      if (tappedElement) {
+        this.dispatchEvent('tapout', tappedElement);
+      }
+      tappedElement = element;
+      this.dispatchEvent('tapstart', element);
+      this.dispatchEvent('tapend', element);
+      this.dispatchEvent('tap', element, false, element);
+      this.dispatchEvent('tapin', element);
+    }
+  },
+
+  /**
+   * @param {Element} element
    * @return {Tappable}
    */
   addTarget: function(element) {
@@ -121,10 +141,10 @@ var Tappable = Class.create(EventTarget, {
 
     if (tapped) {
       event.preventDefault();
+      tappedElement = touchTarget;
       this.dispatchEvent('tapend', touchTarget);
       this.dispatchEvent('tap', touchTarget, false, target);
       this.dispatchEvent('tapin', touchTarget);
-      tappedElement = touchTarget;
       if (dbltapped) {
         this.dispatchEvent('dbltap', touchTarget);
       }
