@@ -9,7 +9,8 @@ HTML_TEMPLATE = """
 <html>
 <head>
 <meta name="viewport"
-  content="width=device-width, initial-scale=%(dpr)s, maximum-scale=%(dpr)s"/>
+  content="width=device-width, initial-scale=%(dpr)s, maximum-scale=%(dpr)s
+           user-scalable=no, target-densitydpi=%(densitydpi)s"/>
 <style>
 %(css)s
 </style>
@@ -31,17 +32,20 @@ def build_app(html_out_path, js_in_path, css_in_path, scale) :
   js_code = js_compress.compress(js_in_path, cssx_map)
   css_code = css_compress.compress(css_in_path, scale, cssx_map)
 
+  densitydpi = int(144 * scale)
+
   html_code = HTML_TEMPLATE % {
     'dpr' : str(1 / scale),
     'css' : css_code,
-    'js' : js_code
+    'js' : js_code,
+    'densitydpi' : densitydpi
   }
-  html_file = open(html_out_path, 'w')
+  html_file = open('google_app_engine_host/build/' + html_out_path, 'w')
   html_file.write(html_code)
   html_file.close()
   print 'Build APP Done'
 
 if __name__ == '__main__' :
-  build_app('index.2x.html', 'app/app.js', 'app/app.css', 2)
-  build_app('index.1x.html', 'app/app.js', 'app/app.css', 1)
-  os.system('cp index.build.html google_app_engine_host/build/index.html')
+  build_app('2x.html', 'app/app.js', 'app/app.css', 2)
+  build_app('1x.html', 'app/app.js', 'app/app.css', 1)
+  build_app('android.html', 'app/app.js', 'app/app.css', 0.5)

@@ -5,7 +5,6 @@
 
 var BaseUI = require('jog/ui/baseui').BaseUI;
 var Class = require('jog/class').Class;
-var Functions = require('jog/functions').Functions;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;

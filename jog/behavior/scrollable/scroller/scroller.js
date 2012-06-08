@@ -8,6 +8,7 @@ var BaseUI = require('jog/ui/baseui').BaseUI;
 var Class = require('jog/class').Class;
 var HashMap = require('jog/hashmap').HashMap;
 var TouchHelper = require('jog/touchhelper').TouchHelper;
+var UserAgent = require('jog/useragent').UserAgent;
 var dom = require('jog/dom').dom;
 
 /**
@@ -100,7 +101,7 @@ var Scroller = Class.create(null, {
   _PAGING_DURATION: 250,
 
   // Duration of post-touch scrolling animation.
-  _SCROLLING_DURATION: 650,
+  _SCROLLING_DURATION: UserAgent.IS_ANDROID ? 200 : 600,
 
   // The factor that builds the tension when scrolling nearby tension points
   // (e.g. page top). Bigger value shall result in stronger tension. Value
@@ -117,7 +118,7 @@ var Scroller = Class.create(null, {
   _BOUNCE_FACTOR: 0.35,
 
   // Max scroll speed.
-  _MAX_SPEED: 1.7,
+  _MAX_SPEED: UserAgent.IS_ANDROID ? 0.6 : 1.7,
 
   /**
    * An Object that implements these methods:
@@ -300,7 +301,6 @@ var Scroller = Class.create(null, {
     this._setAncestorDisabled(false);
 
     if (this._disabled) {
-      alert(1);
       return;
     }
 

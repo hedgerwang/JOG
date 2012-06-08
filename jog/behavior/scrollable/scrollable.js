@@ -9,6 +9,7 @@ var EventTarget = require('jog/events/eventtarget').EventTarget;
 var Events = require('jog/events').Events;
 var Scroller = require('jog/behavior/scrollable/scroller').Scroller;
 var TouchHelper = require('jog/touchhelper').TouchHelper;
+var UserAgent = require('jog/useragent').UserAgent;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
@@ -259,7 +260,7 @@ var Scrollable = Class.create(EventTarget, {
   /**
    * @type {boolean}
    */
-  _renderSlowly: (/android/gi).test(navigator.appVersion),
+  _renderSlowly: UserAgent.IS_ANDROID,
 
   /**
    * @type {Element}

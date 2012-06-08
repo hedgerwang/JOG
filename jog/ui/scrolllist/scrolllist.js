@@ -7,9 +7,11 @@ var BaseUI = require('jog/ui/baseui').BaseUI;
 var Chunk = require('jog/ui/scrolllist/chunk').Chunk;
 var Class = require('jog/class').Class;
 var Scrollable = require('jog/behavior/scrollable').Scrollable;
+var UserAgent = require('jog/useragent').UserAgent;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;
+
 
 var ScrollList = Class.create(BaseUI, {
   /** @override */
@@ -84,7 +86,7 @@ var ScrollList = Class.create(BaseUI, {
 
   _onScrollEnd: function(left, top) {
     clearTimeout(this._onScrollTimer);
-    this._onScrollTimer = this.callLater(this._processContentNow, 100);
+    this._onScrollTimer = this.callLater(this._processContentNow, 300);
   },
 
   _reflow: function() {
@@ -108,7 +110,12 @@ var ScrollList = Class.create(BaseUI, {
     this._maxChunkHeight = Math.max(
       dimentions[0],
       dimentions[1]
-    ) * 4;
+    ) * (UserAgent.IS_ANDROID ? 3 : 4);
+
+    if (UserAgent.IS_ANDROID) {
+      this._maxChunkHeight = Math.min(2200, this._maxChunkHeight);
+    }
+
     this._scrollable.reflow();
   },
 

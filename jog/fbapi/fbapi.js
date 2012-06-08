@@ -68,6 +68,21 @@ var FBAPI = {
    */
   isLoggedIn: function() {
     return isLoggedIn();
+  },
+
+  /**
+   * @return {Deferred}
+   */
+  logout: function() {
+    var df = new Deferred();
+    getApi().addCallback(function(api) {
+      api.logout(function(response) {
+        df.succeed(response);
+        df = null;
+        accessToken = false;
+      });
+    });
+    return df;
   }
 };
 

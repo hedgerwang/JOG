@@ -6,6 +6,7 @@
 var Animator = require('jog/animator').Animator;
 var BaseUI = require('jog/ui/baseui').BaseUI;
 var Class = require('jog/class').Class;
+var UserAgent = require('jog/useragent').UserAgent;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
@@ -20,7 +21,7 @@ var LoadingIndicator = Class.create(BaseUI, {
       className: cssx('jog-ui-loading-indicator')
     });
 
-    if (/Android/.test(navigator.userAgent)) {
+    if (UserAgent.IS_ANDROID) {
       dom.addClassName(node, cssx('jog-ui-loading-indicator-android'));
     }
 

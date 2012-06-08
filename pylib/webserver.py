@@ -24,7 +24,11 @@ urllib2.install_opener(opener)
 
 HTML_META = """
 <meta name="viewport"
-      content="width=device-width, initial-scale=%s, maximum-scale=%s"/>
+      content="
+        width=device-width,
+        initial-scale=%(scale)s,
+        maximum-scale=%(scale)s,
+        user-scalable=no"/>
 """
 
 def recursive_glob(rootdir='.') :
@@ -65,7 +69,9 @@ class WebHandler(BaseHTTPRequestHandler) :
 
       print 'self.DEVICE_PIXEL_RATIO = %s' % DEVICE_PIXEL_RATIO
 
-      self._scale = 1 / float(DEVICE_PIXEL_RATIO)
+      scale = 1 / float(DEVICE_PIXEL_RATIO)
+      scale = float(round(scale * 100) / 100)
+      self._scale  = scale
 
       path = parsed_url.path
       scheme = parsed_url.scheme.lower()
@@ -205,7 +211,7 @@ class WebHandler(BaseHTTPRequestHandler) :
     if html.find('initial-scale') > -1 :
       return html
 
-    meta = HTML_META % (self._scale, self._scale)
+    meta = HTML_META % {'scale' :self._scale}
 
     if html.find('<head>') > -1 :
       html = html.replace('<head>', '<head>' + meta)
