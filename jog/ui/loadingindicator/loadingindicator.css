@@ -1,4 +1,4 @@
-.jog-ui-loading-indicator {
+.jog-ui-loading-indicator {  
   border-color: #666 transparent #666 #666;
   border-radius: 8em;
   border-style: solid;
@@ -10,7 +10,7 @@
   width: 4em;
 }
 
-.jog-ui-loading-indicator:before {
+.jog-ui-loading-indicator:before {  
   border-color: #fff transparent #fff #fff;
   border-radius: 8em;
   border-style: solid;
@@ -25,19 +25,19 @@
   width: 100%;
 }
 
-.jog-ui-loading-indicator-android:before {
+.jog-ui-loading-indicator-android:before {  
   display: none;
 }
 
-.jog-ui-loading-indicator-android {
-  border: inset 2em #fff;
+.jog-ui-loading-indicator-android {  
   border-color: #aaa #bbb #ccc #ddd;
-  width: 3em;
-  height: 3em;
   border-radius: 4em;
+  border: inset 2em #fff;
+  height: 3em;
+  width: 3em;
 }
 
-.jog-ui-loading-indicator-centered {
+.jog-ui-loading-indicator-centered {  
   display: block;
   left: 50%;
   margin: 0 0 0 -2em;
@@ -45,6 +45,6 @@
   top: 50%;
 }
 
-.jog-ui-loading-indicator-android.jog-ui-loading-indicator-centered {
+.jog-ui-loading-indicator-android.jog-ui-loading-indicator-centered {  
   margin-left: -3em;
 }

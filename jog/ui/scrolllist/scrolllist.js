@@ -12,7 +12,6 @@ var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;
 
-
 var ScrollList = Class.create(BaseUI, {
   /** @override */
   main: function() {

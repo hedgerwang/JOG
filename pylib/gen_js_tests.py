@@ -41,8 +41,37 @@ var %(module_name)s = require('%(module_path)s').%(module_name)s;
   });
 '''
 
+js_empty_temlate = '''
+/**
+ * @fileOverview
+ * @author Hedger Wang
+ */
+
+// var BaseUI = require('jog/ui/baseui').BaseUI;
+var Class = require('jog/class').Class;
+//  var EventType = require('app/eventtype').EventType;
+// var Imageable = require('jog/behavior/imageable').Imageable;
+// var Tappable = require('jog/behavior/tappable').Tappable;
+// var cssx = require('jog/cssx').cssx;
+// var dom = require('jog/dom').dom;
+
+var GeneratedClass = Class.create(null, {
+  /** @override */
+  main: function() {
+
+  },
+
+  /** @override */
+  dispose: function() {
+
+  }
+});
+
+exports.GeneratedClass = GeneratedClass;
+'''
+
 js_module_name_pattern = re.compile(
-  r'\s*exports\.[a-zA-Z0-9]+\s*=\s*(?P<path>[A-Za-z0-9]+)')
+  r'\s*exports\.[a-zA-Z0-9]+\s*=\s*(?P<name>[A-Za-z0-9]+)')
 
 def get_js_module_name(path) :
   f = open(path)
@@ -50,7 +79,20 @@ def get_js_module_name(path) :
   f.close()
 
   for match in js_module_name_pattern.finditer(content) :
-    return match.group('path')
+    name = match.group('name')
+    if name == 'GeneratedClass' :
+      raise Exception('GeneratedClass found at %s, please rename it' % path)
+    return name
+
+  source = content.strip()
+
+  if not source :
+    f = open(path, 'w')
+    f.write(js_empty_temlate.strip())
+    f.close()
+    raise Exception(
+      ('source is empty at %s \n, ' +
+       'Will create class GeneratedClass for you') % path)
 
   raise Exception('Unable to get module name from %s' % path)
 
