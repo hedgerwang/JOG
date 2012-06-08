@@ -5,7 +5,7 @@
 
 var Deferred = require('jog/deferred').Deferred;
 
-var TABLE_NAME = 'local_storage_db_table';
+var TABLE_NAME = 'local_storage_db_table_v2';
 
 var dataBase = typeof openDatabase === 'function' ?
   openDatabase('local_storage_db', '1.0', 'cache', 2 * 1024 * 1024) :
@@ -24,13 +24,12 @@ var LocalStorage = {
     if (!dataBase) {
       df.succeed(false);
     } else {
-
-
       dataBase.transaction(function(tx) {
         ensureTableExist(tx, function() {
           deleteItem(tx, key, function() {
             insertItem(tx, key, value, function() {
               df.succeed(true);
+              trimDB(tx);
             })
           });
         });
@@ -54,6 +53,7 @@ var LocalStorage = {
         ensureTableExist(tx, function() {
           selectItem(tx, key, function(value) {
             df.succeed(value);
+            // trimDB(tx);
           })
         });
       });
@@ -68,7 +68,8 @@ var LocalStorage = {
  */
 function ensureTableExist(sqlTransaction, callback) {
   sqlTransaction.executeSql(
-    'CREATE TABLE IF NOT EXISTS ' + TABLE_NAME + ' (key unique, type, value)',
+    'CREATE TABLE IF NOT EXISTS ' + TABLE_NAME +
+      ' (key unique, type, value, timestamp)',
     null,
     callback);
 }
@@ -128,10 +129,11 @@ function insertItem(sqlTransaction, key, value, callback) {
   }
 
   readOnlyArray.length = 0;
-  readOnlyArray.push(key, type, value);
+  readOnlyArray.push(key, type, value, Date.now());
 
-  sqlTransaction.executeSql('INSERT INTO ' + TABLE_NAME + ' (key, type, value) ' +
-    'VALUES (?, ?, ?)',
+  sqlTransaction.executeSql('INSERT INTO ' + TABLE_NAME +
+    ' (key, type, value, timestamp) ' +
+    'VALUES (?, ?, ?, ?)',
     readOnlyArray,
     callback);
 }
@@ -181,6 +183,24 @@ function selectItem(sqlTransaction, key, callback) {
         }
       }
     });
+}
+
+var trimDBCount = 0;
+
+/**
+ * @param {SQLTransaction} sqlTransaction
+ */
+function trimDB(sqlTransaction) {
+  trimDBCount++;
+  if (trimDBCount > 20) {
+    trimDBCount = 0;
+
+    var duration = 3 * 60 * 1000 * 60; // 3 hour.
+
+    sqlTransaction.executeSql(
+      'DELETE FROM  ' + TABLE_NAME + ' WHERE timestamp <=' +
+        (Date.now() - (duration)));
+  }
 }
 
 exports.LocalStorage = LocalStorage;

@@ -118,6 +118,7 @@ function collectSomeVisibleImageables() {
       var el = imageable._element;
       var rect = el.getBoundingClientRect();
       if (rect.top > -1) {
+
         if (rect.top < viewHeight) {
           var thatEl = document.elementFromPoint(rect.left + 10, rect.top + 1);
 

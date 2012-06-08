@@ -33,8 +33,6 @@ var FBData = {
         'count}' +
         '}';
 
-    console.log(query);
-
     return queryGraph(query, useCache);
   },
 

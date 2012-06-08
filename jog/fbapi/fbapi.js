@@ -163,6 +163,7 @@ function isLoggedIn() {
 function redirectToLogin() {
   var url = 'https://graph.facebook.com/oauth/authorize' +
     '?client_id=' + appID +
+    '&display=touch' +
     '&response_type=token' +
     '&redirect_uri=' + top.location.href +
     '&scope=' + permissions.join(',') +

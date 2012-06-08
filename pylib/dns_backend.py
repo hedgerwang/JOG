@@ -37,7 +37,10 @@ class RequestHandler(threading.Thread) :
       # An exception was raised
       print 'Unable to resolve host ' + domain_name
       # Unknown host, send error message
-      self.sock.send('Unable to resolve host ' + domain_name)
+      if domain_name.find('akamaihd') > -1 :
+        self.sock.send('92.123.65.176')
+      else :
+        self.sock.send('Unable to resolve host ' + domain_name)
 
     # Close the client socket
     self.sock.close()

@@ -27,7 +27,6 @@ var Scrollable = Class.create(EventTarget, {
     this._content = element.children[0];
     this._options = opt_options || {};
 
-    this._scroller = new Scroller(this, opt_options);
     this._events = new Events(this);
 
     if (opt_options && opt_options.dimentions) {
@@ -37,6 +36,7 @@ var Scrollable = Class.create(EventTarget, {
     dom.addClassName(this._element, cssx('jog-bebavior-scrollable'));
     dom.addClassName(this._content, cssx('jog-bebavior-scrollable_content'));
     this._scroller = new Scroller(this, opt_options);
+    this._scroller.registerElement(this._element);
 
     this.reflow();
     this._renderScroll();

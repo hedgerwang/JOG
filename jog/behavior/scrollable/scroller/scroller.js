@@ -6,8 +6,15 @@
 var Animator = require('jog/animator').Animator;
 var BaseUI = require('jog/ui/baseui').BaseUI;
 var Class = require('jog/class').Class;
+var HashMap = require('jog/hashmap').HashMap;
 var TouchHelper = require('jog/touchhelper').TouchHelper;
 var dom = require('jog/dom').dom;
+
+/**
+ * @type {HashMap}
+ */
+var elementToScrollerMap = new HashMap();
+var scrollerToElementMap = new HashMap();
 
 var Scroller = Class.create(null, {
   /**
@@ -44,8 +51,11 @@ var Scroller = Class.create(null, {
 
   dispose: function() {
     this._animator.stop();
+    var element = scrollerToElementMap.get(this);
+    if (element) {
+      elementToScrollerMap.remove(element);
+    }
   },
-
 
   // Public member properties must always be read-only to the owner of the
   // scroller.
@@ -143,6 +153,12 @@ var Scroller = Class.create(null, {
   },
 
   doTouchStart: function(event) {
+    this._setAncestorDisabled(true);
+
+    if (this._disabled) {
+      return;
+    }
+
     if (this.scrolling) {
       this._animator.stop();
       this.scrolling = false;
@@ -158,7 +174,7 @@ var Scroller = Class.create(null, {
   },
 
   doTouchMove: function(event) {
-    if (!this._moveCoordStart || this._skipTouchMove) {
+    if (!this._moveCoordStart || this._skipTouchMove || this._disabled) {
       return;
     }
 
@@ -281,6 +297,13 @@ var Scroller = Class.create(null, {
   },
 
   doTouchEnd: function(event) {
+    this._setAncestorDisabled(false);
+
+    if (this._disabled) {
+      alert(1);
+      return;
+    }
+
     if (!this._moveCoordStart) {
       return;
     }
@@ -387,6 +410,14 @@ var Scroller = Class.create(null, {
     this._handler.onScrollStart(this.left, this.top);
     this._scrollTo(left, top);
     this._handler.onScrollEnd(this.left, this.top);
+  },
+
+  /**
+   * @param {Element} element
+   */
+  registerElement :  function(element) {
+    elementToScrollerMap.add(element, this);
+    scrollerToElementMap.add(this, element);
   },
 
   /**
@@ -519,11 +550,42 @@ var Scroller = Class.create(null, {
     }
   },
 
+
+  /**
+   * @type {boolean}
+   */
+  _disabled: false,
+
   /**
    * @return {boolean}
    */
   _canAnimate: function() {
     return this.scrolling;
+  },
+
+  /**
+   * @param {boolean} disabled
+   */
+  _setAncestorDisabled: function(disabled) {
+    if (elementToScrollerMap.getSize() > 1) {
+      var element = scrollerToElementMap.get(this);
+      var node = element && element.parentNode;
+
+      while (node) {
+        var scroller = elementToScrollerMap.get(node);
+        if (scroller) {
+          if (disabled) {
+            if (scroller._canScrollX && this._canScrollX ||
+              scroller._canScrollY && this._canScrollY) {
+              scroller._disabled = true
+            }
+          } else {
+            scroller._disabled = false;
+          }
+        }
+        node = node.parentNode;
+      }
+    }
   },
 
   /**

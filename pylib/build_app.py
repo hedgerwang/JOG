@@ -42,5 +42,6 @@ def build_app(html_out_path, js_in_path, css_in_path, scale) :
   print 'Build APP Done'
 
 if __name__ == '__main__' :
-  build_app('index.build.html', 'app/app.js', 'app/app.css', 2)
+  build_app('index.2x.html', 'app/app.js', 'app/app.css', 2)
+  build_app('index.1x.html', 'app/app.js', 'app/app.css', 1)
   os.system('cp index.build.html google_app_engine_host/build/index.html')

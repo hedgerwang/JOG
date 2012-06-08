@@ -19,6 +19,11 @@ var LoadingIndicator = Class.create(BaseUI, {
     var node = dom.createElement('div', {
       className: cssx('jog-ui-loading-indicator')
     });
+
+    if (/Android/.test(navigator.userAgent)) {
+      dom.addClassName(node, cssx('jog-ui-loading-indicator-android'));
+    }
+
     return node;
   },
 

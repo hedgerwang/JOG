@@ -12,6 +12,7 @@ var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
 var tappedElement = null;
+var isAndroid = /Android/.test(window.navigator.userAgent);
 
 /**
  * Fires events "tapstart, tapend, tap, dbltap, tapin, tapout"
@@ -80,7 +81,14 @@ var Tappable = Class.create(EventTarget, {
       while (target) {
         if (target._tappaple) {
           if (this._targets.contains(target)) {
-            event.preventDefault();
+
+            var doNotPrevent = isAndroid &&
+              target.tagName === 'INPUT' ||
+              target.querySelector('input');
+
+            if (!doNotPrevent) {
+              event.preventDefault();
+            }
 
             this.dispatchEvent('tapstart', target);
 
@@ -140,7 +148,8 @@ var Tappable = Class.create(EventTarget, {
     }
 
     if (tapped) {
-      event.preventDefault();
+
+      // event.preventDefault();
       tappedElement = touchTarget;
       this.dispatchEvent('tapend', touchTarget);
       this.dispatchEvent('tap', touchTarget, false, target);

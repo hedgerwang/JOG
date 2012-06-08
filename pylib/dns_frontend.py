@@ -24,7 +24,7 @@ class DNSQuery :
         ini += lon + 1
         lon = ord(data[ini])
 
-  def request(self, ip) :
+  def request(self, ip = None) :
     packet = ''
     if self.domain :
       packet += self.data[:2] + "\x81\x80"
