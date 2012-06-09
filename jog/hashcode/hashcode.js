@@ -22,15 +22,15 @@ var HashCode = {
    */
   getHashCode : function(obj) {
     if (obj === undefined) {
-      return 'hash_undefined';
+      return '#undefined';
     }
 
     if (obj === null) {
-      return 'hash_null';
+      return '#null';
     }
 
     if (obj === '') {
-      return 'hash_empty_string';
+      return '#empty_string';
     }
 
     switch (typeof obj) {
@@ -69,17 +69,19 @@ var HashCode = {
         return hashCode;
 
       case 'boolean':
-        return obj ? 'hash_boolean_true' : 'hash_boolean_false';
+        return obj ? '#boolean_true' : '#boolean_false';
 
       case 'string':
-        return 'hash_string_' + obj;
+        return '#string_' + obj;
 
       case 'number':
-        return isNaN(obj) ? 'hash_nan' : 'hash_number_' + obj;
+        return isNaN(obj) ? '#nan' : '#number_' + obj;
 
       default:
         // should never be here.
-        throw new Error('Unknown Hash object:' + (typeof obj));
+        if (__DEV__) {
+          throw new Error('Unknown Hash object:' + (typeof obj));
+        }
     }
   }
 };

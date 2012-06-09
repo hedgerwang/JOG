@@ -54,8 +54,9 @@ var FBData = {
    */
   getLargeProfile: function(uid, useCache) {
     var query = (uid ? 'node(' + uid + ')' : 'me()') +
-      '{id,name,profile_picture.size(200,200),birthday,albums.first(1){' +
-      'nodes{cover_photo{image,src}}}}';
+      '{id,name,username,profile_picture.size(100,100){uri},' +
+      'mutual_friends.first(6){nodes{profile_picture.size(80,80){uri},id}},' +
+      'albums.first(1){nodes{id,cover_photo{image{uri}}}}}';
     return queryGraph(query, useCache);
   },
 
@@ -123,6 +124,7 @@ function queryGraph(query, useCache) {
       df.attachTo(FBAPI.queryGraph(query)).addCallback(function(result) {
         if (!result.error) {
           result._cacheTime = Date.now();
+          result._query = query;
           LocalStorage.setItem(query, result);
         }
         query = null;

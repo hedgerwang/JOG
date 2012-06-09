@@ -16,6 +16,11 @@ var objects = {
     }
 
     var cur = opt_obj === undefined ? window : opt_obj;
+
+    if (name.indexOf('.') === -1) {
+      return cur[name];
+    }
+
     var parts = name.split('.');
 
     for (var part; part = parts.shift();) {
