@@ -26,6 +26,12 @@ var Scrollable = Class.create(EventTarget, {
     this._renderScroll = this.bind(this._renderScroll);
     this._element = element;
     this._content = element.children[0];
+
+    if (__DEV__) {
+      if (!this._content) {
+        throw new Error('Scrollable has no content to scroll');
+      }
+    }
     this._options = opt_options || {};
 
     this._events = new Events(this);
@@ -272,11 +278,5 @@ var Scrollable = Class.create(EventTarget, {
    */
   _useCSSTranslate : 'webkitTransform' in document.documentElement.style
 });
-
-
-Scrollable.OPTIONS_PAGING_HORIZONTAL = {
-  direction:'horizontal',
-  paging: true
-};
 
 exports.Scrollable = Scrollable;

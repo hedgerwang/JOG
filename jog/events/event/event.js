@@ -23,7 +23,9 @@ var Event = Class.create(null, {
     }
   },
 
-  stopPropagation: Functions.EMPTY,
+  stopPropagation: function() {
+    this.bubbles = false;
+  },
 
   preventDefault: function() {
     this.defaultPrevented = true;

@@ -89,7 +89,7 @@ var Scroller = Class.create(null, {
 
   // The factor that amplifies or decrease the post touch speed.
   // The bigger, the faster scrolling is.
-  _SPEED_FACTOR: (/android/gi).test(navigator.appVersion) ? 1 : 0.55,
+  _SPEED_FACTOR: UserAgent.IS_ANDROID ? 1 : 0.55,
 
   // The max interval between two consecutive touchmoves.
   _MAX_TOUCH_MOVE_INTERVAL: 220,
@@ -106,7 +106,7 @@ var Scroller = Class.create(null, {
   // The factor that builds the tension when scrolling nearby tension points
   // (e.g. page top). Bigger value shall result in stronger tension. Value
   // must be between 0 and 1.
-  _TENSION_FACTOR: (/android/gi).test(navigator.appVersion) ? 0.4 : 0.95,
+  _TENSION_FACTOR: UserAgent.IS_ANDROID ? 0.4 : 0.95,
 
   // The maximum distance that user can scroll from the tension point.
   // A typical tension point is the point at minScrollTop or maxScrollTop.
@@ -577,6 +577,7 @@ var Scroller = Class.create(null, {
           if (disabled) {
             if (scroller._canScrollX && this._canScrollX ||
               scroller._canScrollY && this._canScrollY) {
+              console.log('disable scroller', node, scroller);
               scroller._disabled = true
             }
           } else {
@@ -603,5 +604,14 @@ var Scroller = Class.create(null, {
         value;
   }
 });
+
+Scroller.OPTIONS_HORIZONTAL = {
+  direction:'horizontal'
+};
+
+Scroller.OPTIONS_PAGING_HORIZONTAL = {
+  direction:'horizontal',
+  paging: true
+};
 
 exports.Scroller = Scroller;
