@@ -11,6 +11,7 @@ var hashCodeGetHashCode = HashCode.getHashCode;
 
 // For perf reason, we should re-use the event singleton.
 var staticReadOnlyEvent = new Event();
+var dispatchingStaticReadOnlyEvent = false;
 
 var EventTarget = Class.create(null, {
   /**
@@ -66,24 +67,40 @@ var EventTarget = Class.create(null, {
     if (this.disposed) {
       return;
     }
-    staticReadOnlyEvent.type = type;
-    staticReadOnlyEvent.target = opt_target || this;
-    staticReadOnlyEvent.currentTarget = this;
-    staticReadOnlyEvent.data = opt_data ? opt_data : null;
-    staticReadOnlyEvent.bubbles = opt_bubble;
+
+    var event;
+    if (dispatchingStaticReadOnlyEvent) {
+      // Developer may have called dispatchEvent caused by another dispatchEvent
+      // call. So we need to create more events to handle this case.
+      event = new Event();
+    } else {
+      dispatchingStaticReadOnlyEvent = true;
+      event = staticReadOnlyEvent;
+    }
+
+    event.type = type;
+    event.target = opt_target || this;
+    event.currentTarget = this;
+    event.data = opt_data ? opt_data : null;
+    event.bubbles = opt_bubble;
 
     for (var key in this._eventTargetHandlers) {
       var handler = this._eventTargetHandlers[key];
       if (handler.type === type) {
         var listener = handler.listener;
         if (typeof listener === 'function') {
-          listener.call(this, staticReadOnlyEvent);
+          listener.call(this, event);
         } else {
-          listener.handleEvent.call(listener, staticReadOnlyEvent);
+          listener.handleEvent.call(listener, event);
         }
       }
     }
-    staticReadOnlyEvent.clear();
+    if (dispatchingStaticReadOnlyEvent) {
+      event.clear();
+      dispatchingStaticReadOnlyEvent = false;
+    } else {
+      event.dispose();
+    }
   },
 
   /**

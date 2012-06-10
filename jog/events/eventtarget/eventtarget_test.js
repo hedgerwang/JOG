@@ -101,7 +101,13 @@ var asserts = require('jog/asserts').asserts;
   function() {
     var target = new EventTarget();
     target.addEventListener('foo', function(event) {
-      
+      var target2 = new EventTarget();
+      target2.addEventListener(function(event2) {
+        asserts.equal(event.type, 'foo');
+        asserts.equal(event2.type, 'bar');
+      });
+      target2.dispatchEvent('bar');
+
       asserts.equal(event.type, 'foo');
     });
     target.dispatchEvent('foo');
