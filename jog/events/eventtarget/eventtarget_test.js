@@ -97,4 +97,13 @@ var asserts = require('jog/asserts').asserts;
     target.removeEventListener('foo', fn, true);
     target.dispatchEvent('foo', 'xyz');
     asserts.equal(called, 3);
+  }).test('test nested dispatching',
+  function() {
+    var target = new EventTarget();
+    target.addEventListener('foo', function(event) {
+      
+      asserts.equal(event.type, 'foo');
+    });
+    target.dispatchEvent('foo');
   });
+

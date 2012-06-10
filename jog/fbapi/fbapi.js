@@ -55,7 +55,8 @@ var FBAPI = {
       var script = dom.createElement('script', {
         src: url,
         async: 'async',
-        defer: 'defer'
+        defer: 'defer',
+        id: FB_SCRIPT_NODE_ID
       });
 
       headNode.appendChild(script);
@@ -88,10 +89,11 @@ var FBAPI = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+var FB_SCRIPT_NODE_ID = 'fbapiscript';
 var headNode = dom.getDocument().getElementsByTagName('head')[0];
 var appID = '328664113867122';
 var fbAPIInitialized = false;
-var scriptInstalled = false;
+var scriptInstalled = !!document.getElementById(FB_SCRIPT_NODE_ID);
 var accessToken = '';
 var userID = 0;
 var expiresIn = 0;
@@ -227,10 +229,12 @@ function installFBApi() {
 
   (new Deferred()).waitForValue(FBAPI, 'fbApi').addCallback(
     function (api) {
-      if (!fbAPIInitialized) {
-        fbAPIInitialized = true;
+      if (!api.jogInitialized && !window.FB) {
+        // Mark as initialzied by JOG.
+        // This property must be public to avoid being renamed.
+        api.jogInitialized = true;
 
-        console.log('FBAPI::installFBApi > fbAPIInitialized', true);
+        console.log('FBAPI::installFBApi > api._jogInitialized', true);
 
         api.init({
           'appId': appID,
