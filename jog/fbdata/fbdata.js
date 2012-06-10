@@ -9,6 +9,10 @@ var LocalStorage = require('jog/localstorage').LocalStorage;
 
 var CACHE_DURATION = 30 * 60 * 1000;
 
+if (__DEV__) {
+  CACHE_DURATION = 5 * 60 * 60 * 1000;
+}
+
 // See https://our.intern.facebook.com/intern/graphiql
 var FBData = {
   /**

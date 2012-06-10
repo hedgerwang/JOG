@@ -229,7 +229,7 @@ function installFBApi() {
 
   (new Deferred()).waitForValue(FBAPI, 'fbApi').addCallback(
     function (api) {
-      if (!api.jogInitialized && !window.FB) {
+      if (!api.jogInitialized) {
         // Mark as initialzied by JOG.
         // This property must be public to avoid being renamed.
         api.jogInitialized = true;

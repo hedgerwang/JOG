@@ -96,6 +96,7 @@ var EventTarget = Class.create(null, {
       }
     }
     if (dispatchingStaticReadOnlyEvent) {
+      // Just clear it so we can reuse it.
       event.clear();
       dispatchingStaticReadOnlyEvent = false;
     } else {
