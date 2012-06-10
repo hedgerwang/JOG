@@ -577,7 +577,6 @@ var Scroller = Class.create(null, {
           if (disabled) {
             if (scroller._canScrollX && this._canScrollX ||
               scroller._canScrollY && this._canScrollY) {
-              console.log('disable scroller', node, scroller);
               scroller._disabled = true
             }
           } else {

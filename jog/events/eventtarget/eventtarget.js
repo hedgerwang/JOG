@@ -21,6 +21,13 @@ var EventTarget = Class.create(null, {
   _eventTargetHandlers: null,
 
   /**
+   * @return {EventTarget}
+   */
+  getBubbleTarget: function() {
+    return null;
+  },
+
+  /**
    * @param {string} type
    * @param {EventListener} listener
    * @param {boolean=} opt_capture
@@ -83,7 +90,22 @@ var EventTarget = Class.create(null, {
     event.currentTarget = this;
     event.data = opt_data ? opt_data : null;
     event.bubbles = opt_bubble;
+    this._dispatchEvent(event);
 
+    if (dispatchingStaticReadOnlyEvent) {
+      // Just clear it so we can reuse it.
+      event.clear();
+      dispatchingStaticReadOnlyEvent = false;
+    } else {
+      event.dispose();
+    }
+  },
+
+  /**
+   * @param {Event} event
+   */
+  _dispatchEvent: function(event) {
+    var type = event.type;
     for (var key in this._eventTargetHandlers) {
       var handler = this._eventTargetHandlers[key];
       if (handler.type === type) {
@@ -95,12 +117,12 @@ var EventTarget = Class.create(null, {
         }
       }
     }
-    if (dispatchingStaticReadOnlyEvent) {
-      // Just clear it so we can reuse it.
-      event.clear();
-      dispatchingStaticReadOnlyEvent = false;
-    } else {
-      event.dispose();
+
+    if (event.bubbles) {
+      var bubbleTarget = this.getBubbleTarget();
+      if (bubbleTarget) {
+        bubbleTarget._dispatchEvent(event);
+      }
     }
   },
 

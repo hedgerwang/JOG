@@ -65,11 +65,8 @@ var BaseUI = Class.create(EventTarget, {
   },
 
   /** @override */
-  dispatchEvent : function(type, opt_data, opt_bubble) {
-    EventTarget.prototype.dispatchEvent.call(this, type, opt_data, opt_bubble);
-    if (opt_bubble && this._parentUI) {
-      this._parentUI.dispatchEvent(type, opt_data, opt_bubble);
-    }
+  getBubbleTarget: function() {
+    return this._parentUI;
   },
 
   /**
