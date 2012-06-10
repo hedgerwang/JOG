@@ -273,4 +273,10 @@ var Scrollable = Class.create(EventTarget, {
   _useCSSTranslate : 'webkitTransform' in document.documentElement.style
 });
 
+
+Scrollable.OPTIONS_PAGING_HORIZONTAL = {
+  direction:'horizontal',
+  paging: true
+};
+
 exports.Scrollable = Scrollable;

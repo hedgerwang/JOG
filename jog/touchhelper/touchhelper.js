@@ -26,30 +26,10 @@ var TouchHelper = {
    */
   getTouchPageCoord : function(event) {
     var touch = TouchHelper.getTouches(event)[0];
-    var coord;
-    switch (event.type) {
-      case TouchHelper.EVT_TOUCHSTART:
-        coord = touchStartCoord;
-        break;
-      case TouchHelper.EVT_TOUCHMOVE:
-        coord = touchMoveCoord;
-        break;
-      case TouchHelper.EVT_TOUCHCANCEL:
-        coord = touchCancelCoord;
-        break;
-      case TouchHelper.EVT_TOUCHEND:
-        coord = touchEndCoord;
-        break;
-      default:
-        if (__DEV__) {
-          throw new Error('Unknown touch event type = ' + event.type);
-        }
-        coord = {};
-    }
-
-    coord.x = touch.pageX;
-    coord.y = touch.pageY;
-    return coord;
+    return {
+      x: touch.pageX,
+      y: touch.pageY
+    };
   },
 
   /**
