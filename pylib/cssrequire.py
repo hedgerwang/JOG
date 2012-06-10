@@ -17,6 +17,7 @@ CSS_TRANSLATE_PROPERTIES = [
   'right',
   'bottom',
   'text-indent',
+  'text-shadow',
   'font-size',
   'font',
   'line-height',
@@ -24,6 +25,7 @@ CSS_TRANSLATE_PROPERTIES = [
   'background-size',
   'background-position',
   'border-radius',
+  'box-shadow',
   ]
 
 CSS_VENDER_PROPERTIES = [
@@ -115,7 +117,7 @@ def _translate_vender_rule(rule) :
       or rule.startswith(' ')) :
     prefix = rule[0 :1]
     rule = rule[1 :]
-  rule = prefix + '-webkit-' + rule + ' /***/'
+  rule = prefix + '-webkit-' + rule + ' /*v*/'
   return rule
 
 
@@ -138,11 +140,13 @@ def _translate_px_rule(rule, scale) :
     new_value = new_value.replace(px_value, new_px_value)
 
   new_rule = rule[0 :rule.find(':')] + new_value
+  if new_rule == rule:
+    return new_rule
   #  print '-' * 80
   #  print rule
   #  print new_rule
 
-  return new_rule + ' /***/'
+  return new_rule + ' /*p*/'
 
 
 def get_deps(path) :

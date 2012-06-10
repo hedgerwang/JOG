@@ -56,7 +56,7 @@ var FBAPI = {
         src: url,
         async: 'async',
         defer: 'defer',
-        id: FB_SCRIPT_NODE_ID
+        id: fbScriptNodeId
       });
 
       headNode.appendChild(script);
@@ -89,11 +89,10 @@ var FBAPI = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-var FB_SCRIPT_NODE_ID = 'fbapiscript';
 var headNode = dom.getDocument().getElementsByTagName('head')[0];
 var appID = '328664113867122';
-var fbAPIInitialized = false;
-var scriptInstalled = !!document.getElementById(FB_SCRIPT_NODE_ID);
+var fbScriptNodeId = 'fbapiscript';
+var scriptInstalled = !!document.getElementById(fbScriptNodeId);
 var accessToken = '';
 var userID = 0;
 var expiresIn = 0;

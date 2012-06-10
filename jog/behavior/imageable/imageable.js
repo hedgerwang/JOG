@@ -24,22 +24,22 @@ var visibleImageablesToLoad = [];
  * Load image asynchronously and lazily.
  * TODO(hedger): Hide image when it's off-screen?
  */
-var Imageable = Class.create(null, {
+var Imageable = Class.create(EventTarget, {
   /**
    * @param {Element} element
    * @param {string} src
+   * @param {number=} opt_resizeMode
    */
-  main: function(element, src) {
+  main: function(element, src, opt_resizeMode) {
     this._element = element;
-    this._width = element.offsetWidth;
-    this._height = element.offsetHeight;
-    this._src = src;
+    this.src = src;
+    this._resizeMode = opt_resizeMode;
 
     dom.addClassName(element, cssx('jog-behavior-imageable'));
     this._reflow();
     imageablesToLoad.push(this);
 
-    processImageables();
+    this.callLater(processImageables, 16);
   },
 
   dispose: function() {
@@ -49,6 +49,15 @@ var Imageable = Class.create(null, {
     }
   },
 
+  /**
+   * @return {Element}
+   */
+  getElement: function() {
+    return this._element;
+  },
+
+  _resizeMode: 0,
+
   _reflow: function() {
     if (!this._size) {
       var element = this._element;
@@ -56,10 +65,21 @@ var Imageable = Class.create(null, {
     }
   },
 
+  src: '',
+  naturalWidth: 0,
+  naturalHeight: 0,
   _size: 0,
-  _element: null,
-  _src: null
+  _element: null
 });
+
+Imageable.RESIZE_MODE_CROPPED = 1;
+Imageable.RESIZE_MODE_USE_WIDTH = 2;
+Imageable.RESIZE_MODE_USE_HEIGHT = 3;
+Imageable.RESIZE_MODE_USE_NATURAL = 4;
+
+exports.Imageable = Imageable;
+
+////////////////////////////////////////////////////////////////////////////////
 
 var MAX_PROCESSING_COUNT = 2;
 var processingCount = 0;
@@ -86,7 +106,7 @@ function processImageables() {
 
   img.onload = handleOnloadOrError;
   img.onerror = handleOnloadOrError;
-  img.src = imageable._src;
+  img.src = imageable.src;
 }
 
 function collectSomeVisibleImageables() {
@@ -160,16 +180,51 @@ function handleOnloadOrError(event) {
       if (img.naturalWidth) {
         var width = img.naturalWidth;
         var height = img.naturalHeight;
-        if (width < height) {
-          elStyle.backgroundSize = '100% auto';
-        } else if (width > height) {
-          elStyle.backgroundSize = 'auto 100%';
-        } else {
-          elStyle.backgroundSize = '100% 100%';
+        switch (imageable._resizeMode) {
+          case Imageable.RESIZE_MODE_USE_NATURAL:
+            if (width < height) {
+              elStyle.backgroundSize = 'auto 100%';
+            } else if (width > height) {
+              elStyle.backgroundSize = '100% auto';
+            } else {
+              elStyle.backgroundSize = '100% 100%';
+            }
+            break;
+
+          case Imageable.RESIZE_MODE_USE_WIDTH:
+            elStyle.backgroundSize = '100% auto';
+            break;
+
+          case Imageable.RESIZE_MODE_USE_HEIGHT:
+            elStyle.backgroundSize = 'auto 100%';
+            break;
+
+          default:
+            if (width < height) {
+              elStyle.backgroundSize = '100% auto';
+            } else if (width > height) {
+              elStyle.backgroundSize = 'auto 100%';
+            } else {
+              elStyle.backgroundSize = '100% 100%';
+            }
+            break;
         }
       }
       elStyle.backgroundImage = 'url(' + img.src + ')';
+      imageable.naturalWidth = width;
+      imageable.naturalHeight = height;
+      imageable.src = img.src;
+      imageable.dispatchEvent('load');
+    } else if (event.type === 'error') {
+      if (__DEV__) {
+        if (event.type === 'error') {
+          console.warn('Fail to load image from ' + img.src);
+        }
+      }
+      imageable.dispatchEvent('error');
     }
+
+
     imageable.dispose();
   }
 
@@ -180,5 +235,3 @@ function handleOnloadOrError(event) {
   processingCount--;
   setTimeout(processImageables, 16);
 }
-
-exports.Imageable = Imageable;

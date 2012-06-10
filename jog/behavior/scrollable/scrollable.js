@@ -98,6 +98,10 @@ var Scrollable = Class.create(EventTarget, {
     return this._scroller.pagesCount;
   },
 
+  getScrollPageIndex: function() {
+    return this._scroller.pageIndex;
+  },
+
   reflow: function() {
     if (this.disposed) {
       return;
