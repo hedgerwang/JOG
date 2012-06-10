@@ -7,6 +7,7 @@ var Class = require('jog/class').Class;
 var EventTarget = require('jog/events/eventtarget').EventTarget;
 var Events = require('jog/events').Events;
 var Functions = require('jog/functions').Functions;
+var Tappable = require('jog/behavior/tappable').Tappable;
 var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;
 
@@ -32,6 +33,11 @@ var BaseUI = Class.create(EventTarget, {
   _events: null,
 
   /**
+   * @type {Tappable}
+   */
+  _nodeTappable: null,
+
+  /**
    * @type {Events}
    */
   _mutationEvents: null,
@@ -43,12 +49,8 @@ var BaseUI = Class.create(EventTarget, {
 
   /** @override */
   dispose : function() {
-    if (this._events) {
-      this._events.dispose();
-    }
-    if (this._mutationEvents) {
-      this._mutationEvents.dispose();
-    }
+    Class.dispose(this._events);
+    Class.dispose(this._mutationEvents);
     dom.remove(this._node);
 
     if (this._parentUI) {
@@ -124,6 +126,16 @@ var BaseUI = Class.create(EventTarget, {
       this._node = this.createNode();
     }
     return this._node;
+  },
+
+  /**
+   * @return {Tappable}
+   */
+  getNodeTappable: function() {
+    if (!this._nodeTappable) {
+      this._nodeTappable = new Tappable(this.getNode());
+    }
+    return this._nodeTappable;
   },
 
   /**
