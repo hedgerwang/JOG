@@ -42,6 +42,11 @@ var Imageable = Class.create(EventTarget, {
     this.callLater(processImageables, 16);
   },
 
+  forceToShow: function() {
+    this._forceShown = true;
+    processImageables();
+  },
+
   dispose: function() {
     var idx = imageablesToLoad.indexOf(this);
     if (idx > -1) {
@@ -55,6 +60,8 @@ var Imageable = Class.create(EventTarget, {
   getElement: function() {
     return this._element;
   },
+
+  _forceShown: false,
 
   _resizeMode: 0,
 
@@ -76,6 +83,17 @@ Imageable.RESIZE_MODE_CROPPED = 1;
 Imageable.RESIZE_MODE_USE_WIDTH = 2;
 Imageable.RESIZE_MODE_USE_HEIGHT = 3;
 Imageable.RESIZE_MODE_USE_NATURAL = 4;
+
+
+/**
+ *
+ * @param element
+ * @param uri
+ * @param mode
+ */
+Imageable.resize = function(element, uri, mode) {
+
+};
 
 exports.Imageable = Imageable;
 
@@ -119,6 +137,13 @@ function collectSomeVisibleImageables() {
     document.documentElement.offsetHeight
   );
 
+  var viewWidth = Math.max(
+    window.outerWidth,
+    window.innerWidth,
+    screen.width,
+    document.documentElement.offsetWidth
+  );
+
   if (__DEV__) {
     // TODO(hedger): Remove this.
     var chrome = document.querySelector('.jog-ui-chrome');
@@ -128,8 +153,14 @@ function collectSomeVisibleImageables() {
   }
 
   var viewHeight2 = ~~(viewHeight * 1.25);
+  var viewWidth2 = ~~(viewWidth * 1.1);
 
   for (var i = 0, imageable; imageable = imageablesToLoad[i]; i++) {
+    if (imageable._forceShown) {
+      visibleImageablesToLoad.push(imageable);
+      continue;
+    }
+
     if (!imageable._size && !imageable.disposed) {
       imageable._reflow();
     }
@@ -139,7 +170,7 @@ function collectSomeVisibleImageables() {
       var rect = el.getBoundingClientRect();
       if (rect.top > -1) {
 
-        if (rect.top < viewHeight) {
+        if (rect.top < viewHeight && rect.left < viewWidth2) {
           var thatEl = document.elementFromPoint(rect.left + 10, rect.top + 1);
 
           if (!thatEl || el === thatEl) {
@@ -216,11 +247,7 @@ function handleOnloadOrError(event) {
       imageable.src = img.src;
       imageable.dispatchEvent('load');
     } else if (event.type === 'error') {
-      if (__DEV__) {
-        if (event.type === 'error') {
-          console.warn('Fail to load image from ' + img.src);
-        }
-      }
+      console.warn('Fail to load image from ' + img.src);
       imageable.dispatchEvent('error');
     }
 

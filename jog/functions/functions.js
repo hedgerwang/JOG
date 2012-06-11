@@ -12,6 +12,10 @@ var Functions = {
 
   PREVENT_DEFAULT: function(evt) {
     evt && evt.preventDefault();
+  },
+
+  VALUE_TRUE: function() {
+    return true;
   }
 };
 

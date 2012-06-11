@@ -69,11 +69,11 @@ var Tappable = Class.create(EventTarget, {
    */
   _onTouchStart: function(event) {
     delete this._tapStartNode;
+    delete this._movedCount;
 
     if (event.defaultPrevented || this._targets.getSize() == 0) {
       return;
     }
-
 
     var target = event.target;
     if (target === this._element || this._element.contains(target)) {
@@ -95,6 +95,8 @@ var Tappable = Class.create(EventTarget, {
             this._tapStartNode = target;
 
             this._events.unlistenAll();
+            this._events.listen(
+              document, TouchHelper.EVT_TOUCHMOVE, this._onTouchMove);
 
             this._events.listen(
               document, TouchHelper.EVT_TOUCHEND, this._onTouchEnd);
@@ -124,6 +126,13 @@ var Tappable = Class.create(EventTarget, {
   /**
    * @param {Event} event
    */
+  _onTouchMove: function(event) {
+    this._movedCount++;
+  },
+
+  /**
+   * @param {Event} event
+   */
   _onTouchEnd: function(event) {
     this._events.unlistenAll();
 
@@ -131,7 +140,7 @@ var Tappable = Class.create(EventTarget, {
     var tapped;
     var dbltapped;
 
-    if (!event.defaultPrevented && touchTarget) {
+    if (!event.defaultPrevented && touchTarget && this._movedCount < 3) {
       var target = event.target;
       if (touchTarget == target || touchTarget.contains(target)) {
         if (this._tappedTarget === touchTarget &&
@@ -148,7 +157,6 @@ var Tappable = Class.create(EventTarget, {
     }
 
     if (tapped) {
-
       // event.preventDefault();
       tappedElement = touchTarget;
       this.dispatchEvent('tapend', touchTarget);
@@ -193,6 +201,11 @@ var Tappable = Class.create(EventTarget, {
    * @type {Element}
    */
   _element : null,
+
+  /**
+   * @type {number}
+   */
+  _movedCount: 0,
 
   /**
    * @type {Events}
