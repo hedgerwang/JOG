@@ -211,6 +211,23 @@ function handleOnloadOrError(event) {
       if (img.naturalWidth) {
         var width = img.naturalWidth;
         var height = img.naturalHeight;
+
+
+        if (width === 1 && height === 1 &&
+          img.src.indexOf('fbexternal-a.akamaihd.net') > 0) {
+          // TODO(hedger): I don't like this solution but this is how to fix it
+          // now.
+          // Safe Image failed to be loaded. Let's try again.
+          var re = /[\?&]url=(.+)\&?/;
+          var match = img.src.match(re);
+          if (match && match[1]) {
+            img.src = decodeURIComponent(match[1]);
+            console.warn('Safe Image failed from ' + match[1]);
+            console.warn('Try ' + img.src + ' instead');
+            return;
+          }
+        }
+
         switch (imageable._resizeMode) {
           case Imageable.RESIZE_MODE_USE_NATURAL:
             if (width < height) {
