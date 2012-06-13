@@ -1,12 +1,12 @@
-.jog-example-myinput {
+.jog-example-myinput {  
   color: #aaa;
-  font-weight: bold;
   display: inline-block;
-  white-space: nowrap;
+  font-weight: bold;
   margin: 0 6px;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
-.jog-example-myinput label {
+.jog-example-myinput label {  
   margin-right: 10px;
 }

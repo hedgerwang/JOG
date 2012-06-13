@@ -30,6 +30,10 @@ var Chrome = Class.create(BaseUI, {
     ];
 
     var node = dom.createElement('div', classNames.join(' '));
+
+    if (__DEV__) {
+      node.id = 'debug-jog-chrome-element';
+    }
     return node;
   },
 
@@ -70,13 +74,8 @@ var Chrome = Class.create(BaseUI, {
    * @param {Event} event
    */
   _onTouch: function(event) {
-    if (!event.defaultPrevented) {
-      var now = Date.now();
-      if (now - this._touchedTime < 500) {
-        event.preventDefault();
-        this._reflow();
-      }
-      this._touchedTime = now;
+    if (!event.defaultPrevented && event.pageY > 50) {
+      this._reflow();
     }
   },
 

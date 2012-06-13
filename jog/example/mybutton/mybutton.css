@@ -1,8 +1,8 @@
-.jog-example-mybutton {
+.jog-example-mybutton {  
   background: #cecece;
-  border: solid 1px #ccc;
-  border-radius: 5px;
   border-color: #aaa #888 #888 #666;
+  border-radius: 5px;
+  border: solid 1px #ccc;
   cursor: pointer;
   display: inline-block;
   font: 12px/100% arial;
@@ -10,7 +10,7 @@
   text-shadow: -1px -1px #ddd;
 }
 
-.jog-example-mybutton-pressed {
+.jog-example-mybutton-pressed {  
   background: #efefef;
   border-color: #666 #888 #888 #aaa;
 }

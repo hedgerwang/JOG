@@ -195,7 +195,29 @@ var DOM = Class.create(null, {
       node.appendChild(frag);
     }
     return node;
-  }
+  },
+
+  getViewportWidth: function() {
+    return this._viewportWidth || (this._viewportWidth = Math.max(
+      window.outerWidth,
+      window.innerWidth,
+      screen.width,
+      document.documentElement.offsetWidth
+    ));
+  },
+
+  getViewportHeight: function() {
+    return this._viewportHeight || (
+      this._viewportHeight = Math.max(
+        window.outerHeight,
+        window.innerHeight,
+        screen.height,
+        document.documentElement.offsetHeight
+      ));
+  },
+
+  _viewportWidth: 0,
+  _viewportHeight: 0
 });
 
 // exports.DOM = DOM;

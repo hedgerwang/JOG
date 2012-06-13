@@ -28,6 +28,11 @@ CSS_TRANSLATE_PROPERTIES = [
   'box-shadow',
   ]
 
+CSS_DISABLE_PROPERTIES = [
+  #  'box-shadow',
+  #  'border-radius',
+]
+
 CSS_VENDER_PROPERTIES = [
   'transform',
   'user-select',
@@ -35,6 +40,7 @@ CSS_VENDER_PROPERTIES = [
   'box-align',
   'box-orient',
   'box-pack',
+  'backface-visibility',
   'hyphens',
   'mask-image',
   'tap-highlight-color',
@@ -89,8 +95,20 @@ re.compile(CSS_TRANSLATE_TEMPLATE % property)
 for property in CSS_VENDER_PROPERTIES
 ]
 
+CSS_DISABLE_PROPERTIES_PATTERNS = [
+re.compile(CSS_TRANSLATE_TEMPLATE % property)
+for property in CSS_DISABLE_PROPERTIES
+]
+
 
 def translate(css_text, scale=1) :
+  for re_pattern in CSS_DISABLE_PROPERTIES_PATTERNS :
+    matches = re_pattern.finditer(css_text)
+    for match in matches :
+      old_rule = match.group()
+      new_rule = _disable_rule(old_rule)
+      css_text = css_text.replace(old_rule, new_rule)
+
   if scale != 1 :
     for re_pattern in CSS_TRANSLATE_PROPERTIES_PATTERNS :
       matches = re_pattern.finditer(css_text)
@@ -108,6 +126,10 @@ def translate(css_text, scale=1) :
       css_text = css_text.replace(old_rule, new_rule)
 
   return css_text
+
+
+def _disable_rule(rule) :
+  return ''
 
 
 def _translate_vender_rule(rule) :
@@ -140,9 +162,9 @@ def _translate_px_rule(rule, scale) :
     new_value = new_value.replace(px_value, new_px_value)
 
   new_rule = rule[0 :rule.find(':')] + new_value
-  if new_rule == rule:
+  if new_rule == rule :
     return new_rule
-  #  print '-' * 80
+    #  print '-' * 80
   #  print rule
   #  print new_rule
 
@@ -212,6 +234,7 @@ def main() :
   css_text = """
 
   .foo {
+    backface-visibility: hidden;
     transform: translate3d(0,0,0);
     user-select: none;
     margin: -1px -2px 3px 4px;

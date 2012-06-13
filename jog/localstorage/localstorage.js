@@ -195,7 +195,7 @@ function trimDB(sqlTransaction) {
   if (trimDBCount > 20) {
     trimDBCount = 0;
 
-    var duration = 3 * 60 * 1000 * 60; // 3 hour.
+    var duration = 0.5 * 60 * 1000 * 60; // 0.5 hour.
 
     sqlTransaction.executeSql(
       'DELETE FROM  ' + TABLE_NAME + ' WHERE timestamp <=' +

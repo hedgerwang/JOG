@@ -5,10 +5,9 @@
  * @url http://localhost:8888/jog/example/mybutton/mybutton_test.html
  */
 
+var MyButton = require('jog/example/mybutton').MyButton;
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
-
-var MyButton = require('jog/example/mybutton').MyButton;
 
 (new TestCase('MyButton Test'))
   .demo('demo',

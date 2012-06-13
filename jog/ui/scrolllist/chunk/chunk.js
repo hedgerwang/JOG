@@ -74,12 +74,12 @@ var Chunk = Class.create(BaseUI, {
         dom.removeClassName(contentNode,
           cssx('jog-ui-scrolllist-chunk-hidden'));
 
-        // node.style.height = '';
+        node.style.height = '';
         this._reflow();
       } else {
-        // node.style.height = this._height + 'px';
+        node.style.height = this._height + 'px';
         // this._contentNode.style.visibility = 'hidden';
-        // node.removeChild(contentNode);
+        node.removeChild(contentNode);
         dom.addClassName(contentNode, cssx('jog-ui-scrolllist-chunk-hidden'));
       }
     }

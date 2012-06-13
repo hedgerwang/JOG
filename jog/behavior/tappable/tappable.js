@@ -81,7 +81,6 @@ var Tappable = Class.create(EventTarget, {
       while (target) {
         if (target._tappaple) {
           if (this._targets.contains(target)) {
-
             var doNotPrevent = isAndroid &&
               target.tagName === 'INPUT' ||
               target.querySelector('input');

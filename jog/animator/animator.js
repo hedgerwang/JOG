@@ -127,25 +127,33 @@ Class.mixin(Animator, {
    * @param {number=} opt_interval
    * @return {string}
    */
-  requestAnimationFrame : function(callback, opt_interval) {
-    // TODO(hedger): Use requestAnimationFrame when possible.
-    var currTime = Date.now();
-    var timeDelta = currTime - lastAnimTime;
-    var interval = opt_interval || animInterval;
-    var timeToCall = Math.max(0, interval - timeDelta);
-    lastAnimTime = currTime + timeToCall;
-    return setTimeout(callback, timeToCall);
-  },
+  requestAnimationFrame : window.webkitRequestAnimationFrame ?
+    function(callback, opt_interval) {
+      return window.webkitRequestAnimationFrame(callback);
+    } :
+    function(callback, opt_interval) {
+      // TODO(hedger): Use requestAnimationFrame when possible.
+      var currTime = Date.now();
+      var timeDelta = currTime - lastAnimTime;
+      var interval = opt_interval || animInterval;
+      var timeToCall = Math.max(0, interval - timeDelta);
+      lastAnimTime = currTime + timeToCall;
+      return setTimeout(callback, timeToCall);
+    },
 
   /**
    * Implementation of requestAnimationFrame.
    * @param {string} requestID
    */
-  cancelAnimationFrame : function(requestID) {
-    // TODO(hedger): Use cancelAnimationFrame when possible.
-    requestID && clearTimeout(requestID);
-  }
+  cancelAnimationFrame : window.webkitCancelAnimationFrame ?
+    function(requestID) {
+      window.webkitCancelAnimationFrame(requestID);
+    } :
+    window.cancelAnimationFrame ||
+      function(requestID) {
+        // TODO(hedger): Use cancelAnimationFrame when possible.
+        requestID && clearTimeout(requestID);
+      }
 });
-
 
 exports.Animator = Animator;

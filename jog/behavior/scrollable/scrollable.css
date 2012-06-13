@@ -7,6 +7,7 @@
 }
 
 .jog-bebavior-scrollable_content {  
+  backface-visibility: hidden;
   position: relative;
   z-index: 1; /* must be less than 10 to prevent overlaying the notifications */
 }

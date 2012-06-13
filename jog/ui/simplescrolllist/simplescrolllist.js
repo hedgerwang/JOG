@@ -2,7 +2,7 @@
  * @fileOverview Scene
  * @author Hedger Wang
  */
-
+var Animator = require('jog/animator').Animator;
 var BaseUI = require('jog/ui/baseui').BaseUI;
 var Chunk = require('jog/ui/scrolllist/chunk').Chunk;
 var Class = require('jog/class').Class;
@@ -39,7 +39,8 @@ var SimpleScrollList = Class.create(BaseUI, {
 
   /** @override */
   dispose: function() {
-    clearInterval(this._onScrollTimer);
+    Animator.cancelAnimationFrame(this._onScrollTimer);
+    delete this._onScrollTimer;
   },
 
   /**
@@ -51,6 +52,10 @@ var SimpleScrollList = Class.create(BaseUI, {
       this._processContent();
     }
   },
+
+  scrollTop: 0,
+
+  scrollLeft: 0,
 
   _reflow: function() {
     // reflow all chunks?
@@ -64,8 +69,8 @@ var SimpleScrollList = Class.create(BaseUI, {
 
   _onScroll: function(left, top) {
     this.getEvents().unlisten(this.getNode(), 'scroll', this._onScroll);
-    this._onScrollTop = window.pageYOffset;
-    this._onScrollTimer = setInterval(this._onScrollCheck, 300);
+    this._onScrollTop = this.getNode().scrollTop;
+    this._onScrollTimer = Animator.requestAnimationFrame(this._onScrollCheck);
   },
 
   _onScrollCheck :function() {
@@ -73,9 +78,13 @@ var SimpleScrollList = Class.create(BaseUI, {
       var scrollTop = this.getNode().scrollTop;
       if (this._onScrollTop !== scrollTop) {
         this._onScrollTop = scrollTop;
+        this.scrollTop = scrollTop;
         this._processContent();
+        this._onScrollTimer =
+          Animator.requestAnimationFrame(this._onScrollCheck);
       } else {
-        clearInterval(this._onScrollTimer);
+        Animator.cancelAnimationFrame(this._onScrollTimer);
+        delete this._onScrollTimer;
         delete this._onScrollTimer;
         this._processContent();
         this.getEvents().listen(this.getNode(), 'scroll', this._onScroll);
@@ -90,8 +99,7 @@ var SimpleScrollList = Class.create(BaseUI, {
     var limitTop = scrollTop - limitBuffer;
     var limitBottom = scrollTop + height + limitBuffer;
     for (var i = 0, chunk; chunk = this._chunks[i]; i++) {
-      chunk.setVisible(true);
-      // chunk.setVisible(this._shouldShowChunk(limitTop, limitBottom, chunk));
+      chunk.setVisible(this._shouldShowChunk(limitTop, limitBottom, chunk));
     }
   },
 
