@@ -4,7 +4,6 @@
  */
 
 var Class = require('jog/class').Class;
-var Events = require('jog/events').Events;
 
 var ImageableManager = Class.create(null, {
   /**
@@ -13,25 +12,24 @@ var ImageableManager = Class.create(null, {
    */
   main: function(maxLoadingCount) {
     this._loadingQueue = [];
-    this._maxLoadingCount = maxLoadingCount;
+    this._maxLoadingCount = maxLoadingCount || 1;
     this._onLoad = this.bind(this._onLoad);
-    this._maybeLoadMore = this.bind(this._maybeLoadMore);
+    this._lookup = this.bind(this._lookup);
+    this._startLookUp = this.bind(this._startLookUp);
   },
 
   /** @override */
   dispose: function() {
     this._loadingQueue.length = 0;
-    clearTimeout(this._loadMoreTimer);
+    clearInterval(this._lookupTimer);
   },
 
   /**
    * @param {Imageable} imageable
    */
   register: function(imageable) {
-    if (!this._maybeLoad(imageable)) {
-      this._loadingQueue.push(imageable);
-      this._maybeLoadMore();
-    }
+    this._loadingQueue.push(imageable);
+    this._startLookUp();
   },
 
   /**
@@ -44,61 +42,57 @@ var ImageableManager = Class.create(null, {
     }
   },
 
-  /**
-   * @param {Imageable} imageable
-   */
-  _maybeLoad: function(imageable) {
-    if (this._loadingCount > this._maxLoadingCount ||
-      !imageable.isElementVisible()) {
-      return false;
-    } else {
-      this._loadingCount++;
-      imageable.addEventListener('load', this._onLoad);
-      imageable.addEventListener(imageable, 'error', this._onLoad);
-      imageable.load();
-      return true;
-    }
-  },
+  _lookupInterval: 800,
 
-  _maybeLoadMore: function() {
-    clearTimeout(this._loadMoreTimer);
-    delete this._loadMoreTimer;
+  _lookupTimer: 0,
 
-    var now = Date.now();
-    var interval = now - this._loadingTimeStamp;
-
-    if (interval < this._loadingInterval) {
-      if (this._loadingQueue.length) {
-        this._loadMoreTimer = setTimeout(
-          this._maybeLoadMore,
-          this._loadingInterval - interval);
-      }
+  _startLookUp: function() {
+    if (this._lookupTimer) {
       return;
     }
 
-    this._loadingTimeStamp = now;
+    var now = Date.now();
+    var timeDiff = now - this._lookupTimeStamp;
 
-    var loadingCountAllowed = Math.min(
-      this._loadingQueue.length,
-      this._maxLoadingCount - this._loadingCount
-    );
+    if (timeDiff >= this._lookupInterval) {
+      this._lookupTimer = setInterval(this._lookup, this._lookupInterval);
+      this.callLater(this._lookup, 0);
+    } else {
+      // Too early to lookup now, shall come back later.
+      this.callLater(this._startLookUp, this._lookupInterval - timeDiff);
+    }
+  },
+
+  _lookup: function() {
+    this._lookupTimeStamp = Date.now();
+
+    if (this._loadingCount >= this._maxLoadingCount) {
+      return;
+    }
+
+    if (!this._loadingQueue.length) {
+      clearInterval(this._lookupTimer);
+      delete this._lookupTimer;
+      return;
+    }
 
     // When we're allowed to load more.
     for (var i = 0, imageable; imageable = this._loadingQueue[i]; i++) {
-      if (this._maybeLoad(imageable)) {
-        loadingCountAllowed--;
-        this._loadingQueue.splice(this._loadingQueue.indexOf(imageable), 1);
+      if (imageable.shouldLoad()) {
+        this._loadingCount++;
+        imageable.addEventListener('load', this._onLoad);
+        imageable.addEventListener(imageable, 'error', this._onLoad);
+        imageable.load();
       }
 
-      if (loadingCountAllowed <= 0) {
-        // Enough.
-        return;
+      if (this._loadingCount >= this._maxLoadingCount) {
+        clearInterval(this._lookupTimer);
+        // No lookup is loading is full.
+        // Will restart it later.
+        this._lookupTimer = 1;
+        break;
       }
     }
-
-    this._loadMoreTimer = setTimeout(
-      this._maybeLoadMore,
-      this._loadingInterval);
   },
 
   /**
@@ -110,30 +104,18 @@ var ImageableManager = Class.create(null, {
     this._loadingCount--;
 
     if (!imageable.disposed) {
-      if (imageable.isElementVisible()) {
+      if (imageable.isVisible()) {
         imageable.show();
-      } else {
-        this._loadingQueue.push(imageable.clone());
+      } else if (imageable.shouldReload()) {
+        this._loadingQueue.unshift(imageable.clone());
       }
     }
+    this.unregister(imageable);
 
-    this._maybeLoadMore();
+    clearInterval(this._lookupTimer);
+    delete this._lookupTimer;
+    this._startLookUp();
   },
-
-  /**
-   * @type {Number}
-   */
-  _loadingInterval: 300,
-
-  /**
-   * @type {Number}
-   */
-  _loadMoreTimer: 0,
-
-  /**
-   * @type {Number}
-   */
-  _loadingTimeStamp: 0,
 
   /**
    * @type {Number}
@@ -144,16 +126,15 @@ var ImageableManager = Class.create(null, {
    * @type {Number}
    */
   _maxLoadingCount: 0,
+  /**
+   * @type {Number}
+   */
+  _lookupTimeStamp : 0,
 
   /**
    * @type {Array.<Imageable>}
    */
-  _loadingQueue: null,
-
-  /**
-   * @type {Events}
-   */
-  _events: null
+  _loadingQueue: null
 });
 
 exports.ImageableManager = ImageableManager;

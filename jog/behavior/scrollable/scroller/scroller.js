@@ -101,7 +101,7 @@ var Scroller = Class.create(null, {
   _PAGING_DURATION: 250,
 
   // Duration of post-touch scrolling animation.
-  _SCROLLING_DURATION: UserAgent.IS_ANDROID ? 200 : 600,
+  _SCROLLING_DURATION: UserAgent.IS_ANDROID ? 200 : 700,
 
   // The factor that builds the tension when scrolling nearby tension points
   // (e.g. page top). Bigger value shall result in stronger tension. Value

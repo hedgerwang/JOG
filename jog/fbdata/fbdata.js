@@ -30,8 +30,8 @@ var FBData = {
         '.first(' + count + '){' +
         'nodes{title,id,url,creation_time,actors{' +
         'profile_picture,name,id},' +
-        'attachments{title,url,media{image{uri,width,height},url,id},' +
-        'subattachments{media{image{uri,width,height}}}},' +
+        'attachments{title,url,media{image.size(960){uri,width,height},url,id},' +
+        'subattachments{media{image.size(180){uri,width,height}}}},' +
         'message{text}},' +
         'page_info{start_cursor,end_cursor,has_next_page,has_previous_page},' +
         'count}' +

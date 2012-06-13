@@ -49,7 +49,7 @@ var Imageable = Class.create(EventTarget, {
    * @param {string} src
    * @param {number=} opt_resizeMode
    */
-  main: function(element, src, opt_resizeMode) {
+  main: function(element, src, opt_resizeMode, opt_useCanvas) {
     this.src = src;
     this._element = element;
     this._resizeMode = opt_resizeMode || Imageable.RESIZE_MODE_CROPPED;
@@ -79,7 +79,7 @@ var Imageable = Class.create(EventTarget, {
   },
 
   load: function() {
-    if (this._loadingImage || !this.isElementVisible()) {
+    if (this._loadingImage || !this.shouldLoad()) {
       return;
     }
 
@@ -92,7 +92,21 @@ var Imageable = Class.create(EventTarget, {
     img.src = this.src;
   },
 
-  isElementVisible: function() {
+  /**
+   * @return {boolean}
+   */
+  shouldLoad: function() {
+    return this.isVisible();
+  },
+
+  /**
+   * @return {boolean}
+   */
+  isVisible: function() {
+    if (!this._element || this.disposed) {
+      return false;
+    }
+
     var viewLeft = 0;
     var viewRight = dom.getViewportWidth();
     var viewTop = 0;
@@ -130,7 +144,16 @@ var Imageable = Class.create(EventTarget, {
     var testElement = document.elementFromPoint(rect.left + 1, rect.top + 1) ||
       document.elementFromPoint(rect.right - 1, rect.bottom - 1);
 
-    return testElement === this._element;
+
+    return testElement === this._element ||
+      (this.width > 100 && this.height > 70);
+  },
+
+  /**
+   * @return {boolean}
+   */
+  shouldReload:function() {
+    return this.src && !this.disposed && dom.isInDocument(this._element);
   },
 
   show: function() {
@@ -205,6 +228,11 @@ var Imageable = Class.create(EventTarget, {
    * @param {string} src
    */
   _normalizeSrc: function(src) {
+    if (!src) {
+      console.warn('empty src', src);
+      return '';
+    }
+
     if (src.indexOf('fbexternal-a.akamaihd.net') > 0) {
       // TODO(hedger): I don't like this solution but this is how to fix it
       // now.

@@ -1,3 +1,4 @@
-.jog-behavior-imageable {  
+.jog-behavior-imageable {
   background: transparent none center center no-repeat;
+  position: relative;
 }
