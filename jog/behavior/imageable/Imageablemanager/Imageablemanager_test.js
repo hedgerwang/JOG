@@ -5,7 +5,7 @@
  * @url http://localhost:8888/jog/behavior/imageable/Imageablemanager/Imageablemanager_test.html
  */
 
-var ImageableManager = require('jog/behavior/imageable/Imageablemanager').ImageableManager;
+var ImageableManager = require('jog/behavior/imageable/imageablemanager').ImageableManager;
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
 

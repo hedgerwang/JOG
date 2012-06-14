@@ -7,7 +7,7 @@ var Class = require('jog/class').Class;
 var EventTarget = require('jog/events/eventtarget').EventTarget;
 var Events = require('jog/events').Events;
 var HashMap = require('jog/hashmap').HashMap;
-var ImageableManager = require('jog/behavior/imageable/Imageablemanager').ImageableManager;
+var ImageableManager = require('jog/behavior/imageable/imageablemanager').ImageableManager;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
@@ -124,21 +124,20 @@ var Imageable = Class.create(EventTarget, {
     var viewBottom = dom.getViewportHeight();
     var buffer = 30;
 
-    if (__DEV__) {
-      // TODO(hedger): There must be a better way to do this.
-      var chrome = document.getElementById('debug-jog-chrome-element');
-      if (chrome) {
-        var chromeRect = chrome.getBoundingClientRect();
-        viewTop = chromeRect.top;
-        viewBottom = chromeRect.bottom;
-        viewLeft = chromeRect.left;
-        viewRight = chromeRect.right;
-      }
+    var rect = this._element.getBoundingClientRect();
+
+    if (!this.width) {
+      this.width = this._element.offsetWidth;
+      this.height = this._element.offsetHeight;
     }
 
-    var rect = this._element.getBoundingClientRect();
-    this.width = rect.width;
-    this.height = rect.height;
+    if (__DEV__) {
+      var viewRect = dom.getViewportElement().getBoundingClientRect();
+      viewLeft = viewRect.left;
+      viewTop = viewRect.top;
+      viewRight = viewRect.right;
+      viewBottom = viewRect.bottom;
+    }
 
     if (!this.width) {
       return false;
@@ -152,12 +151,37 @@ var Imageable = Class.create(EventTarget, {
       return false;
     }
 
-    var testElement = document.elementFromPoint(rect.left + 1, rect.top + 1) ||
-      document.elementFromPoint(rect.right - 1, rect.bottom - 1);
+    if (this.width < 17 && this.height < 17) {
+      // return true;
+    }
 
+    var count = 3;
+    var dx = ~~(rect.width / count);
+    var dy = ~~(rect.height / count);
+    var x = rect.left;
+    var y = rect.top;
 
-    return testElement === this._element ||
-      (this.width > 100 && this.height > 70);
+    while (count) {
+      count--;
+      var offset = count > 0 ? 1 : -1;
+      var testElement = document.elementFromPoint(x + offset, y + offset);
+      if (testElement === this._element) {
+        return true;
+      }
+      x += dx;
+      y += dy;
+    }
+
+    if (__DEV__) {
+      if (this.width > 0 && this.height > 0) {
+        console.log('A big element in view could not be pointed',
+          this._element,
+          testElement,
+          rect);
+      }
+    }
+
+    return false;
   },
 
   /**
@@ -305,18 +329,18 @@ var Imageable = Class.create(EventTarget, {
   },
 
   _handleLoad: function(event) {
-    if (__DEV__) {
-      if (event.type === 'error') {
-        console.error('Imageload:_handleLoad',
-          event.type,
-          this.src,
-          this.width,
-          this.height,
-          this
-        );
-        this._element.style.backgroundColor = '#ff0000';
-      }
+
+    if (event.type === 'error') {
+      console.error('Imageload:_handleLoad',
+        event.type,
+        this.src,
+        this.width,
+        this.height,
+        this
+      );
+      dom.addClassName(this._element, cssx('jog-behavior-imageable-error'));
     }
+
     this.naturalWidth = this._loadingImage.naturalWidth;
     this.naturalHeight = this._loadingImage.naturalHeight;
 
@@ -326,7 +350,7 @@ var Imageable = Class.create(EventTarget, {
     var checkSpeed = function() {
       var rect2 = this._element.getBoundingClientRect();
       var dy = Math.abs(rect2.top - rect1.top);
-      if (dy < 70 || retryCount > 5) {
+      if (dy < 120 || retryCount > 5) {
         // Do not dispatch load/error event until the element is slow down.
         this.dispatchEvent(evtType);
         this.dispose();

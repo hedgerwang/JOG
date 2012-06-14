@@ -43,7 +43,7 @@ var ImageableManager = Class.create(null, {
     }
   },
 
-  _lookupInterval: 800,
+  _lookupInterval: 400,
 
   _lookupTimer: 0,
 

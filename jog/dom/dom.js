@@ -197,16 +197,52 @@ var DOM = Class.create(null, {
     return node;
   },
 
+  getViewportElement: function() {
+    if (__DEV__) {
+      var chrome = document.getElementById('debug-jog-chrome-element');
+      if (chrome) {
+        return chrome;
+      }
+    }
+    return this._rootNode;
+  },
+
+  getViewportLeft: function() {
+
+  },
+
+  getViewportTop: function() {
+
+  },
+
   getViewportWidth: function() {
+    if (__DEV__) {
+      if (!this._viewportWidth) {
+        var chrome = document.getElementById('debug-jog-chrome-element');
+        if (chrome) {
+          this._viewportWidth = chrome.offsetWidth;
+        }
+      }
+    }
+
     return this._viewportWidth || (this._viewportWidth = Math.max(
       window.outerWidth,
       window.innerWidth,
-      screen.width,
       document.documentElement.offsetWidth
     ));
   },
 
   getViewportHeight: function() {
+    if (__DEV__) {
+      if (!this._viewportHeight) {
+        var chrome = document.getElementById('debug-jog-chrome-element');
+        if (chrome) {
+          this._viewportHeight = chrome.offsetHeight;
+        }
+      }
+    }
+
+
     return this._viewportHeight || (
       this._viewportHeight = Math.max(
         window.outerHeight,

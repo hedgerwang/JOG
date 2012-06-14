@@ -7,6 +7,7 @@ var Class = require('jog/class').Class;
 var EventTarget = require('jog/events/eventtarget').EventTarget;
 var Events = require('jog/events').Events;
 var Functions = require('jog/functions').Functions;
+var ID = require('jog/id').ID;
 var Tappable = require('jog/behavior/tappable').Tappable;
 var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;
@@ -60,6 +61,15 @@ var BaseUI = Class.create(EventTarget, {
     if (this._childrenUI) {
       for (var i = 0, j = this._childrenUI.length; i < j; i++) {
         this._childrenUI[i].dispose();
+      }
+    }
+  },
+
+  enableDebugID: function() {
+    if (__DEV__) {
+      if (this._node && !this._node._jogBaseUIHasDebugID) {
+        this._node._jogBaseUIHasDebugID = true;
+        this._node.setAttribute('debugid', ID.next())
       }
     }
   },
@@ -199,7 +209,11 @@ var BaseUI = Class.create(EventTarget, {
   /**
    * Safe to bind events and lookup dom elements.
    */
-  onDocumentReady: Functions.EMPTY,
+  onDocumentReady: function() {
+    if (__DEV__) {
+      this.enableDebugID();
+    }
+  },
 
   /**
    * Handler for node that enters or exits the document.
