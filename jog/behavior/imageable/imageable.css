@@ -1,4 +1,9 @@
-.jog-behavior-imageable {
+.jog-behavior-imageable {  
   background: transparent none center center no-repeat;
   position: relative;
+}
+
+.jog-behavior-imageable_canvas {  
+  height: 100%;
+  width: 100%;
 }

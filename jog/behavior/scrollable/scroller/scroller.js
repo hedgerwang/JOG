@@ -89,7 +89,7 @@ var Scroller = Class.create(null, {
 
   // The factor that amplifies or decrease the post touch speed.
   // The bigger, the faster scrolling is.
-  _SPEED_FACTOR: UserAgent.IS_ANDROID ? 0.5 : 0.99,
+  _SPEED_FACTOR: UserAgent.IS_ANDROID ? 0.5 : 0.96,
 
   // The max interval between two consecutive touchmoves.
   _MAX_TOUCH_MOVE_INTERVAL: 220,
@@ -101,7 +101,7 @@ var Scroller = Class.create(null, {
   _PAGING_DURATION: 250,
 
   // Duration of post-touch scrolling animation.
-  _SCROLLING_DURATION: UserAgent.IS_ANDROID ? 200 : 700,
+  _SCROLLING_DURATION: UserAgent.IS_ANDROID ? 200 : 1200,
 
   // The factor that builds the tension when scrolling nearby tension points
   // (e.g. page top). Bigger value shall result in stronger tension. Value
@@ -118,7 +118,7 @@ var Scroller = Class.create(null, {
   _BOUNCE_FACTOR: 0.25,
 
   // Max scroll speed.
-  _MAX_SPEED: UserAgent.IS_ANDROID ? 0.6 : 1.4,
+  _MAX_SPEED: UserAgent.IS_ANDROID ? 0.6 : 0.8,
 
   /**
    * An Object that implements these methods:

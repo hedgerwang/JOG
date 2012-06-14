@@ -48,11 +48,15 @@ var Imageable = Class.create(EventTarget, {
    * @param {Element} element
    * @param {string} src
    * @param {number=} opt_resizeMode
+   * @param {boolean=} opt_useCanvas
    */
   main: function(element, src, opt_resizeMode, opt_useCanvas) {
     this.src = src;
+
     this._element = element;
     this._resizeMode = opt_resizeMode || Imageable.RESIZE_MODE_CROPPED;
+    this._useCanvas = !!opt_useCanvas;
+
     dom.addClassName(element, cssx('jog-behavior-imageable'));
     manager.register(this);
 
@@ -68,6 +72,8 @@ var Imageable = Class.create(EventTarget, {
     if (img) {
       delete img.onload;
       delete img.onerror;
+      img.src = 'data:image/gif;base64,' +
+        'R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
     }
   },
 
@@ -75,7 +81,11 @@ var Imageable = Class.create(EventTarget, {
    * @return {Imageable}
    */
   clone: function() {
-    return new Imageable(this._element, this._src, this._resizeMode);
+    return new Imageable(
+      this._element,
+      this.src,
+      this._resizeMode,
+      this._useCanvas);
   },
 
   load: function() {
@@ -84,8 +94,9 @@ var Imageable = Class.create(EventTarget, {
     }
 
     this.src = this._normalizeSrc(this.src);
-    var img = new Image();
-    this._loadingImage = img;
+    this._loadingImage = new Image();
+
+    var img = this._loadingImage;
     var handler = this.bind(this._handleLoad);
     img.onload = handler;
     img.onerror = handler;
@@ -157,24 +168,94 @@ var Imageable = Class.create(EventTarget, {
   },
 
   show: function() {
-    if (this.disposed) {
+    if (this.disposed || this._shown) {
       return;
     }
 
-    var nw = this.naturalWidth;
-    var nh = this.naturalHeight;
+    this._shown = true;
 
-    if (!nw || !nh) {
+    if (!this.naturalWidth) {
       if (__DEV__) {
         throw new Error('Attempt to show an image that is not ready. ' +
-          ', naturalWidth = ' + nw +
-          ', naturalHeight =' + nh +
+          ', naturalWidth = 0' +
+          ', naturalHeight = 0' +
           ', src = ' + this.src);
       }
       return;
     }
 
+    if (this._useCanvas) {
+      this._showAsCanvas();
+    } else {
+      this._showAsCSSBackground();
+    }
+    this.dispatchEvent('show');
+  },
+
+  _showAsCanvas: function() {
+    var canvas = dom.createElement('canvas', {
+      className: cssx('jog-behavior-imageable_canvas'),
+      width: this.width,
+      height: this.height
+    });
+
+    var nw = this.naturalWidth;
+    var nh = this.naturalHeight;
+    var ratio = nw / nh;
+    var cw = this.width;
+    var ch = this.height;
+
+    switch (this._resizeMode) {
+      case Imageable.RESIZE_MODE_USE_WIDTH:
+        ch = cw / ratio;
+        break;
+
+      case Imageable.RESIZE_MODE_USE_HEIGHT:
+        cw = ratio * ch;
+        break;
+
+      case Imageable.RESIZE_MODE_USE_NATURAL:
+        if (nw < nh) {
+          cw = ratio * ch;
+        } else if (nw > nh) {
+          ch = cw / ratio;
+        }
+        break;
+
+      case Imageable.RESIZE_MODE_CROPPED:
+        if (nw < nh) {
+          ch = cw / ratio;
+        } else if (nw > nh) {
+          cw = ratio * ch;
+        }
+        break;
+
+      default:
+        if (__DEV__) {
+          throw new Error('Invalid resize mode specified.' + this.src);
+        }
+        return;
+    }
+
+    var cx = ~~((this.width - cw) / 2);
+    var cy = ~~((this.height - ch) / 2);
+    cw = ~~cw;
+    ch = ~~ch;
+    canvas.getContext('2d').drawImage(
+      this._loadingImage, cx, cy, cw, ch);
+
+    canvas.imageSrc = this._loadingImage.src;
+    canvas.imageW = cw;
+    canvas.imageH = ch;
+    canvas.imageX = cx;
+    canvas.imageY = cy;
+    this._element.appendChild(canvas);
+  },
+
+  _showAsCSSBackground: function() {
     var bgSize;
+    var nw = this.naturalWidth;
+    var nh = this.naturalHeight;
 
     switch (this._resizeMode) {
       case Imageable.RESIZE_MODE_USE_WIDTH:
@@ -212,16 +293,55 @@ var Imageable = Class.create(EventTarget, {
         return;
     }
 
+    console.log('Show image as background:',
+      bgSize,
+      this.src,
+      this.naturalWidth,
+      this.naturalHeight
+    );
+
     this._element.style.backgroundSize = bgSize;
     this._element.style.backgroundImage = 'url("' + this.src + '")';
   },
 
   _handleLoad: function(event) {
-    console.log(event.type);
+    if (__DEV__) {
+      if (event.type === 'error') {
+        console.error('Imageload:_handleLoad',
+          event.type,
+          this.src,
+          this.width,
+          this.height,
+          this
+        );
+        this._element.style.backgroundColor = '#ff0000';
+      }
+    }
     this.naturalWidth = this._loadingImage.naturalWidth;
     this.naturalHeight = this._loadingImage.naturalHeight;
-    this.dispatchEvent(event.type);
-    this.dispose();
+
+    var rect1 = this._element.getBoundingClientRect();
+    var evtType = event.type;
+    var retryCount = 0;
+    var checkSpeed = function() {
+      var rect2 = this._element.getBoundingClientRect();
+      var dy = Math.abs(rect2.top - rect1.top);
+      if (dy < 70 || retryCount > 5) {
+        // Do not dispatch load/error event until the element is slow down.
+        this.dispatchEvent(evtType);
+        this.dispose();
+        checkSpeed = null;
+        evtType = null;
+        rect1 = null;
+        rect2 = null;
+        retryCount = 0;
+      } else {
+        retryCount++;
+        rect1 = rect2;
+        this.callLater(checkSpeed, 300);
+      }
+    };
+    this.callLater(checkSpeed, 300);
   },
 
   /**
@@ -233,15 +353,16 @@ var Imageable = Class.create(EventTarget, {
       return '';
     }
 
-    if (src.indexOf('fbexternal-a.akamaihd.net') > 0) {
+    if (src.indexOf('://fbexternal-a.akamaihd.net') > -1) {
       // TODO(hedger): I don't like this solution but this is how to fix it
       // now.
+      console.warn(src + ' mat contain large image, should fix it.');
+
       var match = src.match(/[\?&]url=(.+)\&?/);
       if (match && match[1]) {
-        console.warn('Safe Image failed from ' + src);
+        console.warn('Reset src from: ' + src);
         src = decodeURIComponent(match[1]);
-        console.warn('Try ' + src + ' instead');
-
+        console.warn('To: ' + src);
         return src;
       }
     }
@@ -262,7 +383,12 @@ var Imageable = Class.create(EventTarget, {
   /**
    * @type {number}
    */
-  _element: null
+  _element: null,
+
+  /**
+   * @type {boolean}
+   */
+  _shown: false
 });
 
 Imageable.RESIZE_MODE_CROPPED = 1;

@@ -211,7 +211,6 @@ var DOM = Class.create(null, {
       this._viewportHeight = Math.max(
         window.outerHeight,
         window.innerHeight,
-        screen.height,
         document.documentElement.offsetHeight
       ));
   },

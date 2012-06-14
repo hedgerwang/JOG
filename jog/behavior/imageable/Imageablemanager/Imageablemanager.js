@@ -4,6 +4,7 @@
  */
 
 var Class = require('jog/class').Class;
+var TouchHelper = require('jog/touchhelper').TouchHelper;
 
 var ImageableManager = Class.create(null, {
   /**
@@ -81,7 +82,7 @@ var ImageableManager = Class.create(null, {
       if (imageable.shouldLoad()) {
         this._loadingCount++;
         imageable.addEventListener('load', this._onLoad);
-        imageable.addEventListener(imageable, 'error', this._onLoad);
+        imageable.addEventListener('error', this._onLoad);
         imageable.load();
       }
 
@@ -103,7 +104,7 @@ var ImageableManager = Class.create(null, {
     this.unregister(imageable);
     this._loadingCount--;
 
-    if (!imageable.disposed) {
+    if (event.type === 'load') {
       if (imageable.isVisible()) {
         imageable.show();
       } else if (imageable.shouldReload()) {

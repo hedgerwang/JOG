@@ -1,8 +1,10 @@
 .jog-ui-scrolllist-chunk {  
+  backface-visibility: hidden;
   left: 0;
   overflow: hidden;
   position: absolute;
   top: 0;
+  transform: translate3d(0, 0, 0);
   width: 100%;
   z-index: 1;
 }

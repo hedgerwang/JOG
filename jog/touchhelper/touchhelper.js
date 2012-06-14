@@ -6,10 +6,6 @@
 var Class = require('jog/class').Class;
 
 var useTouch = 'ontouchstart' in document;
-var touchStartCoord = {};
-var touchMoveCoord = {};
-var touchEndCoord = {};
-var touchCancelCoord = {};
 var readonlyTouchEvents = [];
 
 var TouchHelper = {

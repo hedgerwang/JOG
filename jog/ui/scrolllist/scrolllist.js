@@ -119,7 +119,7 @@ var ScrollList = Class.create(BaseUI, {
     this._maxChunkHeight = Math.max(
       dimentions[0],
       dimentions[1]
-    ) * (UserAgent.IS_ANDROID ? 3 : 4);
+    ) * (UserAgent.IS_ANDROID ? 3 : 5);
 
     if (UserAgent.IS_ANDROID) {
       this._maxChunkHeight = Math.min(2200, this._maxChunkHeight);

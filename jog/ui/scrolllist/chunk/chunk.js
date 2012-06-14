@@ -3,6 +3,7 @@
  * @author Hedger Wang
  */
 
+var Animator = require('jog/animator').Animator;
 var BaseUI = require('jog/ui/baseui').BaseUI;
 var Class = require('jog/class').Class;
 var Scrollable = require('jog/behavior/scrollable').Scrollable;
@@ -14,6 +15,10 @@ var Chunk = Class.create(BaseUI, {
   /** @override */
   main: function() {
     this._contentNode = this.getNode().firstChild;
+  },
+
+  dispose: function() {
+    Animator.cancelAnimationFrame(this._redrawID);
   },
 
   /** @override */
@@ -65,23 +70,31 @@ var Chunk = Class.create(BaseUI, {
   setVisible: function(visible) {
     if (this._visible !== visible) {
       this._visible = visible;
-      var node = this.getNode();
-      var contentNode = this._contentNode;
-      if (visible) {
-        if (!this._contentNode.parentNode) {
-          node.appendChild(contentNode);
-        }
-        dom.removeClassName(contentNode,
-          cssx('jog-ui-scrolllist-chunk-hidden'));
+      Animator.cancelAnimationFrame(this._redrawID);
+      this._redrawID = Animator.requestAnimationFrame(this.bind(this._redraw));
+    }
+  },
 
-        node.style.height = '';
-        this._reflow();
-      } else {
-        node.style.height = this._height + 'px';
-        // this._contentNode.style.visibility = 'hidden';
-        node.removeChild(contentNode);
-        dom.addClassName(contentNode, cssx('jog-ui-scrolllist-chunk-hidden'));
+  _redrawID: '',
+
+  _redraw: function() {
+    var visible = this._visible;
+    var node = this.getNode();
+    var contentNode = this._contentNode;
+    if (visible) {
+      if (!this._contentNode.parentNode) {
+        node.appendChild(contentNode);
       }
+      dom.removeClassName(contentNode,
+        cssx('jog-ui-scrolllist-chunk-hidden'));
+
+      node.style.height = '';
+      this._reflow();
+    } else {
+      node.style.height = this._height + 'px';
+      // this._contentNode.style.visibility = 'hidden';
+      node.removeChild(contentNode);
+      dom.addClassName(contentNode, cssx('jog-ui-scrolllist-chunk-hidden'));
     }
     this._reflow();
   },
