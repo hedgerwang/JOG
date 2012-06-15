@@ -7,7 +7,6 @@ var Class = require('jog/class').Class;
 var EventTarget = require('jog/events/eventtarget').EventTarget;
 var Events = require('jog/events').Events;
 var Functions = require('jog/functions').Functions;
-var ID = require('jog/id').ID;
 var Tappable = require('jog/behavior/tappable').Tappable;
 var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;
@@ -39,11 +38,6 @@ var BaseUI = Class.create(EventTarget, {
   _nodeTappable: null,
 
   /**
-   * @type {Events}
-   */
-  _mutationEvents: null,
-
-  /**
    * @type {boolean}
    */
   _inDocument: false,
@@ -51,7 +45,6 @@ var BaseUI = Class.create(EventTarget, {
   /** @override */
   dispose : function() {
     Class.dispose(this._events);
-    Class.dispose(this._mutationEvents);
     dom.remove(this._node);
 
     if (this._parentUI) {
@@ -61,15 +54,6 @@ var BaseUI = Class.create(EventTarget, {
     if (this._childrenUI) {
       for (var i = 0, j = this._childrenUI.length; i < j; i++) {
         this._childrenUI[i].dispose();
-      }
-    }
-  },
-
-  enableDebugID: function() {
-    if (__DEV__) {
-      if (this._node && !this._node._jogBaseUIHasDebugID) {
-        this._node._jogBaseUIHasDebugID = true;
-        this._node.setAttribute('debugid', ID.next())
       }
     }
   },
@@ -97,6 +81,8 @@ var BaseUI = Class.create(EventTarget, {
       throw new Error('UI has been rendered');
     }
 
+    delete node._jogBaseUINodeOffDocument;
+
     if (opt_nextSibling) {
       element.insertBefore(node, opt_nextSibling);
     } else {
@@ -106,15 +92,17 @@ var BaseUI = Class.create(EventTarget, {
     if (dom.isInDocument(node)) {
       this._inDocument = true;
       this.onDocumentReady();
-    } else {
-      var targetNode = element;
-      if (!dom.isInDocument(targetNode)) {
-        targetNode = dom.getDocument().body || dom.getRootNode();
+      if (this._childrenUI) {
+        for (var i = 0, j = this._childrenUI.length; i < j; i++) {
+          var child = this._childrenUI[i];
+          if (!child._inDocument) {
+            if (dom.isInDocument(child.getNode())) {
+              child._inDocument = true;
+              this._childrenUI[i].onDocumentReady();
+            }
+          }
+        }
       }
-      this._mutationEvents = new Events(this);
-      this._mutationEvents.listen(
-        targetNode, 'DOMNodeInserted', this._onDOMNodeInserted
-      );
     }
   },
 
@@ -131,6 +119,9 @@ var BaseUI = Class.create(EventTarget, {
   getNode : function() {
     if (!this._node) {
       this._node = this.createNode();
+      if (__DEV__) {
+        this._node._jogBaseUINodeOffDocument = true;
+      }
     }
     return this._node;
   },
@@ -209,24 +200,34 @@ var BaseUI = Class.create(EventTarget, {
   /**
    * Safe to bind events and lookup dom elements.
    */
-  onDocumentReady: function() {
-    if (__DEV__) {
-      this.enableDebugID();
-    }
-  },
-
-  /**
-   * Handler for node that enters or exits the document.
-   * @param {Event}
-    */
-  _onDOMNodeInserted: function(event) {
-    if (!this.disposed && dom.isInDocument(this._node)) {
-      this._mutationEvents.dispose();
-      delete this._mutationEvents;
-      this._inDocument = true;
-      this.onDocumentReady();
-    }
-  }
+  onDocumentReady: Functions.EMPTY
 });
 
 exports.BaseUI = BaseUI;
+
+
+// To ensure that an UI instance always uses ui.render(node) instead of
+// node.appendChild(ui.getNode());
+if (__DEV__) {
+  if (typeof Element !== undefined) {
+    var appendChild = Element.prototype.appendChild;
+    Element.prototype.appendChild = function(child) {
+      if (child._jogBaseUINodeOffDocument) {
+        throw new Error(
+          'BaseUI node should be added by calling appendChild');
+      }
+      return appendChild.apply(this, arguments);
+    };
+
+    var insertBefore = Element.prototype.insertBefore;
+    Element.prototype.insertBefore = function(child) {
+      if (child._jogBaseUINodeOffDocument) {
+        throw new Error(
+          'It appears that you were trying to use ' +
+            'element.appendChild(ui.getNode()) to append ui\'s node into this ' +
+            'element. You should use ui.render(element) instead.');
+      }
+      return insertBefore.apply(this, arguments);
+    };
+  }
+}

@@ -109,15 +109,18 @@ var Chunk = Class.create(BaseUI, {
     switch (typeof content) {
       case 'string':
         node = dom.getDocument().createTextNode(content);
+        this._contentNode.appendChild(node);
         break;
 
       case 'object':
         if (content.nodeType === 1 || content.nodeType === 11) {
           // Element OR DocumentFragment.
           node = content;
+          this._contentNode.appendChild(node);
         } else if (content instanceof BaseUI) {
           node = content.getNode();
           this.appendChild(content);
+          content.render(this._contentNode);
         }
         break;
     }
@@ -128,7 +131,6 @@ var Chunk = Class.create(BaseUI, {
       }
     }
 
-    this._contentNode.appendChild(node);
     this._reflow();
   },
 

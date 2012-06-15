@@ -198,47 +198,39 @@ var DOM = Class.create(null, {
   },
 
   getViewportElement: function() {
-    if (__DEV__) {
-      var chrome = document.getElementById('debug-jog-chrome-element');
-      if (chrome) {
-        return chrome;
-      }
+    if (!this._chromeNode) {
+      this._chromeNode = document.getElementById('debug-jog-chrome-element')
     }
+
+    if (this._chromeNode) {
+      return this._chromeNode;
+    }
+
     return this._rootNode;
   },
 
-  getViewportLeft: function() {
-
-  },
-
-  getViewportTop: function() {
-
-  },
-
   getViewportWidth: function() {
-    if (__DEV__) {
+    var viewportElement = this.getViewportElement();
+
+    if (this._chromeNode) {
       if (!this._viewportWidth) {
-        var chrome = document.getElementById('debug-jog-chrome-element');
-        if (chrome) {
-          this._viewportWidth = chrome.offsetWidth;
-        }
+        this._viewportWidth = viewportElement.offsetWidth;
       }
     }
 
     return this._viewportWidth || (this._viewportWidth = Math.max(
       window.outerWidth,
       window.innerWidth,
-      document.documentElement.offsetWidth
+      viewportElement.offsetWidth
     ));
   },
 
   getViewportHeight: function() {
-    if (__DEV__) {
+    var viewportElement = this.getViewportElement();
+
+    if (this._chromeNode) {
       if (!this._viewportHeight) {
-        var chrome = document.getElementById('debug-jog-chrome-element');
-        if (chrome) {
-          this._viewportHeight = chrome.offsetHeight;
-        }
+        this._viewportHeight = viewportElement.offsetHeight;
       }
     }
 
@@ -247,10 +239,11 @@ var DOM = Class.create(null, {
       this._viewportHeight = Math.max(
         window.outerHeight,
         window.innerHeight,
-        document.documentElement.offsetHeight
+        viewportElement.offsetHeight
       ));
   },
 
+  _chromeNode: null,
   _viewportWidth: 0,
   _viewportHeight: 0
 });

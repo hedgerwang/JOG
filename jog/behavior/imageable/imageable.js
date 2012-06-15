@@ -11,7 +11,7 @@ var ImageableManager = require('jog/behavior/imageable/imageablemanager').Imagea
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
-var manager = new ImageableManager(1);
+var manager = new ImageableManager(2);
 
 /**
  * Load image asynchronously and lazily.
@@ -151,10 +151,6 @@ var Imageable = Class.create(EventTarget, {
       return false;
     }
 
-    if (this.width < 17 && this.height < 17) {
-      // return true;
-    }
-
     var count = 3;
     var dx = ~~(rect.width / count);
     var dy = ~~(rect.height / count);
@@ -164,6 +160,8 @@ var Imageable = Class.create(EventTarget, {
     while (count) {
       count--;
       var offset = count > 0 ? 1 : -1;
+      // TODO(hedger): Fix document.elementFromPoint
+      // See http://www.icab.de/blog/2011/10/17/elementfrompoint-under-ios-5/
       var testElement = document.elementFromPoint(x + offset, y + offset);
       if (testElement === this._element) {
         return true;
@@ -174,10 +172,13 @@ var Imageable = Class.create(EventTarget, {
 
     if (__DEV__) {
       if (this.width > 0 && this.height > 0) {
-        console.log('A big element in view could not be pointed',
+        var debugInfo = [
+          'A big element in view could not be pointed',
           this._element,
           testElement,
-          rect);
+          rect
+        ];
+        console.log(debugInfo);
       }
     }
 
@@ -317,12 +318,15 @@ var Imageable = Class.create(EventTarget, {
         return;
     }
 
-    console.log('Show image as background:',
-      bgSize,
-      this.src,
-      this.naturalWidth,
-      this.naturalHeight
-    );
+    if (__DEV__) {
+      var debugInfo = [
+        bgSize,
+        this.src,
+        this.naturalWidth,
+        this.naturalHeight
+      ];
+      console.log('Show image as background:', debugInfo);
+    }
 
     this._element.style.backgroundSize = bgSize;
     this._element.style.backgroundImage = 'url("' + this.src + '")';
@@ -330,14 +334,20 @@ var Imageable = Class.create(EventTarget, {
 
   _handleLoad: function(event) {
 
+    if (__DEV__) {
+      if (event.type === 'error') {
+        var debugInfo = [
+          event.type,
+          this.src,
+          this.width,
+          this.height,
+          this
+        ];
+        console.error('Imageload:_handleLoad', debugInfo);
+      }
+    }
+
     if (event.type === 'error') {
-      console.error('Imageload:_handleLoad',
-        event.type,
-        this.src,
-        this.width,
-        this.height,
-        this
-      );
       dom.addClassName(this._element, cssx('jog-behavior-imageable-error'));
     }
 
@@ -350,7 +360,7 @@ var Imageable = Class.create(EventTarget, {
     var checkSpeed = function() {
       var rect2 = this._element.getBoundingClientRect();
       var dy = Math.abs(rect2.top - rect1.top);
-      if (dy < 120 || retryCount > 5) {
+      if (dy < 150 || retryCount > 5) {
         // Do not dispatch load/error event until the element is slow down.
         this.dispatchEvent(evtType);
         this.dispose();
@@ -382,7 +392,7 @@ var Imageable = Class.create(EventTarget, {
       // now.
       console.warn(src + ' mat contain large image, should fix it.');
 
-      var match = src.match(/[\?&]url=(.+)\&?/);
+      var match = src.match(/[\?&]url=([^&]+)&?/);
       if (match && match[1]) {
         console.warn('Reset src from: ' + src);
         src = decodeURIComponent(match[1]);

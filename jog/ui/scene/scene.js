@@ -144,9 +144,7 @@ var Scene = Class.create(BaseUI, {
    * @param {number} x
    */
   _setTranslateX: function(x) {
-    if (x === 0) {
-      this.getNode().style.webkitTransform = '';
-    } else if (x !== this._sceneTranslateX) {
+    if (x !== this._sceneTranslateX) {
       this.getNode().style.webkitTransform = 'translate3d(' + x + 'px,0,0)';
     }
     this._sceneTranslateX = x;

@@ -30,10 +30,8 @@ var Chrome = Class.create(BaseUI, {
     ];
 
     var node = dom.createElement('div', classNames.join(' '));
+    node.id = 'debug-jog-chrome-element';
 
-    if (__DEV__) {
-      node.id = 'debug-jog-chrome-element';
-    }
     return node;
   },
 
