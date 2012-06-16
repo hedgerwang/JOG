@@ -11,7 +11,7 @@ var ImageableManager = require('jog/behavior/imageable/imageablemanager').Imagea
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
-var manager = new ImageableManager(2);
+var manager = new ImageableManager(1);
 
 /**
  * Load image asynchronously and lazily.
@@ -171,14 +171,13 @@ var Imageable = Class.create(EventTarget, {
     }
 
     if (__DEV__) {
-      if (this.width > 0 && this.height > 0) {
-        var debugInfo = [
+      if (this.width > 50 && this.height > 50) {
+        console.info(
           'A big element in view could not be pointed',
           this._element,
           testElement,
           rect
-        ];
-        console.log(debugInfo);
+        );
       }
     }
 
@@ -325,7 +324,7 @@ var Imageable = Class.create(EventTarget, {
         this.naturalWidth,
         this.naturalHeight
       ];
-      console.log('Show image as background:', debugInfo);
+      console.info('Show image as background:', debugInfo);
     }
 
     this._element.style.backgroundSize = bgSize;
@@ -336,14 +335,14 @@ var Imageable = Class.create(EventTarget, {
 
     if (__DEV__) {
       if (event.type === 'error') {
-        var debugInfo = [
+        console.error(
+          'Imageload:_handleLoad',
           event.type,
           this.src,
           this.width,
           this.height,
           this
-        ];
-        console.error('Imageload:_handleLoad', debugInfo);
+        );
       }
     }
 

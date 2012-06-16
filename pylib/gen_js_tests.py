@@ -176,7 +176,7 @@ def gen_js_test(dir_path) :
 if __name__ == '__main__' :
   dir_names = [
     'app',
-    'jog'
+    'jog',
   ]
   for dir_name in dir_names :
     gen_js_test(dir_name)

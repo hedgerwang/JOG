@@ -45,6 +45,8 @@ CSS_VENDER_PROPERTIES = [
   'mask-image',
   'tap-highlight-color',
   'text-size-adjust',
+  'transition-duration',
+  'transition-property',
   ]
 
 MODULE_WRAP = """

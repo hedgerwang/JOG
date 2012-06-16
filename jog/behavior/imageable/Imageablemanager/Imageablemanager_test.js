@@ -2,7 +2,7 @@
  * @fileOverview ImageableManager Test
  * @author Hedger Wang
  *
- * @url http://localhost:8888/jog/behavior/imageable/Imageablemanager/Imageablemanager_test.html
+ * @url http://localhost:8888/jog/behavior/imageable/imageablemanager/imageablemanager_test.html
  */
 
 var ImageableManager = require('jog/behavior/imageable/imageablemanager').ImageableManager;

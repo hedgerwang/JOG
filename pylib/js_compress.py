@@ -136,7 +136,16 @@ def compress(path, cssx_map=None) :
     source = source.replace(expression, new_expression)
 
   # Use closure so that __DEV__ can be removed safely by the compiler.
-  source = '(function(window, document){\n%s\n})(window, document)' % source
+  source = '''(function(window, document){
+  // Make console.* do nothing so that compiler can strip them.
+  var console = {};
+  console.log = function(){};
+  console.error = function(){};
+  console.info = function(){};
+
+  \n%s\n
+  })(window, document)
+  ''' % source
 
   js_file = open(input_file_path, 'w')
   js_file.write(source)
@@ -160,6 +169,16 @@ def compress(path, cssx_map=None) :
   js_file = open(output_file_path)
   source = js_file.read()
   js_file.close()
+
+  idx = source.find('console.')
+  if idx > -1 :
+    raise Exception('''
+    It appears that console.log() did not get removed properly.
+    Can you fix it?
+    %s
+    ''' % source[idx - 200 : idx + 200])
+
+  print idx
   return source
 
 

@@ -18,6 +18,7 @@ var MyButton = Class.create(BaseUI, {
     this.type = type || 'submit';
   },
 
+
   type: '',
 
   createNode: function() {

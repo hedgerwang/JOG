@@ -7,7 +7,7 @@ var Deferred = require('jog/deferred').Deferred;
 var FBAPI = require('jog/fbapi').FBAPI;
 var LocalStorage = require('jog/localstorage').LocalStorage;
 
-var CACHE_DURATION = 30 * 60 * 1000;
+var CACHE_DURATION = 5 * 60 * 1000;
 
 if (__DEV__) {
   CACHE_DURATION = 5 * 60 * 60 * 1000;
@@ -18,19 +18,20 @@ var FBData = {
   /**
    * @param {number} uid
    * @param {number} count
-   * @param {string?} startCursor
+   * @param {string?} cursor
    * @param {boolean} useCache
    * @return {Deferred}
    */
-  getHomeStories: function(uid, count, startCursor, useCache) {
+  getHomeStories: function(uid, count, cursor, useCache) {
     var query =
       (uid ? 'node(' + parseInt(uid, 10) + ')' : 'me()') +
         '{id,name,home_stories' +
-        (startCursor ? '.after(' + startCursor + ')' : '') +
+        (cursor ? '.after(' + cursor + ')' : '') +
         '.first(' + count + '){' +
         'nodes{title,id,url,creation_time,actors{' +
         'profile_picture,name,id},' +
-        'attachments{title,url,media{image.size(180){uri,width,height},url,id},' +
+        'attachments{' +
+        'title,url,media{image.size(180){uri,width,height},url,id},' +
         'subattachments{media{image.size(180){uri,width,height}}}},' +
         'message{text}},' +
         'page_info{start_cursor,end_cursor,has_next_page,has_previous_page},' +
@@ -38,6 +39,25 @@ var FBData = {
         '}';
 
     return queryGraph(query, useCache);
+  },
+
+  /**
+   * @param {number} uid
+   * @param {number} count
+   * @param {string?} cursor
+   * @return {Deferred}
+   */
+  getHomeStoriesPageInfo: function(uid, count, cursor) {
+    var query =
+      (uid ? 'node(' + parseInt(uid, 10) + ')' : 'me()') +
+        '{id,name,home_stories' +
+        (cursor ? '.before(' + cursor + ')' : '') +
+        '.first(' + count + ')' +
+        '{page_info{' +
+        'start_cursor,end_cursor,has_next_page,has_previous_page},' +
+        'count,nodes{id}}}';
+
+    return queryGraph(query, false);
   },
 
   /**
@@ -119,22 +139,26 @@ var FBData = {
 function queryGraph(query, useCache) {
   var df = new Deferred();
 
-  LocalStorage.getItem(query).addCallback(function(result) {
-    if (useCache &&
-      result &&
-      ((Date.now() - result._cacheTime) < CACHE_DURATION)) {
-      df.succeed(result);
-    } else {
-      df.attachTo(FBAPI.queryGraph(query)).addCallback(function(result) {
-        if (!result.error) {
-          result._cacheTime = Date.now();
-          result._query = query;
-          LocalStorage.setItem(query, result);
-        }
-        query = null;
-      });
+  var saveToCache = function(result) {
+    if (!result.error) {
+      result._cacheTime = Date.now();
+      result._query = query;
+      LocalStorage.setItem(query, result);
     }
-  });
+    query = null;
+  };
+
+  if (useCache) {
+    LocalStorage.getItem(query).addCallback(function(result) {
+      if (result && ((Date.now() - result._cacheTime) < CACHE_DURATION)) {
+        df.succeed(result);
+      } else {
+        df.attachTo(FBAPI.queryGraph(query)).addCallback(saveToCache);
+      }
+    });
+  } else {
+    df.attachTo(FBAPI.queryGraph(query)).addCallback(saveToCache);
+  }
 
   return df;
 }

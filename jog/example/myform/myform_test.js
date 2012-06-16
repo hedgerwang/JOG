@@ -5,13 +5,12 @@
  * @url http://localhost:8888/jog/example/myform/myform_test.html
  */
 
+var Events = require('jog/events').Events;
 var MyButton = require('jog/example/mybutton').MyButton;
 var MyForm = require('jog/example/myform').MyForm;
 var MyTextBox = require('jog/example/mytextbox').MyTextBox;
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
-var Events = require('jog/events').Events;
-
 
 (new TestCase('MyForm Test'))
   .demo('demo',
