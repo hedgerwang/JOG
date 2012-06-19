@@ -234,7 +234,6 @@ var DOM = Class.create(null, {
       }
     }
 
-
     return this._viewportHeight || (
       this._viewportHeight = Math.max(
         window.outerHeight,

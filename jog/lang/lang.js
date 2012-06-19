@@ -97,6 +97,31 @@ var lang = {
    */
   unthrottle: function(fn) {
     clearTimeout(fn._throttleTimer);
+  },
+
+  /**
+   * @param {Function} fn
+   * @param {number} delay
+   */
+  callAfter: function(fn, delay) {
+    var start = Date.now();
+    return function() {
+      var dt = Date.now() - start;
+      if (dt < delay) {
+        var args = lang.toArray(arguments);
+        var wfn = this.bind(function() {
+          fn.apply(null, args);
+          fn = null;
+          args = null;
+        });
+        setTimeout(wfn, delay - dt);
+      } else {
+        fn.apply(null, arguments);
+        fn = null;
+      }
+      start = null;
+      delay = null;
+    };
   }
 };
 

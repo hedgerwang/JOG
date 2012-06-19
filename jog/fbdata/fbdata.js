@@ -59,7 +59,7 @@ var FBData = {
         '.first(' + count + ')' +
         '{page_info{' +
         'start_cursor,end_cursor,has_next_page,has_previous_page},' +
-        'count,nodes{id}}}';
+        'count,nodes{id,creation_time}}}';
 
     return queryGraph(query, false);
   },

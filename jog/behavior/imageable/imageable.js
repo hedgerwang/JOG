@@ -13,6 +13,8 @@ var dom = require('jog/dom').dom;
 
 var manager = new ImageableManager(1);
 
+var debugTargetElement;
+
 /**
  * Load image asynchronously and lazily.
  * TODO(hedger): Hide image when it's off-screen?
@@ -172,12 +174,18 @@ var Imageable = Class.create(EventTarget, {
 
     if (__DEV__) {
       if (this.width > 50 && this.height > 50) {
-        console.info(
-          'A big element in view could not be pointed',
-          this._element,
-          testElement,
-          rect
-        );
+        if (debugTargetElement !== this._element) {
+          // Use debugTargetElement to avoid over-logging.
+          debugTargetElement = this._element;
+          /*
+           console.info(
+           'A big element in view could not be pointed',
+           this._element,
+           testElement,
+           rect
+           );
+           */
+        }
       }
     }
 
@@ -371,10 +379,10 @@ var Imageable = Class.create(EventTarget, {
       } else {
         retryCount++;
         rect1 = rect2;
-        this.callLater(checkSpeed, 300);
+        this.setTimeout(checkSpeed, 300);
       }
     };
-    this.callLater(checkSpeed, 300);
+    this.setTimeout(checkSpeed, 300);
   },
 
   /**

@@ -58,7 +58,7 @@ var ImageableManager = Class.create(null, {
       this._lookupTimer = setTimeout(this._lookup, 0);
     } else {
       // Too early to lookup now, shall come back later.
-      this.callLater(this._startLookUp, this._lookupInterval - timeDiff);
+      this.setTimeout(this._startLookUp, this._lookupInterval - timeDiff);
     }
   },
 

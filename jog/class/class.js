@@ -16,7 +16,7 @@ var classID = 1;
 var defaultClassConfig = {
   dispose: classDispose,
   bind: classBind,
-  callLater: classCallLater,
+  setTimeout: classSetTimeout,
   callAfter: classCallAfter
 };
 
@@ -72,7 +72,7 @@ var Class = {
       }
 
       prototype.callAfter = classCallAfter;
-      prototype.callLater = classCallLater;
+      prototype.setTimeout = classSetTimeout;
       prototype.dispose = classDispose;
       prototype.bind = classBind;
     } else {
@@ -159,8 +159,8 @@ function classDispose() {
       klass = klass._superClass;
     }
 
-    if (this._callLaterTimers) {
-      for (var id in this._callLaterTimers) {
+    if (this._setTimeoutTimers) {
+      for (var id in this._setTimeoutTimers) {
         clearTimeout(id);
       }
     }
@@ -199,23 +199,23 @@ function classBind(fn) {
  * @param {number} delay
  * @return {number}
  */
-function classCallLater(fn, delay) {
+function classSetTimeout(fn, delay) {
   var that = this;
   var id;
 
-  if (!that._callLaterTimers) {
-    that._callLaterTimers = {};
+  if (!that._setTimeoutTimers) {
+    that._setTimeoutTimers = {};
   }
 
   var wfn = function() {
-    delete that._callLaterTimers[id];
+    delete that._setTimeoutTimers[id];
     fn.apply(that, arguments);
     that = null;
     id = null;
   };
 
   id = setTimeout(wfn, delay);
-  that._callLaterTimers[id] = true;
+  that._setTimeoutTimers[id] = true;
   return id;
 }
 
@@ -237,7 +237,7 @@ function classCallAfter(fn, delay) {
           fn = null;
           args = null;
         });
-        this.callLater(wfn, delay - dt);
+        this.setTimeout(wfn, delay - dt);
       } else {
         fn.apply(this, arguments);
         fn = null;

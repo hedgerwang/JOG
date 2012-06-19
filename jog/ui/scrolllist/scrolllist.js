@@ -95,7 +95,8 @@ var ScrollList = Class.create(BaseUI, {
 
   _onScrollEnd: function() {
     clearTimeout(this._onScrollTimer);
-    this._onScrollTimer = this.callLater(this._processContentNow, 300);
+    this._onScrollTimer = this.setTimeout(this._processContentNow, 300);
+    this.dispatchEvent('scrollend');
   },
 
   _reflow: function() {

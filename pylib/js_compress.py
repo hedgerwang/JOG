@@ -21,9 +21,9 @@ PRIVATE_MEMBER_PATTERN = re.compile(
   r'[\s;\{\.](?P<name>(_[a-zA-Z0-9]+)+)[><\?:|&\-\+\[\]\.\(\);\s=,\{\}]')
 
 
-# this._fooBar
+# PROPERTY_FOO_BAR
 ENUM_PATTERN = re.compile(
-  r'[\s;\{\.](?P<name>([A-Z]+(_[A-Z]+)+))')
+  r'[\s;\{\.\[\{:](?P<name>([A-Z]+(_[A-Z]+)+))')
 
 # [><\?:|&\-\+\[\]\.\(\);\s=,\{\}]
 

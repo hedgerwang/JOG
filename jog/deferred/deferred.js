@@ -93,7 +93,7 @@ var Deferred = Class.create(null, {
       more = undefined;
     }
 
-    this.callLater(function() {
+    this.setTimeout(function() {
       if (this._callbacks) {
         for (var i = 0, j = this._callbacks.length; i < j; i += 2) {
           var callback = this._callbacks[i];
@@ -123,7 +123,7 @@ var Deferred = Class.create(null, {
     this._clearWaitFor();
     this._done = true;
 
-    this.callLater(function() {
+    this.setTimeout(function() {
       if (this._callbacks) {
         for (var i = 1, j = this._callbacks.length; i < j; i += 2) {
           var callback = this._callbacks[i];
