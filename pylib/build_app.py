@@ -8,6 +8,8 @@ HTML_TEMPLATE = """
 <!doctype html>
 <html>
 <head>
+<title>app</title>
+<meta charset="UTF-8" />
 <meta name="viewport"
   content="width=device-width, initial-scale=%(dpr)s, maximum-scale=%(dpr)s
            user-scalable=no, target-densitydpi=%(densitydpi)s"/>

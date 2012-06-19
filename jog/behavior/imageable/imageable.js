@@ -359,7 +359,7 @@ var Imageable = Class.create(EventTarget, {
     var checkSpeed = function() {
       var rect2 = this._element.getBoundingClientRect();
       var dy = Math.abs(rect2.top - rect1.top);
-      if (dy < 150 || retryCount > 5) {
+      if (dy < 90 || retryCount > 5) {
         // Do not dispatch load/error event until the element is slow down.
         this.dispatchEvent(evtType);
         this.dispose();

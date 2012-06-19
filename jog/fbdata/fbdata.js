@@ -14,6 +14,10 @@ if (__DEV__) {
 }
 
 // See https://our.intern.facebook.com/intern/graphiql
+// Available Photos Sizes.
+// - type(photo){fields{name,calls{name,args{allowed_values}}}}
+// "75","130","180","320","480","720","960","2048"
+
 var FBData = {
   /**
    * @param {number} uid
@@ -31,8 +35,8 @@ var FBData = {
         'nodes{title,id,url,creation_time,actors{' +
         'profile_picture,name,id},' +
         'attachments{' +
-        'title,url,media{image.size(180){uri,width,height},url,id},' +
-        'subattachments{media{image.size(180){uri,width,height}}}},' +
+        'title,url,media{image.size(480){uri,width,height},url,id},' +
+        'subattachments{media{image.size(480){uri,width,height}}}},' +
         'message{text}},' +
         'page_info{start_cursor,end_cursor,has_next_page,has_previous_page},' +
         'count}' +
