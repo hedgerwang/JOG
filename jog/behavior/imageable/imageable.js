@@ -8,6 +8,7 @@ var EventTarget = require('jog/events/eventtarget').EventTarget;
 var Events = require('jog/events').Events;
 var HashMap = require('jog/hashmap').HashMap;
 var ImageableManager = require('jog/behavior/imageable/imageablemanager').ImageableManager;
+var UserAgent = require('jog/useragent').UserAgent;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
@@ -141,16 +142,35 @@ var Imageable = Class.create(EventTarget, {
       viewBottom = viewRect.bottom;
     }
 
-    if (!this.width) {
+    if (!this.width || !rect.width) {
       return false;
     }
 
     if (rect.top > viewBottom + buffer || rect.bottom < viewTop - buffer) {
+      if (UserAgent.IS_OLD_ANDROID) {
+        // For older Android, we don't really know whether an element is in the
+        // viewport or not.
+        this._falseCount++;
+        return this._falseCount > 3;
+      }
+
       return false;
     }
 
     if (rect.left > viewRight + buffer || rect.right < viewLeft - buffer) {
+      if (UserAgent.IS_OLD_ANDROID) {
+        // For older Android, we don't really know whether an element is in the
+        // viewport or not.
+        this._falseCount++;
+        return this._falseCount > 3;
+      }
       return false;
+    }
+
+    if (UserAgent.IS_ANDROID) {
+      // document.elementFromPoint is so buggy on Adnroid.
+      // See http://www.icab.de/blog/2011/10/17/elementfrompoint-under-ios-5/
+      return true;
     }
 
     var count = 3;
@@ -429,7 +449,12 @@ var Imageable = Class.create(EventTarget, {
   /**
    * @type {boolean}
    */
-  _shown: false
+  _shown: false,
+
+  /**
+   * @type {boolean}
+   */
+  _falseCount: 0
 });
 
 Imageable.RESIZE_MODE_CROPPED = 1;

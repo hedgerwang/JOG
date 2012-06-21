@@ -81,8 +81,7 @@ var Tappable = Class.create(EventTarget, {
       while (target) {
         if (target._tappaple) {
           if (this._targets.contains(target)) {
-            var doNotPrevent = isAndroid &&
-              target.tagName === 'INPUT' ||
+            var doNotPrevent = target.tagName === 'INPUT' ||
               target.querySelector('input');
 
             if (!doNotPrevent) {
@@ -139,7 +138,7 @@ var Tappable = Class.create(EventTarget, {
     var tapped;
     var dbltapped;
 
-    if (!event.defaultPrevented && touchTarget && this._movedCount < 3) {
+    if (!event.defaultPrevented && touchTarget && this._movedCount < 1) {
       var target = event.target;
       if (touchTarget == target || touchTarget.contains(target)) {
         if (this._tappedTarget === touchTarget &&

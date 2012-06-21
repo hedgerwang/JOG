@@ -13,6 +13,13 @@ var UserAgent = require('jog/useragent').UserAgent;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
+var useCSSTranslate = 'webkitTransform' in document.documentElement.style;
+
+if (UserAgent.IS_OLD_ANDROID) {
+  useCSSTranslate = false;
+}
+
+
 var Scrollable = Class.create(EventTarget, {
   /**
    * @override
@@ -56,6 +63,13 @@ var Scrollable = Class.create(EventTarget, {
     this._clearListeners();
     this._scroller.dispose();
     this._events.dispose();
+  },
+
+  /**
+   * @return {Scroller}
+   */
+  getScroller: function() {
+    return this._scroller;
   },
 
   /**
@@ -280,7 +294,7 @@ var Scrollable = Class.create(EventTarget, {
   /**
    * @type {boolean}
    */
-  _useCSSTranslate : 'webkitTransform' in document.documentElement.style
+  _useCSSTranslate : useCSSTranslate
 });
 
 exports.Scrollable = Scrollable;

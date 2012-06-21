@@ -6,6 +6,7 @@
 var Deferred = require('jog/deferred').Deferred;
 var FBAPI = require('jog/fbapi').FBAPI;
 var LocalStorage = require('jog/localstorage').LocalStorage;
+var UserAgent = require('jog/useragent').UserAgent;
 
 var CACHE_DURATION = 5 * 60 * 1000;
 
@@ -27,6 +28,7 @@ var FBData = {
    * @return {Deferred}
    */
   getHomeStories: function(uid, count, cursor, useCache) {
+    var px = UserAgent.IS_ANDROID ? 180 : 480;
     var query =
       (uid ? 'node(' + parseInt(uid, 10) + ')' : 'me()') +
         '{id,name,home_stories' +
@@ -35,8 +37,8 @@ var FBData = {
         'nodes{title,id,url,creation_time,actors{' +
         'profile_picture,name,id},' +
         'attachments{' +
-        'title,url,media{image.size(480){uri,width,height},url,id},' +
-        'subattachments{media{image.size(480){uri,width,height}}}},' +
+        'title,url,media{image.size(' + px + '){uri,width,height},url,id},' +
+        'subattachments{media{image.size(' + px + '){uri,width,height}}}},' +
         'message{text}},' +
         'page_info{start_cursor,end_cursor,has_next_page,has_previous_page},' +
         'count}' +

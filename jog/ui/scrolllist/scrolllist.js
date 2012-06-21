@@ -49,6 +49,13 @@ var ScrollList = Class.create(BaseUI, {
     events.listen(this._scrollable, 'scrollend', this._onScrollEnd);
   },
 
+  /**
+   * @return {Scroller}
+   */
+  getScroller: function() {
+    return this._scrollable.getScroller();
+  },
+
   /** @override */
   dispose: function() {
     clearTimeout(this._onScrollTimer);

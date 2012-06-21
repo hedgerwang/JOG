@@ -5,6 +5,7 @@
 
 var BaseUI = require('jog/ui/baseui').BaseUI;
 var Class = require('jog/class').Class;
+var UserAgent = require('jog/useragent').UserAgent;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;
@@ -78,7 +79,7 @@ var Chrome = Class.create(BaseUI, {
   },
 
   _reflow: function() {
-    if (this._reflowing) {
+    if (this._reflowing || UserAgent.IS_ANDROID) {
       return;
     }
     var dpi = window.devicePixelRatio || 1;

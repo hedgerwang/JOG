@@ -51,7 +51,7 @@ var Scroller = Class.create(null, {
   },
 
   dispose: function() {
-    this._animator.stop();
+    Class.dispose(this._animator);
     var element = scrollerToElementMap.get(this);
     if (element) {
       elementToScrollerMap.remove(element);
@@ -101,12 +101,12 @@ var Scroller = Class.create(null, {
   _PAGING_DURATION: 250,
 
   // Duration of post-touch scrolling animation.
-  _SCROLLING_DURATION: UserAgent.IS_ANDROID ? 600 : 1200,
+  _SCROLLING_DURATION: UserAgent.IS_ANDROID ? 800 : 1200,
 
   // The factor that builds the tension when scrolling nearby tension points
   // (e.g. page top). Bigger value shall result in stronger tension. Value
   // must be between 0 and 1.
-  _TENSION_FACTOR: UserAgent.IS_ANDROID ? 0.6 : 0.7,
+  _TENSION_FACTOR: UserAgent.IS_ANDROID ? 0.7 : 0.75,
 
   // The maximum distance that user can scroll from the tension point.
   // A typical tension point is the point at minScrollTop or maxScrollTop.
@@ -401,15 +401,54 @@ var Scroller = Class.create(null, {
    * Programmatically set the scroll positions. Any exiting scrolling actions
    * will be stopped.
    * @param {number} left
-   * @param {number} top
+   * @param {number}
+    * @param {boolean=} opt_animating
    */
-  scrollTo: function(left, top) {
+  scrollTo: function(left, top, opt_animating) {
     this._animator.stop();
     this.scrolling = false;
     delete this._moveCoordStart;
-    this._handler.onScrollStart(this.left, this.top);
-    this._scrollTo(left, top);
-    this._handler.onScrollEnd(this.left, this.top);
+    if (!opt_animating) {
+      this._handler.onScrollStart(this.left, this.top);
+      this._scrollTo(left, top);
+      this._handler.onScrollEnd(this.left, this.top);
+    } else {
+      var x0 = this.left;
+      var x1 = left;
+      var dx = x1 - x0;
+      var y0 = this.top;
+      var y1 = top;
+      var dy = y1 - y0;
+      this.scrolling = true;
+
+      var step = this._canScrollX ?
+        this.bind(function(percent) {
+          var left = x0 + percent * dx;
+          this._scrollTo(left, y0);
+        }) :
+        this.bind(function(percent) {
+          var top = y0 + dy * percent;
+          this._scrollTo(x0, top);
+        });
+
+      var complete = this.bind(function() {
+        this._handler.onScrollEnd(this.left, this.top);
+        x0 = null;
+        x1 = null;
+        y0 = null;
+        y1 = null;
+        dx = null;
+        dy = null;
+      });
+
+      this._handler.onScrollStart(this.left, this.top);
+      this._animator.start(
+        step,
+        this._canAnimate,
+        complete,
+        500
+      );
+    }
   },
 
   /**

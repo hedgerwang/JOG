@@ -32,7 +32,8 @@
 .jog-ui-loading-indicator-android {  
   border-color: #aaa #bbb #ccc #ddd;
   border-radius: 4em;
-  border: inset 2em #fff;
+  border-style: inset;
+  border-width: 2em;
   height: 3em;
   width: 3em;
 }
