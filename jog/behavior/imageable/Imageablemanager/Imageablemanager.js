@@ -40,6 +40,9 @@ var ImageableManager = Class.create(null, {
     if (idx > -1) {
       this._loadingQueue.splice(idx, 1);
     }
+    if (imageable.isLoading()) {
+      this._loadingCount--;
+    }
   },
 
   _lookupInterval: 600,
@@ -71,6 +74,11 @@ var ImageableManager = Class.create(null, {
 
   _lookup: function() {
     this._lookupTimeStamp = Date.now();
+    console.log(
+      'this._lookupTimeStamp =' + this._lookupTimeStamp,
+      'this._loadingCount = ' + this._loadingCount,
+      'this._loadingQueue.length =' + this._loadingQueue.length
+    );
 
     if (this._loadingCount >= this._maxLoadingCount ||
       !this._loadingQueue.length) {
@@ -103,8 +111,8 @@ var ImageableManager = Class.create(null, {
    */
   _onLoad:function(event) {
     var imageable = event.target;
-    this.unregister(imageable);
     this._loadingCount--;
+    this.unregister(imageable);
 
     if (event.type === 'load') {
       if (imageable.isVisible()) {
@@ -113,7 +121,6 @@ var ImageableManager = Class.create(null, {
         this._loadingQueue.unshift(imageable.clone());
       }
     }
-    this.unregister(imageable);
 
     clearTimeout(this._lookupTimer);
     delete this._lookupTimer;

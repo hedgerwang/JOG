@@ -98,6 +98,7 @@ var Imageable = Class.create(EventTarget, {
 
     this.src = this._normalizeSrc(this.src);
     this._loadingImage = new Image();
+    this._loading = true;
 
     var img = this._loadingImage;
     var handler = this.bind(this._handleLoad);
@@ -379,6 +380,7 @@ var Imageable = Class.create(EventTarget, {
       var dy = Math.abs(rect2.top - rect1.top);
       if (dy < 90 || retryCount > 5) {
         // Do not dispatch load/error event until the element is slow down.
+        delete this._loading;
         this.dispatchEvent(evtType);
         this.dispatchEvent('complete');
         this.dispose();
@@ -421,6 +423,18 @@ var Imageable = Class.create(EventTarget, {
 
     return src;
   },
+
+  /**
+   * @return {boolean}
+   */
+  isLoading: function() {
+    return this._loading;
+  },
+
+  /**
+   * @type {boolean}
+   */
+  _loading: false,
 
   /**
    * @type {Image}

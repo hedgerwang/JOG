@@ -6,7 +6,7 @@ import os
 
 HTML_TEMPLATE = """
 <!doctype html>
-<html>
+<html manifest="/cache.manifest">
 <head>
 <title>app</title>
 <meta charset="UTF-8" />
