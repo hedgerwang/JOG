@@ -137,6 +137,10 @@ var ScrollList = Class.create(BaseUI, {
       this._maxChunkHeight = Math.min(2200, this._maxChunkHeight);
     }
 
+    console.log('this._scrollDimentions',
+      this._scrollDimentions,
+      this._lastChunk && this._lastChunk.getBottom()
+    );
     this._scrollable.reflow();
   },
 

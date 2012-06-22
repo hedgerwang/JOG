@@ -345,16 +345,6 @@ var Imageable = Class.create(EventTarget, {
         return;
     }
 
-    if (__DEV__) {
-      var debugInfo = [
-        bgSize,
-        this.src,
-        this.naturalWidth,
-        this.naturalHeight
-      ];
-      console.info('Show image as background:', debugInfo);
-    }
-
     this._element.style.backgroundSize = bgSize;
     this._element.style.backgroundImage = 'url("' + this.src + '")';
   },

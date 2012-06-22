@@ -56,6 +56,7 @@ var Chunk = Class.create(BaseUI, {
    * @return {number}
    */
   getHeight: function() {
+    this._reflow();
     return this._height;
   },
 

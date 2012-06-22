@@ -6,6 +6,7 @@
 var Deferred = require('jog/deferred').Deferred;
 var FBAPI = require('jog/fbapi').FBAPI;
 var LocalStorage = require('jog/localstorage').LocalStorage;
+var MockData = require('jog/fbdata/mockdata').MockData;
 var UserAgent = require('jog/useragent').UserAgent;
 
 var CACHE_DURATION = 5 * 60 * 1000;
@@ -155,23 +156,17 @@ var FBData = {
    * @param {boolean} useCache
    */
   getTimelineSections: function(useCache) {
-    var query = 'me(){' +
-      'id,' +
-      'timeline_sections.first(5){' +
-      'nodes{' +
-      'label,' +
-      'timeline_units.first(5){' +
-      'nodes{' +
-      'story{' +
-      'message{text},' +
-      'attachments{' +
-      'media{' +
-      'image.size(180){uri},' +
-      'message{text}}}}}}}}}';
-    return queryGraph(query, useCache);
+    return MockData.getTimelineSections();
+
+//    var query = 'me()' +
+//      '{id,timeline_sections.first(5)' +
+//      '{nodes{label,timeline_units.first(5)' +
+//      '{nodes{story{message{text},attachments{media{image.size(180)' +
+//      '{uri},message{text}}},actors{id,name,profile_picture{uri}}}}}}}}';
+//
+//    return queryGraph(query, useCache);
   }
 };
-
 
 /**
  * @param {string} query
