@@ -156,15 +156,16 @@ var FBData = {
    * @param {boolean} useCache
    */
   getTimelineSections: function(useCache) {
-    return MockData.getTimelineSections();
+    if (1 < 2) {
+      return MockData.getTimelineSections();
+    }
+    var query = 'me()' +
+      '{id,timeline_sections.first(5)' +
+      '{nodes{label,timeline_units.first(5)' +
+      '{nodes{story{message{text},attachments{media{image.size(180)' +
+      '{uri},message{text}}},actors{id,name,profile_picture{uri}}}}}}}}';
 
-//    var query = 'me()' +
-//      '{id,timeline_sections.first(5)' +
-//      '{nodes{label,timeline_units.first(5)' +
-//      '{nodes{story{message{text},attachments{media{image.size(180)' +
-//      '{uri},message{text}}},actors{id,name,profile_picture{uri}}}}}}}}';
-//
-//    return queryGraph(query, useCache);
+    return queryGraph(query, useCache);
   }
 };
 

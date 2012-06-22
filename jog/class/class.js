@@ -16,8 +16,7 @@ var classID = 1;
 var defaultClassConfig = {
   dispose: classDispose,
   bind: classBind,
-  setTimeout: classSetTimeout,
-  callAfter: classCallAfter
+  setTimeout: classSetTimeout
 };
 
 var Class = {
@@ -71,7 +70,6 @@ var Class = {
         prototype[newClass._disposeID] = prototype.dispose;
       }
 
-      prototype.callAfter = classCallAfter;
       prototype.setTimeout = classSetTimeout;
       prototype.dispose = classDispose;
       prototype.bind = classBind;
@@ -218,35 +216,5 @@ function classSetTimeout(fn, delay) {
   that._setTimeoutTimers[id] = true;
   return id;
 }
-
-
-/**
- *
- * @param {Function} fn
- * @param {number} delay
- */
-function classCallAfter(fn, delay) {
-  var start = Date.now();
-  return this.bind(function() {
-    if (!this.disposed) {
-      var dt = Date.now() - start;
-      if (dt < delay) {
-        var args = lang.toArray(arguments);
-        var wfn = this.bind(function() {
-          fn.apply(this, args);
-          fn = null;
-          args = null;
-        });
-        this.setTimeout(wfn, delay - dt);
-      } else {
-        fn.apply(this, arguments);
-        fn = null;
-      }
-    }
-    start = null;
-    delay = null;
-  });
-}
-
 
 exports.Class = Class;
