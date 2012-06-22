@@ -74,6 +74,10 @@ var ScrollList = Class.create(BaseUI, {
     }
   },
 
+  reflow: function() {
+    this._reflow();
+  },
+
   clearContent: function() {
     this._contentsQueue.length = 0;
 

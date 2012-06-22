@@ -7,7 +7,6 @@
 
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
-
 var elementFromPoint = require('jog/dom/elementfrompoint').elementFromPoint;
 
 (new TestCase('elementFromPoint Test'))

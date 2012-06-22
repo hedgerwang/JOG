@@ -7,7 +7,6 @@
 
 var TestCase = require('jog/testing').TestCase;
 var asserts = require('jog/asserts').asserts;
-
 var translate = require('jog/style/translate').translate;
 
 (new TestCase('translate Test'))

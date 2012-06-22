@@ -91,6 +91,20 @@ var FBData = {
   },
 
   /**
+   * @param {number} uid
+   * @param {number} count
+   * @param {string?} cursor
+   * @param {boolean} useCache
+   * @return {Deferred}
+   */
+  getAlbums: function(uid, count, cursor, useCache) {
+    var query = (uid ? 'node(' + uid + ')' : 'me()') +
+      '{albums.first(' + count + '){' +
+      'nodes{cover_photo{image.size(75){uri}}}}}';
+    return queryGraph(query, useCache);
+  },
+
+  /**
    * @param {number} count
    * @param {string?} startCursor
    * @param {boolean} useCache
@@ -132,6 +146,28 @@ var FBData = {
       (startCursor ? '.after(' + startCursor + ')' : '') +
       '.first(' + count + '){' +
       'page_info{start_cursor,end_cursor,has_next_page},nodes{name,id,url}}}';
+    return queryGraph(query, useCache);
+  },
+
+
+  /**
+   * @see http://fburl.com/3472625
+   * @param {boolean} useCache
+   */
+  getTimelineSections: function(useCache) {
+    var query = 'me(){' +
+      'id,' +
+      'timeline_sections.first(5){' +
+      'nodes{' +
+      'label,' +
+      'timeline_units.first(5){' +
+      'nodes{' +
+      'story{' +
+      'message{text},' +
+      'attachments{' +
+      'media{' +
+      'image.size(180){uri},' +
+      'message{text}}}}}}}}}';
     return queryGraph(query, useCache);
   }
 };

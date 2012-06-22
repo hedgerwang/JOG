@@ -6,6 +6,7 @@
 var Animator = require('jog/animator').Animator;
 var BaseUI = require('jog/ui/baseui').BaseUI;
 var Class = require('jog/class').Class;
+var Deferred = require('jog/deferred').Deferred;
 var UserAgent = require('jog/useragent').UserAgent;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
@@ -34,11 +35,36 @@ var LoadingIndicator = Class.create(BaseUI, {
 
   /** @override */
   onDocumentReady: function() {
+    this._shownTime = Date.now();
     this.play();
   },
 
   center: function() {
     dom.addClassName(this.getNode(), cssx('jog-ui-loading-indicator-centered'));
+  },
+
+  /**
+   * @return {Deferred}
+   */
+  dismiss: function() {
+    var df = new Deferred();
+    if (!this.disposed) {
+      var now = Date.now();
+      var duration = now - this._shownTime;
+      if (duration < 1000) {
+        this.setTimeout(function() {
+          this.dispose();
+          df.succeed();
+          df = null;
+        }, 1000 - duration);
+      } else {
+        this.dispose();
+        df.succeed();
+      }
+    } else {
+      df.succeed();
+    }
+    return df;
   },
 
   play: function() {
@@ -78,6 +104,8 @@ var LoadingIndicator = Class.create(BaseUI, {
       this.play();
     }
   },
+
+  _shownTime: 0,
   _playing: false,
   _animator: null,
   _animID: 0,

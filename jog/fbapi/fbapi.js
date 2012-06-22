@@ -35,7 +35,8 @@ var FBAPI = {
         if (response.error) {
           deferred.fail(response);
           if (__DEV__) {
-            alert('FBAPI ERROR:\n\n' + url + '\n\n' + JSON.stringify(response));
+            alert('FBAPI ERROR:\n\n' + url + '\n\n' +
+              query + '\n\n' + JSON.stringify(response));
           }
         } else {
           deferred.succeed(response);
