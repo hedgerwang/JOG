@@ -7,6 +7,7 @@ var Class = require('jog/class').Class;
 var EventTarget = require('jog/events/eventtarget').EventTarget;
 var Events = require('jog/events').Events;
 var Functions = require('jog/functions').Functions;
+var Imageable = require('jog/behavior/imageable').Imageable;
 var Tappable = require('jog/behavior/tappable').Tappable;
 var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;
@@ -52,8 +53,14 @@ var BaseUI = Class.create(EventTarget, {
     }
 
     if (this._childrenUI) {
-      for (var i = 0, j = this._childrenUI.length; i < j; i++) {
-        this._childrenUI[i].dispose();
+      for (var c = 0, childUI; childUI = this._childrenUI[c]; c++) {
+        childUI.dispose();
+      }
+    }
+
+    if (this._imageables) {
+      for (var i = 0, imageable; imageable = this._imageables[i]; i++) {
+        imageable.dispose();
       }
     }
   },
@@ -196,6 +203,40 @@ var BaseUI = Class.create(EventTarget, {
     ui._parentUI._childrenUI.splice(ui._parentUI._childrenUI.indexOf(ui), 0);
     delete ui._parentUI;
   },
+
+  /**
+   * @param {Element} element
+   * @param {string} src
+   * @param {number=} opt_resizeMode
+   * @return {Imageable}
+   */
+  renderImage: function(element, src, opt_resizeMode) {
+    if (!this._imageables) {
+      this._imageables = [];
+      this._handleImageComplete = this.bind(this._handleImageComplete);
+    }
+
+    var imageable = new Imageable(element, src, opt_resizeMode);
+    imageable.addEventListener('complete', this._handleImageComplete);
+    this._imageables.push(imageable);
+    return imageable;
+  },
+
+  /**
+   * @param {Event} event
+   */
+  _handleImageComplete: function(event) {
+    var imageable = event.target;
+    var idx = this._imageables.indexOf(imageable);
+    if (idx > 0) {
+      this._imageables.splice(idx, 1);
+    }
+  },
+
+  /**
+   * @type {Array.<Imageable>}
+   */
+  _imageables: null,
 
   /**
    * Safe to bind events and lookup dom elements.

@@ -380,6 +380,7 @@ var Imageable = Class.create(EventTarget, {
       if (dy < 90 || retryCount > 5) {
         // Do not dispatch load/error event until the element is slow down.
         this.dispatchEvent(evtType);
+        this.dispatchEvent('complete');
         this.dispose();
         checkSpeed = null;
         evtType = null;
