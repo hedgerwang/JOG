@@ -189,6 +189,10 @@ var Scroller = Class.create(null, {
       // Current touchmove timestamp.
       this._moveTimeNow = now;
 
+      if (!this._moveCoordNow) {
+        return;
+      }
+
       if (moveCoord.y === this._moveCoordNow.y &&
         moveCoord.x === this._moveCoordNow.x) {
         return;

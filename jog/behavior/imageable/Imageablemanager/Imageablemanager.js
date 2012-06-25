@@ -74,11 +74,6 @@ var ImageableManager = Class.create(null, {
 
   _lookup: function() {
     this._lookupTimeStamp = Date.now();
-    console.log(
-      'this._lookupTimeStamp =' + this._lookupTimeStamp,
-      'this._loadingCount = ' + this._loadingCount,
-      'this._loadingQueue.length =' + this._loadingQueue.length
-    );
 
     if (this._loadingCount >= this._maxLoadingCount ||
       !this._loadingQueue.length) {

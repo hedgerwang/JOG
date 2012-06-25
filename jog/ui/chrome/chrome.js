@@ -10,23 +10,16 @@ var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 var lang = require('jog/lang').lang;
 
-// features.
-var ua = window.navigator.userAgent;
-var useTouch = 'ontouchstart' in document;
-var isAndroid = /Android/g.test(ua);
-var isIOS = /iPhone/g.test(ua);
-var isPC = !(isAndroid || isIOS);
-
 var Chrome = Class.create(BaseUI, {
 
   /** @override */
   createNode: function() {
     var classNames = [
       cssx('jog-ui-chrome'),
-      useTouch ? cssx('touch') : null,
-      isAndroid ? cssx('android') : null,
-      isIOS ? cssx('ios') : null,
-      isPC ? cssx('pc') : null,
+      UserAgent.USE_TOUCH ? cssx('touch') : null,
+      UserAgent.IS_ANDROID ? cssx('android') : null,
+      UserAgent.IS_IOS ? cssx('ios') : null,
+      UserAgent.IS_PC ? cssx('pc') : null,
       __DEV__ ? cssx('dev') : null
     ];
 
@@ -37,7 +30,7 @@ var Chrome = Class.create(BaseUI, {
   },
 
   onDocumentReady:function() {
-    if (!isPC) {
+    if (UserAgent.IS_MOBILE) {
       this._onresize = lang.throttle(this._onresize, 500, this);
       this.getEvents().listen(document, 'resize', this._onresize);
       this.getEvents().listen(document, 'orientationchange', this._onresize);
@@ -104,7 +97,6 @@ var Chrome = Class.create(BaseUI, {
   },
 
   _scale: 1,
-  _touchedTime: 0,
   _reflowing: false
 });
 
