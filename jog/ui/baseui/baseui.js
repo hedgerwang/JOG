@@ -96,19 +96,23 @@ var BaseUI = Class.create(EventTarget, {
       element.appendChild(node);
     }
 
-    if (dom.isInDocument(node)) {
-      this._inDocument = true;
-      this.onDocumentReady();
-      if (this._childrenUI) {
-        for (var i = 0, j = this._childrenUI.length; i < j; i++) {
-          var child = this._childrenUI[i];
-          if (!child._inDocument) {
-            if (dom.isInDocument(child.getNode())) {
-              child._inDocument = true;
-              this._childrenUI[i].onDocumentReady();
-            }
-          }
-        }
+    this._maybeEnterDocument();
+  },
+
+  _maybeEnterDocument: function() {
+    if (this._inDocument || !dom.isInDocument(this.getNode())) {
+      if (!this._parentUI || !this._parentUI.isInDocument()) {
+        return;
+      }
+    }
+
+    this._inDocument = true;
+
+    this.onDocumentReady();
+
+    if (this._childrenUI) {
+      for (var i = 0, child; child = this._childrenUI[i]; i++) {
+        child._maybeEnterDocument();
       }
     }
   },
@@ -125,9 +129,20 @@ var BaseUI = Class.create(EventTarget, {
    */
   getNode : function() {
     if (!this._node) {
+      var childrenLength;
+      if (__DEV__) {
+        childrenLength = this._childrenUI ? this._childrenUI.length : 0;
+      }
+
       this._node = this.createNode();
+
       if (__DEV__) {
         this._node._jogBaseUINodeOffDocument = true;
+        if (this._childrenUI && this._childrenUI.length !== childrenLength) {
+          throw new Error('New child appeared to be added while calling ' +
+            '#createNode. You should only call #appendChild() after the node ' +
+            'has been created.');
+        }
       }
     }
     return this._node;

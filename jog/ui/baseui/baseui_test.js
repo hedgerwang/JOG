@@ -79,4 +79,20 @@ var asserts = require('jog/asserts').asserts;
     asserts.isTrue(child.isInDocument());
     parent.removeChild(child);
     asserts.isTrue(child.isInDocument());
+  }).
+  test('onDocumentReady',
+  function() {
+    var parent = new BaseUI();
+    var child = new BaseUI();
+    var grandChild = new BaseUI();
+
+    var body = document.body;
+    parent.render(body);
+    child.render(body);
+    grandChild.render(body);
+
+    parent.appendChild(child);
+    child.appendChild(grandChild);
+
+    asserts.isTrue(grandChild.isInDocument());
   });
