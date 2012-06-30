@@ -111,13 +111,28 @@ def translate(css_text, scale=1) :
       new_rule = _disable_rule(old_rule)
       css_text = css_text.replace(old_rule, new_rule)
 
+  placeholders = []
+  i = 0
+
   if scale != 1 :
     for re_pattern in CSS_TRANSLATE_PROPERTIES_PATTERNS :
       matches = re_pattern.finditer(css_text)
       for match in matches :
         old_rule = match.group()
         new_rule = _translate_px_rule(old_rule, scale)
-        css_text = css_text.replace(old_rule, new_rule)
+        placeholder = '<' + str(i) + '>'
+        i += 1
+        placeholders.append(new_rule)
+        css_text = css_text.replace(old_rule, placeholder)
+
+  i = 0
+  while i < len(placeholders) - 1 :
+    placeholder = '<' + str(i) + '>'
+    css_text = css_text.replace(placeholder, placeholders[i])
+    i += 1
+
+  placeholders = []
+  i = 0
 
   for re_pattern in CSS_VENDER_PROPERTIES_PATTERNS :
     matches = re_pattern.finditer(css_text)
@@ -125,7 +140,16 @@ def translate(css_text, scale=1) :
     for match in matches :
       old_rule = match.group()
       new_rule = _translate_vender_rule(old_rule)
-      css_text = css_text.replace(old_rule, new_rule)
+      placeholder = '<' + str(i) + '>'
+      i += 1
+      placeholders.append(new_rule)
+      css_text = css_text.replace(old_rule, placeholder)
+
+  i = 0
+  while i < len(placeholders) - 1 :
+    placeholder = '<' + str(i) + '>'
+    css_text = css_text.replace(placeholder, placeholders[i])
+    i += 1
 
   return css_text
 
@@ -267,6 +291,7 @@ def main() :
     border-bottom-left-radius: 10px 15px;
     background-size : 100% auto;
     background-size : 100px 100px;
+    background-size : 200px 200px;
     background-size : 123px 321px;
     background-position: -10px 10px;
     background: #fff url(/image/foo.jpg) 10px 10px no-repeat;
@@ -282,4 +307,3 @@ def main() :
 
 if __name__ == '__main__' :
   main()
-

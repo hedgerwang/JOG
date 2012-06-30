@@ -12,7 +12,7 @@ var UserAgent = require('jog/useragent').UserAgent;
 var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
-var manager = new ImageableManager(1);
+var manager = new ImageableManager(2);
 
 var debugTargetElement;
 

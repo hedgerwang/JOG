@@ -96,14 +96,17 @@ var BaseUI = Class.create(EventTarget, {
       element.appendChild(node);
     }
 
+
     this._maybeEnterDocument();
   },
 
   _maybeEnterDocument: function() {
-    if (this._inDocument || !dom.isInDocument(this.getNode())) {
-      if (!this._parentUI || !this._parentUI.isInDocument()) {
-        return;
-      }
+    if (this._inDocument) {
+      return;
+    }
+
+    if (!dom.isInDocument(this.getNode())) {
+      return;
     }
 
     this._inDocument = true;
@@ -129,21 +132,13 @@ var BaseUI = Class.create(EventTarget, {
    */
   getNode : function() {
     if (!this._node) {
-      var childrenLength;
-      if (__DEV__) {
-        childrenLength = this._childrenUI ? this._childrenUI.length : 0;
-      }
-
       this._node = this.createNode();
 
       if (__DEV__) {
         this._node._jogBaseUINodeOffDocument = true;
-        if (this._childrenUI && this._childrenUI.length !== childrenLength) {
-          throw new Error('New child appeared to be added while calling ' +
-            '#createNode. You should only call #appendChild() after the node ' +
-            'has been created.');
-        }
       }
+
+      this.onNodeReady();
     }
     return this._node;
   },
@@ -177,6 +172,15 @@ var BaseUI = Class.create(EventTarget, {
    * @paran {boolean=} opt_render
    */
   appendChild: function(child, opt_render) {
+    if (__DEV__) {
+      if (!this._node) {
+        if (arguments.callee.caller === this.createNode) {
+          throw new Error('you should not call #BaseUI.appendChild from ' +
+            'BaseUI#createNode');
+        }
+      }
+    }
+
     if (__DEV__) {
       if (!child || !(child instanceof BaseUI)) {
         throw new Error('child must be an instance of BaseUI');
@@ -256,7 +260,9 @@ var BaseUI = Class.create(EventTarget, {
   /**
    * Safe to bind events and lookup dom elements.
    */
-  onDocumentReady: Functions.EMPTY
+  onDocumentReady: Functions.EMPTY,
+
+  onNodeReady: Functions.EMPTY
 });
 
 exports.BaseUI = BaseUI;
