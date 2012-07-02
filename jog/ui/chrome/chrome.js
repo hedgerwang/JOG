@@ -26,7 +26,12 @@ var Chrome = Class.create(BaseUI, {
     var node = dom.createElement('div', classNames.join(' '));
     node.id = 'debug-jog-chrome-element';
 
+    this._spacer = dom.createElement('div', cssx('jog-ui-chrome_spacer'));
     return node;
+  },
+
+  dispose: function() {
+    dom.remove(this._spacer);
   },
 
   onDocumentReady:function() {
@@ -47,6 +52,7 @@ var Chrome = Class.create(BaseUI, {
         this.getNode().style.webkitTransform = 'scale(' + scale + ')';
       }
     }
+    document.body.appendChild(this._spacer);
   },
 
   /**
@@ -72,7 +78,7 @@ var Chrome = Class.create(BaseUI, {
   },
 
   _reflow: function() {
-    if (this._reflowing || UserAgent.IS_ANDROID) {
+    if (this._reflowing || UserAgent.IS_ANDROID || window.pageYOffset >= 1) {
       return;
     }
     var dpi = window.devicePixelRatio || 1;
@@ -80,23 +86,32 @@ var Chrome = Class.create(BaseUI, {
       dpi = document.documentElement.offsetWidth / window.outerWidth;
     }
     this._reflowing = true;
-    this.getNode().style.height = screen.height * dpi + 'px';
+    this._spacer.style.height = (screen.height + 1) * dpi + 'px';
+
+    if (!this.getNode().style.height) {
+      this.getNode().style.height = this._spacer.style.height;
+    }
+
     this.setTimeout(function() {
       if (!window.pageYOffset !== 1) {
         window.scrollTo(0, 1);
       }
     }, 100);
+
     this.setTimeout(function() {
-      if (parseInt(this.getNode().style.height, 10) !== window.innerHeight) {
-        this.getNode().style.height = window.innerHeight + 'px';
+      if (parseInt(this._spacer.style.height, 10) !== window.innerHeight + 1) {
+        this._spacer.style.height = window.innerHeight + 1 + 'px';
       }
     }, 500);
+
     this.setTimeout(function() {
       this._reflowing = false;
+      this.getNode().style.height = this._spacer.style.height;
     }, 1000);
   },
 
   _scale: 1,
+  _spacer: null,
   _reflowing: false
 });
 
