@@ -50,4 +50,4 @@ def build_app(html_out_path, js_in_path, css_in_path, scale) :
 if __name__ == '__main__' :
   build_app('2x.html', 'app/app.js', 'app/app.css', 2)
   build_app('1x.html', 'app/app.js', 'app/app.css', 1)
-  build_app('0x.html', 'app/app.js', 'app/app.css', 0.5)
+  # build_app('0x.html', 'app/app.js', 'app/app.css', 0.5)

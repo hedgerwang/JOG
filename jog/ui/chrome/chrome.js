@@ -39,7 +39,10 @@ var Chrome = Class.create(BaseUI, {
       this._onresize = lang.throttle(this._onresize, 500, this);
       this.getEvents().listen(document, 'resize', this._onresize);
       this.getEvents().listen(document, 'orientationchange', this._onresize);
-      this.getEvents().listen(document, 'touchstart', this._onTouch);
+      if (UserAgent.USE_TOUCH) {
+        this.getEvents().listen(document, 'touchstart', this._onTouch);
+        this.getEvents().listen(document, 'touchmove', this._onTouchMove);
+      }
       // this.getEvents().listen(document, 'focusin', this._reflow);
       this._reflow();
     } else {
@@ -75,6 +78,13 @@ var Chrome = Class.create(BaseUI, {
     if (!event.defaultPrevented && event.pageY > 50) {
       this._reflow();
     }
+  },
+
+  /**
+   * @param {Event} event
+   */
+  _onTouchMove: function(event) {
+    event.preventDefault();
   },
 
   _reflow: function() {
