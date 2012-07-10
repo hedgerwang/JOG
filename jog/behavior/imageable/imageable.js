@@ -135,16 +135,16 @@ var Imageable = Class.create(EventTarget, {
       this.height = this._element.offsetHeight;
     }
 
-    if (__DEV__) {
-      var viewRect = dom.getViewportElement().getBoundingClientRect();
+    if (!this.width || !rect.width) {
+      return false;
+    }
+
+    if (UserAgent.IS_DESKTOP) {
+      var viewRect = dom.getViewportRect();
       viewLeft = viewRect.left;
       viewTop = viewRect.top;
       viewRight = viewRect.right;
       viewBottom = viewRect.bottom;
-    }
-
-    if (!this.width || !rect.width) {
-      return false;
     }
 
     if (rect.top > viewBottom + buffer || rect.bottom < viewTop - buffer) {

@@ -17,7 +17,7 @@ var UserAgent = {
   IS_IOS6: isIOS && !!window.requestAnimationFrame,
   IS_MOBILE: isMobile,
   IS_OLD_ANDROID: androidVersion < 4 && androidVersion > 0,
-  IS_PC: !isMobile,
+  IS_DESKTOP: !isMobile,
   USE_TOUCH: 'ontouchstart' in document
 };
 

@@ -197,20 +197,18 @@ var DOM = Class.create(null, {
     return node;
   },
 
-  getViewportElement: function() {
-    if (!this._chromeNode) {
-      this._chromeNode = document.getElementById('debug-jog-chrome-element')
-    }
-
-    if (this._chromeNode) {
-      return this._chromeNode;
-    }
-
-    return this._rootNode;
+  /**
+   * @return {ClientRect}
+   */
+  getViewportRect: function() {
+    return this._getViewportElement().getBoundingClientRect();
   },
 
+  /**
+   * @return {number}
+   */
   getViewportWidth: function() {
-    var viewportElement = this.getViewportElement();
+    var viewportElement = this._getViewportElement();
 
     if (this._chromeNode) {
       if (!this._viewportWidth) {
@@ -225,8 +223,11 @@ var DOM = Class.create(null, {
     ));
   },
 
+  /**
+   * @return {number}
+   */
   getViewportHeight: function() {
-    var viewportElement = this.getViewportElement();
+    var viewportElement = this._getViewportElement();
 
     if (this._chromeNode) {
       if (!this._viewportHeight) {
@@ -240,6 +241,21 @@ var DOM = Class.create(null, {
         window.innerHeight,
         viewportElement.offsetHeight
       ));
+  },
+
+  /**
+   * @return {Element}
+   */
+  _getViewportElement: function() {
+    if (!this._chromeNode) {
+      this._chromeNode = document.getElementById('debug-jog-chrome-element')
+    }
+
+    if (this._chromeNode) {
+      return this._chromeNode;
+    }
+
+    return this._rootNode;
   },
 
   _chromeNode: null,

@@ -15,7 +15,7 @@ var tappedElement = null;
 var isAndroid = /Android/.test(window.navigator.userAgent);
 
 /**
- * Fires events "tapstart, tapend, tap, dbltap, tapin, tapout"
+ * Fires events "tapstart, tapend, tap, dbltap, tapin, tapout, tapclick"
  */
 var Tappable = Class.create(EventTarget, {
   /**
@@ -25,8 +25,9 @@ var Tappable = Class.create(EventTarget, {
     this._element = ele;
     this._events = new Events(this);
     this._targets = new HashSet();
+    this._tapClick = this.bind(this._tapClick);
     this._events.listen(
-      document, TouchHelper.EVT_TOUCHSTART, this._onTouchStart);
+      this._element, TouchHelper.EVT_TOUCHSTART, this._onTouchStart);
   },
 
   dispose: function() {
@@ -51,6 +52,7 @@ var Tappable = Class.create(EventTarget, {
       this.dispatchEvent('tapend', element);
       this.dispatchEvent('tap', element, false, element);
       this.dispatchEvent('tapin', element);
+      this.dispatchEvent('tapclick', element, false, element);
     }
   },
 
@@ -71,6 +73,12 @@ var Tappable = Class.create(EventTarget, {
     delete this._tapStartNode;
     delete this._movedCount;
 
+    if (this._tapClickTimer) {
+      clearTimeout(this._tapClickTimer);
+      this._tapClickTimer = undefined;
+      this._tapClickNode = undefined;
+    }
+
     if (event.defaultPrevented || this._targets.getSize() == 0) {
       return;
     }
@@ -89,6 +97,7 @@ var Tappable = Class.create(EventTarget, {
             }
 
             this.dispatchEvent('tapstart', target);
+            dom.addClassName(target, cssx('tap-pressed'));
 
             this._tapStartNode = target;
 
@@ -157,6 +166,7 @@ var Tappable = Class.create(EventTarget, {
     if (tapped) {
       // event.preventDefault();
       tappedElement = touchTarget;
+      dom.removeClassName(tappedElement, cssx('tap-pressed'));
       this.dispatchEvent('tapend', touchTarget);
       this.dispatchEvent('tap', touchTarget, false, target);
       this.dispatchEvent('tapin', touchTarget);
@@ -170,15 +180,43 @@ var Tappable = Class.create(EventTarget, {
     delete this._tapStartNode;
 
     this._events.listen(
-      document,
+      this._element,
       TouchHelper.EVT_TOUCHSTART,
       this._onTouchStart);
+
+    if (tapped) {
+      this._tapClickNode = touchTarget;
+      this._tapClickOriginalNode = target;
+      this._tapClickTimer = this.setTimeout(this._tapClick, 120);
+    }
   },
+
+  _tapClick: function() {
+    if (this._tapClickNode) {
+      this.dispatchEvent(
+        'tapclick', this._tapClickNode, false, this._tapClickOriginalNode);
+      this._tapClickNode = undefined;
+      this._tapClickTimer = undefined;
+      this._tapClickOriginalNode = undefined;
+    }
+  },
+
+  _tapClickTimer: 0,
 
   /**
    * @type {Element}
    */
   _tapStartNode: null,
+
+  /**
+   * @type {Element}
+   */
+  _tapClickOriginalNode:null,
+
+  /**
+   * @type {Element}
+   */
+  _tapClickNode: null,
 
   /**
    * @type {Element}

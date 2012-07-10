@@ -19,7 +19,7 @@ var Chrome = Class.create(BaseUI, {
       UserAgent.USE_TOUCH ? cssx('touch') : null,
       UserAgent.IS_ANDROID ? cssx('android') : null,
       UserAgent.IS_IOS ? cssx('ios') : null,
-      UserAgent.IS_PC ? cssx('pc') : null,
+      UserAgent.IS_DESKTOP ? cssx('pc') : null,
       __DEV__ ? cssx('dev') : null
     ];
 
