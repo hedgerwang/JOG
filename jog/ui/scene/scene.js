@@ -61,7 +61,7 @@ var Scene = Class.create(BaseUI, {
     var df = new Deferred();
 
     if (!opt_duration || !this.isInDocument() || !this.getWidth()) {
-      this._setTranslateX(x);
+      this._setTranslate(x, this._sceneTranslateY);
       return df.succeed(this);
     }
 
@@ -70,13 +70,12 @@ var Scene = Class.create(BaseUI, {
 
     if (__DEV__) {
       if (isNaN(x0) || isNaN(x) || isNaN(dx)) {
-        console.log(x0, x, dx);
         throw  new Error('Invalid x');
       }
     }
 
     var stepFn = this.bind(function(value) {
-      this._setTranslateX(x0 + ~~(dx * value));
+      this._setTranslate(x0 + ~~(dx * value), this._sceneTranslateY);
     });
 
     var verifyFn = this.bind(function() {
@@ -89,9 +88,61 @@ var Scene = Class.create(BaseUI, {
       x0 = null;
       dx = null;
       df = null;
+      x = null;
     });
 
     if (dx !== 0) {
+      this._animator = new Animator();
+      this._animator.start(stepFn, verifyFn, completedFn, opt_duration || 350);
+    } else {
+      df.succeed(this);
+    }
+    return df;
+  },
+
+
+  /**
+   * @param {number} y
+   * @param {number} opt_duration
+   * @return {Deferred}
+   */
+  translateYTo: function(y, opt_duration) {
+    Class.dispose(this._animator);
+
+    var df = new Deferred();
+
+    if (!opt_duration || !this.isInDocument() || !this.getWidth()) {
+      this._setTranslate(this._sceneTranslateX, y);
+      return df.succeed(this);
+    }
+
+    var y0 = this._sceneTranslateY;
+    var dy = y - this._sceneTranslateY;
+
+    if (__DEV__) {
+      if (isNaN(y0) || isNaN(y) || isNaN(dy)) {
+        throw new Error('Invalid y');
+      }
+    }
+
+    var stepFn = this.bind(function(value) {
+      this._setTranslate(this._sceneTranslateX, y0 + ~~(dy * value));
+    });
+
+    var verifyFn = this.bind(function() {
+      return this._sceneTranslateY !== y;
+    });
+
+    var completedFn = this.bind(function() {
+      Class.dispose(this._animator);
+      df.succeed(this);
+      y0 = null;
+      dy = null;
+      df = null;
+      y = null;
+    });
+
+    if (dy !== 0) {
       this._animator = new Animator();
       this._animator.start(stepFn, verifyFn, completedFn, opt_duration || 350);
     } else {
@@ -105,6 +156,13 @@ var Scene = Class.create(BaseUI, {
    */
   getTranslateX: function() {
     return this._sceneTranslateX;
+  },
+
+  /**
+   * @return {number}
+   */
+  getTranslateY: function() {
+    return this._sceneTranslateY;
   },
 
   /**
@@ -142,12 +200,15 @@ var Scene = Class.create(BaseUI, {
 
   /**
    * @param {number} x
+   * @param {number} y
    */
-  _setTranslateX: function(x) {
-    if (x !== this._sceneTranslateX) {
-      this.getNode().style.webkitTransform = 'translate3d(' + x + 'px,0,0)';
+  _setTranslate: function(x, y) {
+    if (x !== this._sceneTranslateX || y !== this._sceneTranslateY) {
+      this.getNode().style.webkitTransform =
+        'translate3d(' + x + 'px,' + y + 'px,0)';
+      this._sceneTranslateX = x;
+      this._sceneTranslateY = y;
     }
-    this._sceneTranslateX = x;
   },
 
   /**
@@ -164,6 +225,7 @@ var Scene = Class.create(BaseUI, {
 
 
   _sceneTranslateX: 0,
+  _sceneTranslateY: 0,
   _sceneOpacity: 1,
   _hidden: false,
   _disabled: false,

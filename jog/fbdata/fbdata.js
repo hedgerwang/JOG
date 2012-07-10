@@ -28,7 +28,7 @@ var FBData = {
    * @return {Deferred}
    */
   getHomeStories: function(uid, count, cursor, useCache) {
-    var px = UserAgent.IS_ANDROID ? 180 : 480;
+    var px = UserAgent.IS_ANDROID ? 180 : 720;
     var query =
       (uid ? 'node(' + parseInt(uid, 10) + ')' : 'me()') +
         '{id,name,home_stories' +

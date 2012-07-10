@@ -220,12 +220,21 @@ var Imageable = Class.create(EventTarget, {
     return this.src && !this.disposed && dom.isInDocument(this._element);
   },
 
-  show: function() {
+  /**
+   * @param {number=} opt_width
+   * @param {number=} opt_height
+   */
+  show: function(opt_width, opt_height) {
     if (this.disposed || this._shown) {
       return;
     }
 
     this._shown = true;
+
+    if (opt_width && opt_height) {
+      this.naturalWidth = opt_width;
+      this.naturalHeight = opt_height;
+    }
 
     if (!this.naturalWidth) {
       if (__DEV__) {
@@ -246,63 +255,65 @@ var Imageable = Class.create(EventTarget, {
   },
 
   _showAsCanvas: function() {
-    var canvas = dom.createElement('canvas', {
-      className: cssx('jog-behavior-imageable_canvas'),
-      width: this.width,
-      height: this.height
-    });
+    if (__DEV__) {
+      var canvas = dom.createElement('canvas', {
+        className: cssx('jog-behavior-imageable_canvas'),
+        width: this.width,
+        height: this.height
+      });
 
-    var nw = this.naturalWidth;
-    var nh = this.naturalHeight;
-    var ratio = nw / nh;
-    var cw = this.width;
-    var ch = this.height;
+      var nw = this.naturalWidth;
+      var nh = this.naturalHeight;
+      var ratio = nw / nh;
+      var cw = this.width;
+      var ch = this.height;
 
-    switch (this._resizeMode) {
-      case Imageable.RESIZE_MODE_USE_WIDTH:
-        ch = cw / ratio;
-        break;
-
-      case Imageable.RESIZE_MODE_USE_HEIGHT:
-        cw = ratio * ch;
-        break;
-
-      case Imageable.RESIZE_MODE_USE_NATURAL:
-        if (nw < nh) {
-          cw = ratio * ch;
-        } else if (nw > nh) {
+      switch (this._resizeMode) {
+        case Imageable.RESIZE_MODE_USE_WIDTH:
           ch = cw / ratio;
-        }
-        break;
+          break;
 
-      case Imageable.RESIZE_MODE_CROPPED:
-        if (nw < nh) {
-          ch = cw / ratio;
-        } else if (nw > nh) {
+        case Imageable.RESIZE_MODE_USE_HEIGHT:
           cw = ratio * ch;
-        }
-        break;
+          break;
 
-      default:
-        if (__DEV__) {
-          throw new Error('Invalid resize mode specified.' + this.src);
-        }
-        return;
+        case Imageable.RESIZE_MODE_USE_NATURAL:
+          if (nw < nh) {
+            cw = ratio * ch;
+          } else if (nw > nh) {
+            ch = cw / ratio;
+          }
+          break;
+
+        case Imageable.RESIZE_MODE_CROPPED:
+          if (nw < nh) {
+            ch = cw / ratio;
+          } else if (nw > nh) {
+            cw = ratio * ch;
+          }
+          break;
+
+        default:
+          if (__DEV__) {
+            throw new Error('Invalid resize mode specified.' + this.src);
+          }
+          return;
+      }
+
+      var cx = ~~((this.width - cw) / 2);
+      var cy = ~~((this.height - ch) / 2);
+      cw = ~~cw;
+      ch = ~~ch;
+      canvas.getContext('2d').drawImage(
+        this._loadingImage, cx, cy, cw, ch);
+
+      canvas.imageSrc = this._loadingImage.src;
+      canvas.imageW = cw;
+      canvas.imageH = ch;
+      canvas.imageX = cx;
+      canvas.imageY = cy;
+      this._element.appendChild(canvas);
     }
-
-    var cx = ~~((this.width - cw) / 2);
-    var cy = ~~((this.height - ch) / 2);
-    cw = ~~cw;
-    ch = ~~ch;
-    canvas.getContext('2d').drawImage(
-      this._loadingImage, cx, cy, cw, ch);
-
-    canvas.imageSrc = this._loadingImage.src;
-    canvas.imageW = cw;
-    canvas.imageH = ch;
-    canvas.imageX = cx;
-    canvas.imageY = cy;
-    this._element.appendChild(canvas);
   },
 
   _showAsCSSBackground: function() {
