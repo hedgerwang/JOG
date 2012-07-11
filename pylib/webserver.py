@@ -71,7 +71,7 @@ class WebHandler(BaseHTTPRequestHandler) :
 
       scale = 1 / float(DEVICE_PIXEL_RATIO)
       scale = float(round(scale * 100) / 100)
-      self._scale  = scale
+      self._scale = scale
 
       path = parsed_url.path
       scheme = parsed_url.scheme.lower()
@@ -123,6 +123,9 @@ class WebHandler(BaseHTTPRequestHandler) :
         elif type == 'jpg' :
           mine = 'image/jpg'
           content = self._get_file(path)
+        elif type == 'manifest' :
+          mine = 'text/cache-manifest'
+          content = 'NETWORK: \n*'
         else :
           mine = 'text/plain'
           content = 'Not supported "%s, %s"' % (type, path)
@@ -211,7 +214,7 @@ class WebHandler(BaseHTTPRequestHandler) :
     if html.find('initial-scale') > -1 :
       return html
 
-    meta = HTML_META % {'scale' :self._scale}
+    meta = HTML_META % {'scale' : self._scale}
 
     if html.find('<head>') > -1 :
       html = html.replace('<head>', '<head>' + meta)

@@ -22,7 +22,7 @@ var asserts = require('jog/asserts').asserts;
     var ui = new BaseUI();
     asserts.isFalse(ui.isInDocument());
 
-    asserts.throws(function() {
+    asserts.error(function() {
       document.body.appendChild(ui.getNode());
     });
 
@@ -43,7 +43,7 @@ var asserts = require('jog/asserts').asserts;
     var child = new BaseUI();
     parent.appendChild(child, true);
 
-    asserts.throws(function() {
+    asserts.error(function() {
       document.body.appendChild(parent.getNode());
     });
 

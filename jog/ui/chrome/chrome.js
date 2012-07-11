@@ -84,7 +84,9 @@ var Chrome = Class.create(BaseUI, {
    * @param {Event} event
    */
   _onTouchMove: function(event) {
-    event.preventDefault();
+    if (event.target.tagName !== 'TEXTAREA') {
+      event.preventDefault();
+    }
   },
 
   _reflow: function() {

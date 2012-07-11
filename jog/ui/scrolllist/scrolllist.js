@@ -47,6 +47,8 @@ var ScrollList = Class.create(BaseUI, {
     events.listen(this._scrollable, 'scrollstart', this._onScrollStart);
     events.listen(this._scrollable, 'scroll', this._onScroll);
     events.listen(this._scrollable, 'scrollend', this._onScrollEnd);
+    // Capture reflow events dispatched by contents nodes.
+    events.listen(this, 'reflow', this._reflow);
   },
 
   /**

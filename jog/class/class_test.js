@@ -71,13 +71,13 @@ var asserts = require('jog/asserts').asserts;
       _x: 0
     });
 
-    asserts.throws(function() {
+    asserts.error(function() {
       Class.create(SuperClass, {
         _x: 'a'
       });
     });
 
-    asserts.throws(function() {
+    asserts.error(function() {
       Class.create(SuperClass, {
         _y: {}
       });

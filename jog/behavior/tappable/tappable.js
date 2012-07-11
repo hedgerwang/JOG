@@ -12,7 +12,7 @@ var cssx = require('jog/cssx').cssx;
 var dom = require('jog/dom').dom;
 
 var tappedElement = null;
-var isAndroid = /Android/.test(window.navigator.userAgent);
+var pressedElement = null;
 
 /**
  * Fires events "tapstart, tapend, tap, dbltap, tapin, tapout, tapclick"
@@ -97,14 +97,14 @@ var Tappable = Class.create(EventTarget, {
             }
 
             this.dispatchEvent('tapstart', target);
-            dom.addClassName(target, cssx('tap-pressed'));
+            pressedElement = target;
+            dom.addClassName(pressedElement, cssx('tap-pressed'));
 
             this._tapStartNode = target;
 
             this._events.unlistenAll();
             this._events.listen(
               document, TouchHelper.EVT_TOUCHMOVE, this._onTouchMove);
-
             this._events.listen(
               document, TouchHelper.EVT_TOUCHEND, this._onTouchEnd);
             this._events.listen(
@@ -135,6 +135,10 @@ var Tappable = Class.create(EventTarget, {
    */
   _onTouchMove: function(event) {
     this._movedCount++;
+    if (pressedElement && this._movedCount > 5) {
+      dom.removeClassName(pressedElement, cssx('tap-pressed'));
+      pressedElement = undefined;
+    }
   },
 
   /**
@@ -146,6 +150,11 @@ var Tappable = Class.create(EventTarget, {
     var touchTarget = this._tapStartNode;
     var tapped;
     var dbltapped;
+
+    if (pressedElement) {
+      dom.removeClassName(pressedElement, cssx('tap-pressed'));
+      pressedElement = undefined;
+    }
 
     if (!event.defaultPrevented && touchTarget && this._movedCount < 1) {
       var target = event.target;
@@ -166,7 +175,6 @@ var Tappable = Class.create(EventTarget, {
     if (tapped) {
       // event.preventDefault();
       tappedElement = touchTarget;
-      dom.removeClassName(tappedElement, cssx('tap-pressed'));
       this.dispatchEvent('tapend', touchTarget);
       this.dispatchEvent('tap', touchTarget, false, target);
       this.dispatchEvent('tapin', touchTarget);

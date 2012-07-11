@@ -34,7 +34,9 @@ var FBData = {
         '{id,name,home_stories' +
         (cursor ? '.after(' + cursor + ')' : '') +
         '.first(' + count + '){' +
-        'nodes{title,id,url,creation_time,actors{' +
+        'nodes{' +
+        'feedback{id,comments{count},likers{count}},' +
+        'title,id,url,creation_time,actors{' +
         'profile_picture,name,id},' +
         'attachments{' +
         'title,url,media{image.size(' + px + '){uri,width,height},url,id},' +
@@ -44,6 +46,25 @@ var FBData = {
         'count}' +
         '}';
 
+    return queryGraph(query, useCache);
+  },
+
+  /**
+   * @see http://fburl.com/getFeedbacks
+   * @param {string} feedbackID
+   * @param {number=} count
+   * @param {string=} cursor
+   * @param {boolean=} useCache
+   * @return {Deferred}
+   */
+  getFeedbacks: function(feedbackID, count, cursor, useCache) {
+    var query = 'node(' + feedbackID + '){' +
+      'comments' +
+      (cursor ? '.after(' + cursor + ')' : '') +
+      '.first(' + count + '){' +
+      'nodes{body{text},author{' +
+      'profile_picture{height,uri,width},id,name},created_time},' +
+      'count,page_info}}';
     return queryGraph(query, useCache);
   },
 
@@ -173,6 +194,8 @@ var FBData = {
  */
 function queryGraph(query, useCache) {
   var df = new Deferred();
+
+  useCache = false;
 
   var saveToCache = function(result) {
     if (!result.error) {

@@ -46,7 +46,7 @@ var lang = require('jog/lang').lang;
 
     var fn2 = lang.bind(context, fn);
 
-    asserts.throws(function() {
+    asserts.error(function() {
       lang.bind({y: 1}, fn2);
     });
   });

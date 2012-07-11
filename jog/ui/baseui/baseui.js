@@ -273,10 +273,13 @@ exports.BaseUI = BaseUI;
 if (__DEV__) {
   if (typeof Element !== undefined) {
     var appendChild = Element.prototype.appendChild;
-    Element.prototype.appendChild = function(child) {
-      if (child._jogBaseUINodeOffDocument) {
+    Element.prototype.appendChild = function(childNode) {
+      if (!childNode) {
+        throw new Error('childNode is null');
+      }
+      if (childNode._jogBaseUINodeOffDocument) {
         throw new Error(
-          'BaseUI node should be added by calling appendChild');
+          'BaseUI node should be added by calling appendChild.');
       }
       return appendChild.apply(this, arguments);
     };

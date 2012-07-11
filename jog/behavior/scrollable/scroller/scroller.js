@@ -647,11 +647,11 @@ var Scroller = Class.create(null, {
   }
 });
 
-Scroller.OPTIONS_HORIZONTAL = {
+Scroller.OPTION_HORIZONTAL = {
   direction:'horizontal'
 };
 
-Scroller.OPTIONS_PAGING_HORIZONTAL = {
+Scroller.OPTION_PAGING_HORIZONTAL = {
   direction:'horizontal',
   paging: true
 };
