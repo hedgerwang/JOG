@@ -57,6 +57,7 @@ var Scene = Class.create(BaseUI, {
    */
   translateXTo: function(x, opt_duration) {
     Class.dispose(this._animator);
+    this.translating = true;
 
     var df = new Deferred();
 
@@ -84,6 +85,7 @@ var Scene = Class.create(BaseUI, {
 
     var completedFn = this.bind(function() {
       Class.dispose(this._animator);
+      this.translating = false;
       df.succeed(this);
       x0 = null;
       dx = null;
@@ -108,6 +110,7 @@ var Scene = Class.create(BaseUI, {
    */
   translateYTo: function(y, opt_duration) {
     Class.dispose(this._animator);
+    this.translating = true;
 
     var df = new Deferred();
 
@@ -135,6 +138,7 @@ var Scene = Class.create(BaseUI, {
 
     var completedFn = this.bind(function() {
       Class.dispose(this._animator);
+      this.translating = false;
       df.succeed(this);
       y0 = null;
       dy = null;
@@ -186,6 +190,7 @@ var Scene = Class.create(BaseUI, {
 
     var completedFn = this.bind(function() {
       Class.dispose(this._animator);
+      this.translating = false;
       df.succeed(this);
 
       if (opt_dispose) {
@@ -223,7 +228,7 @@ var Scene = Class.create(BaseUI, {
     this._sceneOpacity = opacity;
   },
 
-
+  translating: false,
   _sceneTranslateX: 0,
   _sceneTranslateY: 0,
   _sceneOpacity: 1,

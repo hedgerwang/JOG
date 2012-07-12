@@ -140,6 +140,9 @@ var DOM = Class.create(null, {
     for (var key in properties) {
       var value = properties[key];
       switch (key) {
+        case 'htmlFor':
+          node.htmlFor = value;
+          break;
         case 'class':
         case 'className':
           node.className = value;

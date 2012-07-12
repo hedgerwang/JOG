@@ -92,19 +92,16 @@ var Imageable = Class.create(EventTarget, {
   },
 
   load: function() {
-    if (this._loadingImage || !this.shouldLoad()) {
-      return;
+    if (!this._loadingImage && this.shouldLoad()) {
+      this._load();
     }
+  },
 
-    this.src = this._normalizeSrc(this.src);
-    this._loadingImage = new Image();
-    this._loading = true;
-
-    var img = this._loadingImage;
-    var handler = this.bind(this._handleLoad);
-    img.onload = handler;
-    img.onerror = handler;
-    img.src = this.src;
+  forceLoad: function() {
+    if (!this._loadingImage) {
+      this._forced = true;
+      this._load();
+    }
   },
 
   /**
@@ -118,6 +115,10 @@ var Imageable = Class.create(EventTarget, {
    * @return {boolean}
    */
   isVisible: function() {
+    if (this._forced) {
+      return true;
+    }
+
     if (!this._element || this.disposed) {
       return false;
     }
@@ -361,6 +362,18 @@ var Imageable = Class.create(EventTarget, {
     this._element.style.backgroundImage = 'url("' + this.src + '")';
   },
 
+  _load: function() {
+    this.src = this._normalizeSrc(this.src);
+    this._loadingImage = new Image();
+    this._loading = true;
+
+    var img = this._loadingImage;
+    var handler = this.bind(this._handleLoad);
+    img.onload = handler;
+    img.onerror = handler;
+    img.src = this.src;
+  },
+
   _handleLoad: function(event) {
 
     if (__DEV__) {
@@ -458,7 +471,7 @@ var Imageable = Class.create(EventTarget, {
   _resizeMode: 0,
 
   /**
-   * @type {number}
+   * @type {Element}
    */
   _element: null,
 
@@ -470,7 +483,12 @@ var Imageable = Class.create(EventTarget, {
   /**
    * @type {boolean}
    */
-  _falseCount: 0
+  _falseCount: 0,
+
+  /**
+   * @type {number}
+   */
+  _forced: false
 });
 
 Imageable.RESIZE_MODE_CROPPED = 1;

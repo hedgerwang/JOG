@@ -44,6 +44,7 @@ CSS_VENDER_PROPERTIES = [
   'hyphens',
   'mask-image',
   'tap-highlight-color',
+  'touch-callout',
   'text-size-adjust',
   'transition-duration',
   'transition-property',

@@ -10,6 +10,9 @@ HTML_TEMPLATE = """
 <head>
 <title>app</title>
 <meta charset="UTF-8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <meta name="viewport"
   content="width=device-width, initial-scale=%(dpr)s, maximum-scale=%(dpr)s
            user-scalable=no, target-densitydpi=%(densitydpi)s"/>

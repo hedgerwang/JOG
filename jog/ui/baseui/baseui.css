@@ -10,7 +10,7 @@ table, caption, tbody, tfoot, thead, tr, th, td,
 article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup,
 menu, nav, output, ruby, section, summary,
-time, mark, audio, video {  
+time, mark, audio, video {
   border: 0;
   font-size: 100%;
   font: inherit;
@@ -21,70 +21,76 @@ time, mark, audio, video {
 
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {  
+footer, header, hgroup, menu, nav, section {
   display: block;
 }
 
-body {  
+body {
   border: none;
   line-height: 1;
   text-size-adjust: none;
   user-select: none;
 }
 
-* {  
-  tap-highlight-color: rgba(0, 0, 0, 0);
+textarea, input {
+  font-size: 100%;
+  resize: none;
 }
 
-ol, ul {  
+* {
+  tap-highlight-color: rgba(0, 0, 0, 0);
+  touch-callout: none;
+}
+
+ol, ul {
   list-style: none;
 }
 
-blockquote, q {  
+blockquote, q {
   quotes: none;
 }
 
 blockquote:before, blockquote:after,
-q:before, q:after {  
+q:before, q:after {
   content: '';
   content: none;
 }
 
-table {  
+table {
   border-collapse: collapse;
   border-spacing: 0;
 }
 
-body {  
+body {
   font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
   font-size: 14px;
   line-height: 125%;
 }
 
-::-webkit-scrollbar {  
+::-webkit-scrollbar {
   height: 4px;
   width: 4px;
 }
 
 ::-webkit-scrollbar-button:start:decrement,
-::-webkit-scrollbar-button:end:increment {  
+::-webkit-scrollbar-button:end:increment {
   background-color: transparent;
   display: block;
   height: 30px;
 }
 
-::-webkit-scrollbar-track-piece {  
+::-webkit-scrollbar-track-piece {
   background-color: #ccc;
   border-radius: 6px;
 }
 
-::-webkit-scrollbar-thumb:vertical {  
+::-webkit-scrollbar-thumb:vertical {
   background-color: #ccc;
   border-radius: 6px;
   height: 50px;
 }
 
-::-webkit-scrollbar-thumb:horizontal {  
+::-webkit-scrollbar-thumb:horizontal {
   background-color: #ccc;
   border-radius: 3px;
   width: 50px;

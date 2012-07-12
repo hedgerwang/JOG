@@ -195,8 +195,6 @@ var FBData = {
 function queryGraph(query, useCache) {
   var df = new Deferred();
 
-  useCache = false;
-
   var saveToCache = function(result) {
     if (!result.error) {
       result._cacheTime = Date.now();

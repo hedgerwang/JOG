@@ -5,6 +5,7 @@
 
 var Class = require('jog/class').Class;
 
+
 var ImageableManager = Class.create(null, {
   /**
    *
@@ -45,7 +46,7 @@ var ImageableManager = Class.create(null, {
     }
   },
 
-  _lookupInterval: 600,
+  _lookupInterval: 500,
 
   _lookupTimer: 0,
 
@@ -84,6 +85,8 @@ var ImageableManager = Class.create(null, {
     // When we're allowed to load more.
     for (var i = 0, imageable; imageable = this._loadingQueue[i]; i++) {
       if (imageable.shouldLoad()) {
+        var src = imageable.src;
+
         this._loadingCount++;
         imageable.addEventListener('load', this._onLoad);
         imageable.addEventListener('error', this._onLoad);
