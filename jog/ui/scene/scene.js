@@ -63,6 +63,7 @@ var Scene = Class.create(BaseUI, {
 
     if (!opt_duration || !this.isInDocument() || !this.getWidth()) {
       this._setTranslate(x, this._sceneTranslateY);
+      this.translating = false;
       return df.succeed(this);
     }
 
@@ -97,6 +98,7 @@ var Scene = Class.create(BaseUI, {
       this._animator = new Animator();
       this._animator.start(stepFn, verifyFn, completedFn, opt_duration || 350);
     } else {
+      this.translating = false;
       df.succeed(this);
     }
     return df;
@@ -111,11 +113,13 @@ var Scene = Class.create(BaseUI, {
   translateYTo: function(y, opt_duration) {
     Class.dispose(this._animator);
     this.translating = true;
+    y = Math.round(y);
 
     var df = new Deferred();
 
     if (!opt_duration || !this.isInDocument() || !this.getWidth()) {
       this._setTranslate(this._sceneTranslateX, y);
+      this.translating = false;
       return df.succeed(this);
     }
 
@@ -150,6 +154,7 @@ var Scene = Class.create(BaseUI, {
       this._animator = new Animator();
       this._animator.start(stepFn, verifyFn, completedFn, opt_duration || 350);
     } else {
+      this.translating = false;
       df.succeed(this);
     }
     return df;

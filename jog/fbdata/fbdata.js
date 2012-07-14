@@ -40,7 +40,8 @@ var FBData = {
         'profile_picture,name,id},' +
         'attachments{' +
         'title,url,media{image.size(' + px + '){uri,width,height},url,id},' +
-        'subattachments{media{image.size(' + px + '){uri,width,height}}}},' +
+        'subattachments{' +
+        'media{image.size(' + px + '){uri,width,height},feedback{id}}}},' +
         'message{text}},' +
         'page_info{start_cursor,end_cursor,has_next_page,has_previous_page},' +
         'count}' +

@@ -121,14 +121,14 @@ def translate(css_text, scale=1) :
       for match in matches :
         old_rule = match.group()
         new_rule = _translate_px_rule(old_rule, scale)
-        placeholder = '<' + str(i) + '>'
+        placeholder = '<p' + str(i) + '>'
         i += 1
         placeholders.append(new_rule)
         css_text = css_text.replace(old_rule, placeholder)
 
   i = 0
-  while i < len(placeholders) - 1 :
-    placeholder = '<' + str(i) + '>'
+  while i < len(placeholders) :
+    placeholder = '<p' + str(i) + '>'
     css_text = css_text.replace(placeholder, placeholders[i])
     i += 1
 
@@ -141,14 +141,14 @@ def translate(css_text, scale=1) :
     for match in matches :
       old_rule = match.group()
       new_rule = _translate_vender_rule(old_rule)
-      placeholder = '<' + str(i) + '>'
+      placeholder = '<v' + str(i) + '>'
       i += 1
       placeholders.append(new_rule)
       css_text = css_text.replace(old_rule, placeholder)
 
   i = 0
-  while i < len(placeholders) - 1 :
-    placeholder = '<' + str(i) + '>'
+  while i < len(placeholders) :
+    placeholder = '<v' + str(i) + '>'
     css_text = css_text.replace(placeholder, placeholders[i])
     i += 1
 
