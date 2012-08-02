@@ -51,7 +51,8 @@ var FBAPI = {
         '?access_token=' + accessToken +
         '&q=' + encodeURIComponent(query) +
         '&passthru_domain=trunkstable' +
-        '&callback=' + callbackName;
+        '&callback=' + callbackName +
+        '&nocahce=' + Math.random()
 
       var script = dom.createElement('script', {
         src: url,
@@ -115,7 +116,7 @@ var permissions = [
   'friends_location',
   'friends_notes',
   'friends_online_presence',
-  'friends_photo_video_tags',
+  // 'friends_photo_video_tags',
   'friends_photos',
   'friends_relationship_details',
   'friends_relationships',
@@ -150,7 +151,7 @@ var permissions = [
   'user_likes',
   'user_location',
   'user_notes',
-  'user_online_presence',
+  // 'user_online_presence',
   'user_photo_video_tags',
   'user_photos',
   'user_relationship_details',
@@ -186,7 +187,8 @@ function redirectToLogin() {
     '&scope=' + permissions.join(',') +
     '&redirect_uri' + encodeURIComponent(top.location.href);
 
-  window.location.replace(url);
+  // window.location.replace(url);
+
 }
 
 /**
@@ -314,10 +316,12 @@ function ensureSession() {
 
   updateSession().addCallback(function(result) {
     if (!result) {
+      console.warn('ensureSession() has no result');
       redirectToLogin();
     } else {
       checkPermissions().addCallback(function(pass) {
         if (!pass) {
+          console.warn('ensureSession() permission check did not pass', pass);
           redirectToLogin();
         } else {
           deferred.succeed(true);
@@ -341,6 +345,7 @@ function checkPermissions() {
       permissions.some(function(key) {
         if (!userPermissions[key]) {
           pass = false;
+          console.warn('permission denied:' + key);
           return pass;
         }
       });
