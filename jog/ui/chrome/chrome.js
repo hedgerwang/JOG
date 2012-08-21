@@ -20,6 +20,7 @@ var Chrome = Class.create(BaseUI, {
       UserAgent.IS_ANDROID ? cssx('android') : null,
       UserAgent.IS_IOS ? cssx('ios') : null,
       UserAgent.IS_DESKTOP ? cssx('pc') : null,
+      UserAgent.IS_IPAD ? cssx('ipad') : null,
       __DEV__ ? cssx('dev') : null
     ];
 
@@ -43,8 +44,6 @@ var Chrome = Class.create(BaseUI, {
         this.getEvents().listen(document, 'touchstart', this._onTouch);
         this.getEvents().listen(document, 'touchmove', this._onTouchMove);
       }
-      // this.getEvents().listen(document, 'focusin', this._reflow);
-      this._reflow();
     } else {
       var re = /(initial-scale\s*=\s*)([0-9\.]+)/g;
       var match = document.head.innerHTML.match(re);
@@ -56,6 +55,8 @@ var Chrome = Class.create(BaseUI, {
       }
     }
     document.body.appendChild(this._spacer);
+    this.getEvents().listen(window, 'resize', this._reflow);
+    this._reflow();
   },
 
   /**
@@ -75,7 +76,8 @@ var Chrome = Class.create(BaseUI, {
    * @param {Event} event
    */
   _onTouch: function(event) {
-    if (!event.defaultPrevented && event.pageY > 50) {
+    if (event.defaultPrevented && event.pageY < 50) {
+      // Tapping on page-top to hide the addressbar.
       this._reflow();
     }
   },
@@ -90,9 +92,20 @@ var Chrome = Class.create(BaseUI, {
   },
 
   _reflow: function() {
-    if (this._reflowing || UserAgent.IS_ANDROID || window.pageYOffset >= 1) {
+    if (UserAgent.IS_DESKTOP) {
+      var el = this.getNode();
+      el.style.margin = -Math.round(el.offsetHeight / 2) + 'px ' +
+        '0 0 -' + Math.round(el.offsetWidth / 2) + 'px';
+    }
+
+    if (this._reflowing ||
+      UserAgent.IS_DESKTOP ||
+      UserAgent.IS_ANDROID ||
+      UserAgent.IS_IPAD ||
+      window.pageYOffset >= 1) {
       return;
     }
+
     var dpi = window.devicePixelRatio || 1;
     if (document.documentElement.offsetWidth > window.outerWidth) {
       dpi = document.documentElement.offsetWidth / window.outerWidth;

@@ -17,6 +17,17 @@ var TouchHelper = {
 
   /**
    * @param {Event} event
+   * @return {boolean}
+   */
+  isMultiTouch : function(event) {
+    return ((event.targetTouches && event.targetTouches[1]) ||
+      (event.touches && event.touches[1]) ||
+      (event.changedTouches && event.changedTouches[1])
+      ) ? true : false;
+  },
+
+  /**
+   * @param {Event} event
    * @return {Object} The (x, y) coordinate of the touch event relative to the
    *         page.
    */

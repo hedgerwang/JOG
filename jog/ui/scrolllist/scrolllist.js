@@ -24,7 +24,7 @@ var ScrollList = Class.create(BaseUI, {
     this._scrollDimentions = [1, 1, 1, 1];
     this._scrollable = new Scrollable(
       this._scrollElement,
-      {dimentions: this._scrollDimentions}
+      {dimensions: this._scrollDimentions}
     );
     this._contentsQueue = [];
     this._processContentNow = this.bind(this._processContentNow);
@@ -117,22 +117,22 @@ var ScrollList = Class.create(BaseUI, {
       return;
     }
 
-    var dimentions = this._scrollDimentions;
-    dimentions[1] = this._scrollElement.offsetHeight;
+    var dimensions = this._scrollDimentions;
+    dimensions[1] = this._scrollElement.offsetHeight;
 
     if (this._lastChunk) {
       // scrollHeight
       this._scrollDimentions[3] =
-        Math.max(dimentions[1], this._lastChunk.getBottom());
+        Math.max(dimensions[1], this._lastChunk.getBottom());
     } else {
       // scrollHeight
-      this._scrollDimentions[3] = dimentions[1];
+      this._scrollDimentions[3] = dimensions[1];
     }
 
     // Chunk height limit.
     this._maxChunkHeight = Math.max(
-      dimentions[0],
-      dimentions[1]
+      dimensions[0],
+      dimensions[1]
     ) * (UserAgent.IS_ANDROID ? 3 : 5);
 
     if (UserAgent.IS_ANDROID) {
@@ -143,11 +143,11 @@ var ScrollList = Class.create(BaseUI, {
   },
 
   _toggleChunks: function() {
-    var dimentions = this._scrollDimentions;
+    var dimensions = this._scrollDimentions;
     var buffer = this._maxChunkHeight;
     var scrollTop = this._scrollable.getScrollTop();
     var top = scrollTop - buffer;
-    var bottom = scrollTop + dimentions[1] + buffer;
+    var bottom = scrollTop + dimensions[1] + buffer;
     for (var i = 0, chunk; chunk = this._chunks[i]; i++) {
       chunk.setVisible(this._shouldShowChunk(top, bottom, chunk));
     }
@@ -167,10 +167,10 @@ var ScrollList = Class.create(BaseUI, {
       return;
     }
 
-    var dimentions = this._scrollDimentions;
+    var dimensions = this._scrollDimentions;
     var limitBuffer = this._maxChunkHeight;
     var scrollTop = this._scrollable.getScrollTop();
-    var limitBottom = scrollTop + dimentions[1] + limitBuffer;
+    var limitBottom = scrollTop + dimensions[1] + limitBuffer;
 
     if (!this._lastChunk) {
       this._addChunk();

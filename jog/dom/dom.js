@@ -124,6 +124,16 @@ var DOM = Class.create(null, {
 
   /**
    *
+   * @param {Element} element
+   * @return {string}
+   */
+  getOuterHTML: function(element) {
+    return element['outerHTML'] ||
+      this.createElement('div', null, element.cloneNode(true)).innerHTML;
+  },
+
+  /**
+   *
    * @param {string} tagName
    * @param {Object} properties
    * @param {...*} more

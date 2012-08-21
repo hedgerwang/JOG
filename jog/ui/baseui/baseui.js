@@ -19,7 +19,7 @@ var BaseUI = Class.create(EventTarget, {
   _parentUI: null,
 
   /**
-   * @type {Array.<BaseUI>
+   * @type {Array.<BaseUI>}
    */
   _childrenUI: null,
 
@@ -168,8 +168,19 @@ var BaseUI = Class.create(EventTarget, {
   },
 
   /**
+   * @return {Array.<BaseUI>}
+   */
+  getChildren: function() {
+    if (!this._childrenUI) {
+      this._childrenUI = [];
+    }
+    return this._childrenUI;
+  },
+
+  /**
    * @param {BaseUI} child
-   * @paran {boolean=} opt_render
+   * @param {boolean=} opt_render
+   * @return {BaseUI}
    */
   appendChild: function(child, opt_render) {
     if (__DEV__) {

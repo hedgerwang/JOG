@@ -17,9 +17,14 @@ body {
   cursor: pointer;
   height: 480px;
   left: 50%;
-  margin: -240px 0 0 -160px;
   top: 50%;
   width: 320px;
+}
+
+/* Debug for iPAD Layout only */
+.jog-ui-chrome.pc {
+  height: 322px;
+  width: 490px;
 }
 
 .jog-ui-chrome_spacer {

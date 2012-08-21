@@ -52,7 +52,7 @@ var FBAPI = {
         '&q=' + encodeURIComponent(query) +
         '&passthru_domain=trunkstable' +
         '&callback=' + callbackName +
-        '&nocahce=' + Math.random()
+        '&nocahce=' + Math.random();
 
       var script = dom.createElement('script', {
         src: url,
@@ -187,8 +187,7 @@ function redirectToLogin() {
     '&scope=' + permissions.join(',') +
     '&redirect_uri' + encodeURIComponent(top.location.href);
 
-  // window.location.replace(url);
-
+  window.location.replace(url);
 }
 
 /**
@@ -316,7 +315,7 @@ function ensureSession() {
 
   updateSession().addCallback(function(result) {
     if (!result) {
-      console.warn('ensureSession() has no result');
+      console.warn('ensureSession() has no result', result);
       redirectToLogin();
     } else {
       checkPermissions().addCallback(function(pass) {

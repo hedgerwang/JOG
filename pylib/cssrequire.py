@@ -43,9 +43,12 @@ CSS_VENDER_PROPERTIES = [
   'backface-visibility',
   'hyphens',
   'mask-image',
+  'perspective',
   'tap-highlight-color',
   'touch-callout',
   'text-size-adjust',
+  'transform-origin',
+  'transform-style',
   'transition-duration',
   'transition-property',
   ]

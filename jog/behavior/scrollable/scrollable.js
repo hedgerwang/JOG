@@ -43,8 +43,8 @@ var Scrollable = Class.create(EventTarget, {
 
     this._events = new Events(this);
 
-    if (opt_options && opt_options.dimentions) {
-      this._dimentions = opt_options.dimentions;
+    if (opt_options && opt_options.dimensions) {
+      this._dimensions = opt_options.dimensions;
     }
 
     dom.addClassName(this._element, cssx('jog-bebavior-scrollable'));
@@ -121,8 +121,8 @@ var Scrollable = Class.create(EventTarget, {
       return;
     }
 
-    if (this._dimentions) {
-      this._scroller.setDimensions.apply(this._scroller, this._dimentions);
+    if (this._dimensions) {
+      this._scroller.setDimensions.apply(this._scroller, this._dimensions);
     } else {
       this._scroller.setDimensions(
         this._element.offsetWidth,
@@ -216,19 +216,24 @@ var Scrollable = Class.create(EventTarget, {
    */
   _onTouchStart: function(event) {
     this.reflow();
-    this._scroller.doTouchStart(event);
-    this._clearListeners();
-    this._bindListeners(false);
-  },
 
-  _onTouchMove: function(event) {
     if (!event.defaultPrevented) {
-      this._scroller.doTouchMove(event);
+      this._scroller.doTouchStart(event);
+      this._clearListeners();
+      this._bindListeners(false);
     }
   },
 
+  _onTouchMove: function(event) {
+    // if (!event.defaultPrevented) {
+    this._scroller.doTouchMove(event);
+    //}
+  },
+
   _onTouchEnd: function(event) {
+    //if (!event.defaultPrevented) {
     this._scroller.doTouchEnd(event);
+    //}
     this._clearListeners();
     this._bindListeners(true);
   },
@@ -274,7 +279,7 @@ var Scrollable = Class.create(EventTarget, {
   /**
    * @type {Array.<number>}
    */
-  _dimentions: null,
+  _dimensions: null,
 
   /**
    * @type {string}

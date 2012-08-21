@@ -118,7 +118,7 @@ var Scroller = Class.create(null, {
   _BOUNCE_FACTOR: 0.25,
 
   // Max scroll speed.
-  _MAX_SPEED: UserAgent.IS_ANDROID ? 0.6 : 0.8,
+  _MAX_SPEED: UserAgent.IS_ANDROID ? 0.6 : UserAgent.IS_IPAD ? 4 : 0.8,
 
   /**
    * An Object that implements these methods:
